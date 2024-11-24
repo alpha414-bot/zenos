@@ -1,0 +1,75 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer {
+  :root {
+    --toastify-color-progress-success: 144, 97, 249;
+  }
+  /* Toastify Setup */
+  .Toastify__progress-bar--success {
+    @apply bg-purple-500;
+  }
+  /* Glassmorphism */
+  .glass-container {
+    @apply relative;
+    perspective: 800px;
+  }
+  .glass-card {
+    @apply w-full h-full top-0;
+  }
+  .glass-front,
+  .glass-back {
+    @apply flex items-center w-full h-full rounded-2xl md:rounded-3xl !bg-glass border-2 !border-glass transition-all duration-200 ease-in-out;
+    /* backdrop-filter: blur(8px) !important; */
+    backdrop-filter: blur(14px) !important;
+    transform-style: preserve-3d !important;
+    backface-visibility: hidden !important;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1) !important;
+  }
+  .glass-front {
+    @apply flex flex-col justify-center gap-12;
+  }
+  @media (min-width: 768px) {
+    .glass-card:hover .glass-back {
+      @apply transition-all duration-700 ease-in-out transform-gpu;
+      transform: rotateY(0deg);
+    }
+  }
+  .glass-card:hover .glass-front {
+    @apply transition-all duration-700 ease-in-out transform-gpu;
+    transform: rotateY(-180deg);
+  }
+  .glass-back {
+    @apply top-0 justify-around transform-gpu;
+    transform: rotateY(180deg);
+  }
+  .rotate-y-0 {
+    transform: rotateY(0deg) !important;
+  }
+
+  /* Hide scrollbar for IE, Edge and Firefox */
+  .hide-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+
+  /* Customize scrollbar */
+  .scroll-mobile {
+    @apply md:pr-2  mb-16;
+  }
+  .scroll-mobile::-webkit-scrollbar {
+    @apply hidden w-0 md:block md:w-2;
+  }
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-zenos-500 rounded-lg overflow-hidden;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-gray-200 w-1 rounded-lg overflow-hidden;
+  }
+}

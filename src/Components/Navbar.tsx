@@ -118,7 +118,7 @@ function Navbar() {
                   clipRule="evenodd"
                 />
               </svg>
-              <span className="flex items-center justify-center w-6 h-6 p-1 ms-2 absolute -top-1 -right-1 text-sm font-bold text-zenos-600 bg-gray-300 rounded-full border-4 border-zinc-100">
+              <span className="flex items-center justify-center w-6 h-6 p-1 ms-2 absolute -top-1 -right-1 text-sm font-bold text-white bg-zenos-600 rounded-full border-2 border-white">
                 {CartProducts?.length}
               </span>
             </Link>

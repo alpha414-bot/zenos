@@ -1,23 +1,13 @@
-import { ParsedToken, User } from "firebase/auth";
-import { AppMetaDataInterface } from "./Module";
+import { User } from "firebase/auth";
 
-interface ClaimsInterface extends ParsedToken {
-  admin?: boolean;
-  role?: "admin" | "user";
-}
-interface UserMetaDataInterface {
-  admin: boolean;
-  role: "admin" | "user" | "guest";
-  displayName?: string | null;
-  uid: string;
-  first_name?: string;
-  last_name?: string;
+interface AuthUserInterface extends User {
+  displayName?: any;
+  email?: any;
+  first_name?: any;
+  last_name?: any;
+  role?: "admin" | "user" | "guest" | "admin";
+  uid?: any;
+  username?: any;
 }
 
-interface NewAuthUser extends User {
-  claims?: ClaimsInterface;
-  metadata?: UserMetaDataInterface | null;
-  app?: AppMetaDataInterface;
-}
-
-type AuthUserType = User | null | undefined;
+type AuthUserType = AuthUserInterface | null;

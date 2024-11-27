@@ -2,6 +2,9 @@
   "buckets": [
     {
       "id": "vint-ecommerce.firebasestorage.app"
+    },
+    {
+      "id": "vint-ecommerce.appspot.com"
     }
   ]
 }

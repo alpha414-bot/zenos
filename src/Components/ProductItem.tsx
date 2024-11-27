@@ -35,11 +35,11 @@ const ProductItem: React.FC<{
         "flex-col items-stretch gap-2 md:flex-row shadow-sm shadow-gray-600":
           TypeCartListing || TypeSimilarListing,
         "pb-0 flex-col": TypeOrderListing,
-        "pb-4 flex-col shadow-sm shadow-gray-600": TypeProductListing,
+        "pb-4 flex-col items-start justify-center shadow-sm shadow-gray-600": TypeProductListing,
       })}
     >
       {/* Product image */}
-      <Link to={`/products/${product.id}`}>
+      <Link to={`/products/${product.id}`} className="bg-red-500 overflow-hidden inline-block">
         <Img
           src={"/"}
           className="w-full rounded-2xl md:rounded-3xl overflow-hidden bg-red-500"
@@ -50,7 +50,7 @@ const ProductItem: React.FC<{
           unloader={
             <div
               className={classNames(
-                `w-full p-0  max-h-[27rem] flex flex-col gap-5 items-center justify-center bg-ray-100/95`,
+                `w-full p-0 max-h-[27rem] flex flex-col gap-5 items-center justify-center bg-ray-100/95 md:max-h-auto`,
                 {
                   "w-56 h-full rounded-t-xl md:rounded-t-none md:rounded-ss-xl md:rounded-es-xl":
                     TypeCartListing,
@@ -76,22 +76,6 @@ const ProductItem: React.FC<{
             </div>
           }
         />
-        <div
-          className={classNames(
-            "hidden bg-no-repeat bg-cover bg-center bg-zinc-100/95",
-            {
-              "w-full h-full rounded-t-xl md:rounded-t-none md:rounded-ss-xl md:rounded-es-xl md:w-52 md:min-h-52":
-                TypeCartListing,
-              "w-full h-32 min-h-full max-h-full rounded-t-xl md:rounded-t-none md:rounded-ss-xl md:rounded-es-xl md:w-32 md:h-24":
-                TypeSimilarListing,
-              "hidden ": TypeOrderListing,
-              "w-full h-80 rounded-t-xl": TypeProductListing,
-            }
-          )}
-          style={{
-            backgroundImage: `url('${image || "/favicon.svg"}')`,
-          }}
-        ></div>
       </Link>
       {/* Product metadata */}
       <div
@@ -124,7 +108,7 @@ const ProductItem: React.FC<{
                     Category:
                   </p>
                   <p className="text-xs font-medium underline underline-offset-4 decoration-double">
-                    {_.startCase(product.category)}
+                    {_.startCase(product.category?.value)}
                   </p>
                 </div>
               </div>

@@ -1,6 +1,5 @@
-
 type FirestoreDate = { seconds: string; nanoseconds: string };
-type MiddlewareItems = "auth" | "guest" | "checkout";
+type MiddlewareItems = "auth" | "guest" | "checkout" | "admin" | "admin_guest";
 type QueryUseType = {
   data: any;
   isError: boolean;
@@ -70,7 +69,7 @@ interface ProductItemType {
   id?: string;
   name: string;
   description: string;
-  category: string;
+  category: { key: string; value: string };
   price: number;
   salePrice?: number;
   variants?: ProductVariantType[];

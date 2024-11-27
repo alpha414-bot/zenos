@@ -3,6 +3,11 @@
 @tailwind utilities;
 
 @layer {
+  /* Firebase Emulator */
+  .firebase-emulator-warning{
+    @apply !fixed !left-auto !right-4 !bottom-2 !rounded-full !w-12 !h-12 !text-white !bg-white !text-opacity-0 !bg-no-repeat !bg-contain !bg-center bg-[url('https://firebase.google.com/static/images/brand-guidelines/logo-logomark.png')] !shadow-sm !shadow-gray-200
+  }
+  .firebase-emulator-warning 
   :root {
     --toastify-color-progress-success: 144, 97, 249;
   }

@@ -205,7 +205,7 @@ export const addToCartQuery = (product: ProductItemType) =>
             updateDoc(UserCartDoc, { products: NewUserProducts })
               .then((data) => {
                 notify.success({
-                  text: `<strong class="underline underline-offset-2 decoration-dotted">${product.name}</strong> added to cart.`,
+                  text: `<span class="font-extrabold underline underline-offset-4 decoration-dotted decoration-green-500">${product.name}</span> added to cart.`,
                 });
                 resolve(data);
               })
@@ -231,7 +231,7 @@ export const addToCartQuery = (product: ProductItemType) =>
             })
               .then((data) => {
                 notify.success({
-                  text: `<strong class="underline underline-offset-2 decoration-dotted">${product.name}</strong> added to cart.`,
+                  text: `<span class="font-extrabold underline underline-offset-4 decoration-dotted decoration-green-500">${product.name}</span> added to cart.`,
                 });
                 resolve(data);
               })

@@ -18,7 +18,7 @@ const Button: React.FC<ButtonProps> = ({
     className={`${className} ${
       custom
         ? className + " bg-zenos-700 hover:bg-zenos-800"
-        : `inline-flex items-center px-4 py-0.5 text-base font-medium text-center rounded-lg ${
+        : `inline-flex items-center px-6 py-1 text-lg font-medium text-center rounded-lg ${
             disabled
               ? "cursor-not-allowed bg-gray-400"
               : "bg-zenos-700 hover:bg-zenos-800 hover:border-gray-800 hover:ring-2 hover:outline-none hover:ring-zenos-600"

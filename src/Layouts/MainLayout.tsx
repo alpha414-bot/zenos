@@ -1,16 +1,14 @@
 import Footer from "@/Components/Footer";
-import MediaModalContext from "@/Components/MediaModalContext";
+import MediaModal from "@/Components/MediaModal";
 import Navbar from "@/Components/Navbar";
 import React, { useLayoutEffect, useState } from "react";
 import LoadingBar from "react-top-loading-bar";
 
 const MainLayout: React.FC<{
   children: React.ReactNode;
-  title: string;
-  description?: string;
   no_navbar?: boolean;
   no_footer?: boolean;
-}> = ({ children, title, description, no_navbar, no_footer }) => {
+}> = ({ children, no_navbar, no_footer }) => {
   const [showLoadingBar, setShowLoadingBar] = useState<boolean>(false);
   useLayoutEffect(() => {
     setShowLoadingBar(true);
@@ -25,9 +23,6 @@ const MainLayout: React.FC<{
           progress={100}
         />
       )}
-
-      <meta name="description" content={description} />
-      <title>{title} - Zenos</title>
       <div>
         {/* <div className="inline-flex flex-col justify-between w-full min-h-screen "> */}
         {!no_navbar && <Navbar />}
@@ -35,7 +30,7 @@ const MainLayout: React.FC<{
           <div id="wrapper">{children}</div>
         </div>
         {!no_footer && <Footer />}
-        <MediaModalContext  />
+        <MediaModal />
       </div>
     </>
   );

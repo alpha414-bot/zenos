@@ -1,17 +1,18 @@
 import { auth } from "@/firebase-config";
 import { Link, NavLink } from "react-router-dom";
-import Logo from "./Logo";
 
 const Footer = () => {
   return (
     <div className="mt-8 px-3 py-5 md:px-10 md:py-3">
-      <div className="pt-9 pb-5 flex flex- items-stretch gap-4 md:px-5 md:gap-28 md:items-start md:flex-row">
-        <Logo type="footer-logo" />
+      <div className="pt-5 pb-2 flex flex-col items-center justify-center gap-2 md:px-5 md:flex-col">
         <div>
-          <p className="text-sm font-mono font-normal underline underline-offset-2 decoration-double md:decoration-dotted">
+          <img src="/zenos.svg" alt="" className="max-w-56" />
+        </div>
+        <div>
+          <p className="text-sm text-center font-mono font-normal underline underline-offset-2 decoration-double md:decoration-dotted">
             Power Up Your Life: The Latest in Laptops, Gadgets, and Software
           </p>
-          <div className="mt-5 flex flex-col gap-4 md:mt-12">
+          <div className="flex flex-row items-center justify-center gap-4 mt-2">
             <NavLink to="/about" className="text-base font-medium">
               Home
             </NavLink>
@@ -36,22 +37,16 @@ const Footer = () => {
         </div>
       </div>
 
-      <div className="mt-8">
+      <div className="">
         <Link
           target="_blank"
-          to="https://app.imperial.learnchameleon.com/"
-          className="inline-flex items-center justify-center gap-1 w-full"
+          to="https://bumiaagency.com/"
+          className="inline-flex items-center justify-center py-2 gap-1 w-full"
         >
           <div>
             <span className="text-xs font-bold">Powered By</span>
           </div>
-          <div
-            className="bg-no-repeat bg-contain bg-center w-24 h-10 rounded-xl"
-            style={{
-              backgroundImage:
-                "url('https://lh6.googleusercontent.com/4YxlDkJwbdpqJk7dW0YggqzmSoOWDm-E4_sGqwa18jVKfIzvv9IxTvtkXv9on3JQMV1JvPpvU5R1u5nYGBKwx-PKq_vPr04ada4GYNVet1rx5BWGdLb2Nca4pvWZwvp72A=w976')",
-            }}
-          ></div>
+          <img src="/bumialogo.svg" alt="Bumia Agency Logo" className="w-8" />
         </Link>
         <p className="text-center text-xs">
           <small>&copy;&nbsp;Copyright {new Date().getFullYear()}</small>

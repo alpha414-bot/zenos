@@ -8,7 +8,7 @@ import _ from "lodash";
 import moment from "moment";
 import { useEffect } from "react";
 
-const MediaComponent: React.FC<{
+const MediaItem: React.FC<{
   item: MediaItemInterface;
   modal?: ModalInterface;
   onBlur?: any;
@@ -16,6 +16,7 @@ const MediaComponent: React.FC<{
   showThumbnail?: boolean;
   multiSelect?: boolean;
   onSelect?: any;
+  clearSelect?: any;
 }> = ({
   item,
   modal,
@@ -24,6 +25,7 @@ const MediaComponent: React.FC<{
   showThumbnail = false,
   multiSelect,
   onSelect,
+  clearSelect,
 }) => {
   const type = _.split(item?.media?.contentType, "/")[0];
   const { data: src } = useMediaFile(item?.media?.fullPath);
@@ -34,10 +36,11 @@ const MediaComponent: React.FC<{
     initFlowbite();
   }, [src, item]);
   const MediaOnChange = (data: any) => {
+    // if not multiselect, choose a file and continue
     if (!multiSelect) {
-      // if not multiselect, choose a file and continue
       modal?.hide();
       onChange(data);
+      clearSelect();
     } else {
       // if multiselect, select file
       onSelect();
@@ -50,56 +53,23 @@ const MediaComponent: React.FC<{
         showThumbnail ? "h-full" : "h-auto"
       } bg-zenos-400 bg-opacity-50 rounded-md overflow-hidden group`}
     >
-      <div className="w-full absolute top-1 z-20 flex flex-row px-1 items-end justify-between">
-        {/* Button to Select media */}
-        {!showThumbnail && multiSelect && (
-          <button
-            type="button"
-            onClick={onSelect}
-            className={classNames(
-              "w-6 h-6 border-2 border-white rounded-md flex items-center justify-center",
-              { "bg-emerald-500/55": item._selected }
-            )}
-          >
-            {!!item._selected && (
-              <svg
-                className="w-6 h-6 text-white"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2.8"
-                  d="M5 11.917 9.724 16.5 19 7.5"
-                />
-              </svg>
-            )}
-          </button>
-        )}
+      {/* Button to Select media */}
+      {!showThumbnail && multiSelect && (
         <button
           type="button"
-          className="rounded-md bg-zenos-500 p-0.5 cursorpointer shadow-md"
-          onClick={() => {
-            if (!showThumbnail) {
-              // if modal is opened,
-              queryToDeleteFiles(media.fullPath);
-            } else {
-              // remove file
-              MediaOnChange(null);
-            }
-          }}
+          onClick={onSelect}
+          className={classNames(
+            "absolute top-1 left-1 z-20 w-6 h-6 border-2 border-white rounded-md flex items-center justify-center",
+            { "bg-emerald-500/55": item._selected }
+          )}
         >
-          {(!showThumbnail && (
+          {!!item._selected && (
             <svg
               className="w-6 h-6 text-white"
               aria-hidden="true"
               xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
               fill="none"
               viewBox="0 0 24 24"
             >
@@ -107,32 +77,73 @@ const MediaComponent: React.FC<{
                 stroke="currentColor"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                strokeWidth="2"
-                d="M5 7h14m-9 3v8m4-8v8M10 3h4a1 1 0 0 1 1 1v3H9V4a1 1 0 0 1 1-1ZM6 7h12v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7Z"
-              />
-            </svg>
-          )) || (
-            <svg
-              className="w-6 h-6 text-white"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              width={24}
-              height={24}
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18 17.94 6M18 18 6.06 6"
+                strokeWidth="2.8"
+                d="M5 11.917 9.724 16.5 19 7.5"
               />
             </svg>
           )}
         </button>
-      </div>
+      )}
+      {!showThumbnail && (
+        <button
+          type="button"
+          className={classNames(
+            "absolute top-1 right-1 z-20 rounded-md bg-zenos-500 p-0.5 cursorpointer shadow-md"
+          )}
+          onClick={() => {
+            // if modal is opened,
+            queryToDeleteFiles(media.fullPath);
+          }}
+        >
+          <svg
+            className="w-6 h-6 text-white"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M5 7h14m-9 3v8m4-8v8M10 3h4a1 1 0 0 1 1 1v3H9V4a1 1 0 0 1 1-1ZM6 7h12v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7Z"
+            />
+          </svg>
+        </button>
+      )}
+      {showThumbnail && !multiSelect && (
+        <button
+          type="button"
+          className={classNames(
+            "absolute top-1 left-1 z-20 rounded-md bg-zenos-500 p-0.5 cursorpointer shadow-md"
+          )}
+          onClick={() => {
+            // remove file from form value
+            MediaOnChange(null);
+          }}
+        >
+          <svg
+            className="w-6 h-6 text-white"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            width={24}
+            height={24}
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M6 18 17.94 6M18 18 6.06 6"
+            />
+          </svg>
+        </button>
+      )}
 
+      {/* Showing Thumbnail and the rest */}
       <button
         type="button"
         // data-modal-hide="mediaModal"
@@ -198,6 +209,11 @@ const MediaComponent: React.FC<{
                 </svg>
               </>
             )}
+            {type == "video" && (
+              <video>
+                <source src={src} />
+              </video>
+            )}
           </>
         )}
         <div className="hidden absolute inset-0 bg-gray-800 bg-opacity-40 transition-all ease-in-out delay-100 duration-200 group-hover:block">
@@ -238,4 +254,4 @@ const MediaComponent: React.FC<{
   );
 };
 
-export default MediaComponent;
+export default MediaItem;

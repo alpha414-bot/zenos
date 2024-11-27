@@ -30,9 +30,9 @@ export const ToastWrapper = ({
         className={classNames(
           "text-base font-normal bg-clip-text text-transparent bg-gradient-to-r",
           {
-            "from-green-500 via-green-400 to-green-50":
+            "from-green-500 via-green-400 to-green-50 decoration-white":
               toastProps?.type == "success",
-            "from-red-500 via-red-400 to-red-50": toastProps?.type == "error",
+            "from-red-500 via-red-400 to-red-50 decoration-white": toastProps?.type == "error",
           }
         )}
         dangerouslySetInnerHTML={{ __html: text }}
@@ -48,10 +48,7 @@ notify.success = (myProps: ToastWrapperProps, toastProps?: ToastProps) =>
   toast.success(<ToastWrapper {...myProps} />, {
     ...toastProps,
     progressClassName(context) {
-      return classNames(
-        "bg-green-500",
-        context?.defaultClassName
-      );
+      return classNames("bg-green-500", context?.defaultClassName);
     },
   });
 
@@ -62,10 +59,7 @@ notify.error = (
   toast.error(<ToastWrapper title={title || "Error"} {...myProps} />, {
     ...toastProps,
     progressClassName(context) {
-      return classNames(
-        "bg-red-500",
-        context?.defaultClassName
-      );
+      return classNames("bg-red-500", context?.defaultClassName);
     },
   });
 

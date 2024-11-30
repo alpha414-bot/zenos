@@ -106,6 +106,7 @@ interface UserSignUpFormInput {
 interface UserSignInFormInput {
   email?: string;
   password?: string;
+  admin?: boolean;
 }
 
 interface PaymentOnSuccessProps {

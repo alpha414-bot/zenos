@@ -38,7 +38,7 @@ const Product = () => {
                   <div
                     className={`bg-no-repeat bg-cover bg-center w-full h-80 rounded-xl md:bg-contain md:w-full md:min-h-full md:h-96 bg-white/5`}
                     style={{
-                      backgroundImage: `url('${image || "/favicon.svg"}')`,
+                      backgroundImage: `url('${image || "/assets/images/favicon.svg"}')`,
                     }}
                   ></div>
                 </div>

@@ -1,5 +1,5 @@
 import { useLayoutEffect } from "react";
-import { Navigate, RouteObject, useLocation } from "react-router-dom";
+import { RouteObject, useLocation, useNavigate } from "react-router-dom";
 import { useAuthUser, useCartProducts } from "../Hook";
 
 // Creating a higher-order component to wrap the router with scroll-to-top functionality
@@ -17,53 +17,56 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   children,
   middlewares,
 }) => {
-  const { data: currentUser, isLoading, isFetching } = useAuthUser();
+  const navigate = useNavigate();
+  const { data: currentUser, isLoading, isFetching, isFetched } = useAuthUser();
   const {
     data: carts,
-    isLoading: CartIsLoading,
-    isFetching: CartIsFetching,
+    isLoading: cartIsLoading,
+    isFetching: cartIsFetching,
   } = useCartProducts();
   const PauseAuthorization =
-    isLoading || isFetching || CartIsLoading || CartIsFetching;
-  if (!PauseAuthorization) {
-    if (middlewares && middlewares.includes("admin")) {
-      if (!currentUser?.uid || !(currentUser.role == "admin")) {
-        return <Navigate to="/admin/login" />;
+    isLoading || isFetching || cartIsLoading || cartIsFetching;
+  useLayoutEffect(() => {
+    if (!PauseAuthorization && isFetched) {
+      // middleware is for admin, currentuser needs to be authenticated and must be an administrator
+      if (middlewares && middlewares.includes("admin")) {
+        if (!currentUser?.uid || !currentUser.admin) {
+          return navigate("/admin/login", {
+            replace: true,
+          });
+        }
       }
-    }
-    if (middlewares && middlewares.includes("admin_guest")) {
-      if (
-        currentUser?.uid &&
-        !currentUser.isAnonymous &&
-        currentUser.role == "admin"
-      ) {
-        // user is authenticated, user is not anonymous and user is an administrator.
-        return <Navigate to="/admin/dashboard" />;
+      // middleware is for admin guest, currentUser needs to be authenticated
+      if (middlewares && middlewares.includes("admin_guest")) {
+        console.log("currentUser", currentUser)
+        if (currentUser?.uid && currentUser.admin) {
+          // user is authenticated, user is not anonymous and user is an administrator.
+          return navigate("/admin/dashboard", { replace: true });
+        }
       }
-    }
-    if (middlewares && middlewares.includes("auth")) {
-      if (!currentUser?.isAnonymous) {
-        // current user is not anonymous
-        if (!currentUser?.uid) {
-          // user user is not permanently signed in
-          return <Navigate to="/login" />;
+      // middle is for authenticated user, user must be not be anonymous and must be logged in
+      if (middlewares && middlewares.includes("auth")) {
+        if (!currentUser?.isAnonymous && !currentUser?.uid) {
+          return navigate("/login", { replace: true });
+        }
+      }
+      // user is authenticated and user is not anonymous
+      if (middlewares && middlewares.includes("guest")) {
+        if (currentUser?.uid && !currentUser.isAnonymous) {
+          return navigate("/", { replace: true });
+        }
+      }
+      // before checkout can proceed, carts must have content
+      if (middlewares && middlewares.includes("checkout")) {
+        if (carts?.length == 0) {
+          return navigate("/user/carts", { replace: true });
         }
       }
     }
-    if (middlewares && middlewares.includes("guest")) {
-      if (currentUser?.uid && !currentUser.isAnonymous) {
-        // user is authenticated and user is not anonymous
-        return <Navigate to="/" />;
-      }
-    }
-    if (middlewares && middlewares.includes("checkout")) {
-      // check if the checkout contains data
-      if (carts?.length == 0) {
-        return <Navigate to="/" />;
-      }
-    }
+  }, [currentUser, PauseAuthorization, navigate]);
+  if (PauseAuthorization) {
+    return <p>Loading...</p>;
   }
-
   return children;
 };
 

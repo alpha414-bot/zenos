@@ -1,16 +1,14 @@
 import { ErrorFilter, isURL } from "@/System/function";
+import { AuthUserType } from "@/Types/Auth";
 import { auth, firestore } from "@/firebase-config";
 import { notify } from "@/notify";
 import { getUrl } from "aws-amplify/storage";
 import {
-  EmailAuthProvider,
   User,
-  linkWithCredential,
   sendEmailVerification,
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
-  signOut,
-  updateProfile,
+  signOut
 } from "firebase/auth";
 import {
   addDoc,
@@ -23,7 +21,7 @@ import {
   query,
   setDoc,
   updateDoc,
-  where
+  where,
 } from "firebase/firestore";
 
 export const getProductData = (listener: any, product_id?: any) =>
@@ -494,14 +492,17 @@ export const removeCartProductDiscount = (product: ProductItemType) =>
     }
   });
 
-export const getCartProducts = (listener: any): Promise<CartMetaItem[]> =>
+export const getCartProducts = (
+  listener: any,
+  currentUser?: AuthUserType
+): Promise<CartMetaItem[]> =>
   new Promise((resolve, reject) => {
     try {
       const CartCollection = collection(firestore, "Carts");
-      if (auth.currentUser?.uid) {
-        const UserDocs = doc(CartCollection, auth.currentUser?.uid);
+      if (currentUser?.uid) {
+        const UserCartDocs = doc(CartCollection, currentUser?.uid);
         onSnapshot(
-          UserDocs,
+          UserCartDocs,
           async (snap) => {
             const DocData = snap.data() as CartProductItem;
             const DocDataProducts = DocData?.products;
@@ -525,8 +526,9 @@ export const getCartProducts = (listener: any): Promise<CartMetaItem[]> =>
                 .catch((error) => {
                   console.error("Error fetching product data:", error);
                 });
+            } else {
+              resolve(listener([]));
             }
-            // resolve(listener(DocDataProducts || []));
           },
           (error) => {
             notify.error({
@@ -655,43 +657,43 @@ export const getOrders = (listener: any): Promise<OrderDataInterface[]> =>
     }
   });
 
-export const createUser = (AuthData: UserSignUpFormInput) =>
-  new Promise((resolve, reject) => {
-    try {
-      const Credential = EmailAuthProvider.credential(
-        AuthData.email as string,
-        AuthData.password as string
-      );
-      linkWithCredential(auth.currentUser as User, Credential)
-        .then((newuser) => {
-          notify.success({
-            text: "Your account has successfully being created",
-          });
-          updateProfile(newuser.user, {
-            displayName: AuthData.username,
-          }).catch((error) => {
-            notify.error({
-              text: `[Error @usme]: Account is created successfully, but there was problem with updating user profile. <br/>${JSON.stringify(
-                error
-              )} <br/> Contact administrator`,
-            });
-          });
-          resolve(newuser);
-        })
-        .catch((error) => {
-          notify.error({ text: ErrorFilter(error) });
-          reject(error);
-        });
-    } catch (error) {
-      notify.error({
-        title: "Error",
-        text: `[Error #BNmzx]: try/catch: ${JSON.stringify(
-          error
-        )}. <br/>Contact administrator.`,
-      });
-      reject(error);
-    }
-  });
+// export const createUs = (AuthData: UserSignUpFormInput) =>
+//   new Promise((resolve, reject) => {
+//     try {
+//       const Credential = EmailAuthProvider.credential(
+//         AuthData.email as string,
+//         AuthData.password as string
+//       );
+//       linkWithCredential(auth.currentUser as User, Credential)
+//         .then((newuser) => {
+//           notify.success({
+//             text: "Your account has successfully being created",
+//           });
+//           updateProfile(newuser.user, {
+//             displayName: AuthData.username,
+//           }).catch((error) => {
+//             notify.error({
+//               text: `[Error @usme]: Account is created successfully, but there was problem with updating user profile. <br/>${JSON.stringify(
+//                 error
+//               )} <br/> Contact administrator`,
+//             });
+//           });
+//           resolve(newuser);
+//         })
+//         .catch((error) => {
+//           notify.error({ text: ErrorFilter(error) });
+//           reject(error);
+//         });
+//     } catch (error) {
+//       notify.error({
+//         title: "Error",
+//         text: `[Error #BNmzx]: try/catch: ${JSON.stringify(
+//           error
+//         )}. <br/>Contact administrator.`,
+//       });
+//       reject(error);
+//     }
+//   });
 
 export const loginUser = (AuthData: UserSignInFormInput) =>
   new Promise((resolve, reject) => {

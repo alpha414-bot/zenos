@@ -21,7 +21,7 @@ const PageMeta: React.FC<PageMetaInterface> = ({
             {title} {title && "- Zenos"}
           </title>
         )) || <title>loading...</title>}
-        <link rel="icon" type="image/svg+xml" href={"/favicon.svg"} />
+        <link rel="icon" type="image/svg+xml" href={"/assets/images/favicon.svg"} />
         <link rel="canonical" href={window.location.origin} />
         <meta name="description" content={description} />
         <meta property="og:title" content={title} />

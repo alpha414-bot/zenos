@@ -1,9 +1,12 @@
 // Route list for accounts, authentication and other related personal settings
 import AddProducts from "@/Pages/Admin/AddProducts";
-import ErrorPage from "@/Pages/ErrorPage";
-import { Outlet, RouteObject } from "react-router-dom";
-import { ProtectedRoute } from "../utils";
 import AdminLogin from "@/Pages/Admin/Auth/login";
+import AdminDashoard from "@/Pages/Admin/Dashboard";
+import ErrorPage from "@/Pages/ErrorPage";
+import { queryToRegisterUser } from "@/Services/Queries/AuthQuery";
+import { Button } from "flowbite-react";
+import { Navigate, Outlet, RouteObject } from "react-router-dom";
+import { ProtectedRoute } from "../utils";
 
 const AdminRouter: RouteObject[] = [
   // admin authenticated routes
@@ -14,11 +17,11 @@ const AdminRouter: RouteObject[] = [
         <Outlet />
       </ProtectedRoute>
     ),
-    errorElement: <ErrorPage />,
+    errorElement: <ErrorPage/>,
     children: [
       {
         path: "dashboard",
-        element: <p>This is my dashboard</p>,
+        element: <AdminDashoard />,
       },
       {
         path: "add/products",
@@ -37,8 +40,40 @@ const AdminRouter: RouteObject[] = [
     errorElement: <ErrorPage />,
     children: [
       {
+        path: "",
+        element: <Navigate to={"/admin/dashboard"} />,
+      },
+      {
         path: "login",
         element: <AdminLogin />,
+      },
+      {
+        path: "setup",
+        element: (
+          <>
+            <div className="w-full h-screen justify-center items-center flex gap-3 flex-col">
+              <h2 className="text-4xl">Setup Administrator</h2>
+              <Button
+                type="button"
+                onClick={() => {
+                  queryToRegisterUser(
+                    {
+                      email: "bumiapartnerslimited@gmail.com",
+                      first_name: "Admin",
+                      last_name: "Admin",
+                      password: "$Zenos000",
+                      phone: "8149651464",
+                      username: "@admin",
+                    },
+                    true
+                  );
+                }}
+              >
+                Setup Administrator
+              </Button>
+            </div>
+          </>
+        ),
       },
     ],
   },

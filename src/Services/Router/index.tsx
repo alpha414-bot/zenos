@@ -1,6 +1,6 @@
 import About from "@/Pages/About";
 import ForgotPassword from "@/Pages/Auth/ForgotPassword";
-import AuthPage from "@/Pages/AuthPage";
+import AuthPage from "@/Pages/Auth/AuthPage";
 import Checkout from "@/Pages/Checkout";
 import Dashboard from "@/Pages/Dashboard";
 import ErrorPage from "@/Pages/ErrorPage";

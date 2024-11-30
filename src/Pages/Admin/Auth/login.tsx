@@ -2,6 +2,7 @@ import Button from "@/Components/Button";
 import Input from "@/Components/Input";
 import MainLayout from "@/Layouts/MainLayout";
 import PageMeta from "@/Layouts/PageMeta";
+import { queryToLoginUser } from "@/Services/Queries/AuthQuery";
 import { EmailPattern } from "@/System/function";
 import { SubmitHandler, useForm } from "react-hook-form";
 
@@ -11,8 +12,7 @@ const AdminLogin = () => {
       mode: "all",
     });
   const onSignInFormSubmit: SubmitHandler<UserSignInFormInput> = (data) => {
-    console.log("data is", data)
-    // loginUser(data).then(() => navigate("/"));
+    queryToLoginUser({ ...data, ...{ admin: true } });
   };
   return (
     <MainLayout>

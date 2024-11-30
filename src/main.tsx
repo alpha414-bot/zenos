@@ -1,27 +1,24 @@
 import _ from "lodash";
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { QueryClient, QueryClientProvider } from "react-query";
+import { HelmetProvider } from "react-helmet-async";
+import { QueryClientProvider } from "react-query";
 import { ReactQueryDevtools } from "react-query/devtools";
 import { Provider } from "react-redux";
 import { RouterProvider } from "react-router-dom";
 import { Slide, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./Assets/index.css";
-import { store } from "./Services/Store";
+import { QueryClient } from "./Services/Queries/QueryClient";
 import router from "./Services/Router";
-import { HelmetProvider } from "react-helmet-async";
-
-const Client = new QueryClient({
-  defaultOptions: { queries: { refetchInterval: false, staleTime: Infinity } },
-});
+import { store } from "./Services/Store";
 
 localStorage.theme = "dark";
 window._ = _;
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <HelmetProvider>
-      <QueryClientProvider client={Client}>
+      <QueryClientProvider client={QueryClient}>
         <Provider store={store}>
           <ToastContainer
             position="bottom-right"

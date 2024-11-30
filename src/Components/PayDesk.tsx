@@ -57,7 +57,7 @@ const PayDesk: React.FC<PayDeskInterface> = ({
         className="flex gap-2 items-center px-4 py-3 text-base font-medium text-center rounded-lg bg-zenos-700 hover:bg-zenos-800 hover:border-gray-800 hover:ring-2 hover:outline-none hover:ring-zenos-600"
       >
         <p>Pay with</p>
-        <img src="paystack.svg" className="w-16 md:w-24" />
+        <img src="/assets/images/paystack.svg" className="w-16 md:w-24" />
       </PaystackButton>
     </>
   );

@@ -17,10 +17,41 @@ import {
 
 export const useAuthUser = () => {
   const queryClient = useQueryClient();
+  const queryKey = ["auth_user"];
   useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(auth, async (user) => {
       // for syncing all query data if auth user is changed
-      queryClient.setQueryData("auth_user", user);
+      const data = await queryToGetUserData(user);
+      queryClient.setQueryData(queryKey, data);
+    });
+  }, []);
+  return useQuery({
+    queryKey,
+    queryFn: (): Promise<AuthUserType> =>
+      new Promise((resolve, reject) => {
+        onAuthStateChanged(auth, (user) => {
+          try {
+            if (user?.uid) {
+              queryToGetUserData(user).then((metadata) => {
+                resolve({ ...user, ...metadata });
+              });
+            } else {
+              resolve(null);
+            }
+          } catch (error) {
+            reject(error);
+          }
+        });
+      }),
+  });
+};
+export const seAuthUser = () => {
+  const queryClient = useQueryClient();
+  useEffect(() => {
+    onAuthStateChanged(auth, async (user) => {
+      // for syncing all query data if auth user is changed
+      const data = await queryToGetUserData(user);
+      queryClient.setQueryData("auth_user", data);
     });
   }, []);
   return useQuery(
@@ -33,10 +64,7 @@ export const useAuthUser = () => {
               // if user is not signed, sign in user anonymously
               signInAnonymously(auth)
                 .then((new_user) => {
-                  queryToGetUserData(
-                    new_user.user,
-                    new_user.user.isAnonymous
-                  ).then((data) => {
+                  queryToGetUserData(new_user.user).then((data) => {
                     resolve(data);
                   });
                 })
@@ -48,7 +76,7 @@ export const useAuthUser = () => {
                   reject(error);
                 });
             } else {
-              queryToGetUserData(user, user.isAnonymous).then((data) => {
+              queryToGetUserData(user).then((data) => {
                 resolve(data);
               });
             }
@@ -114,10 +142,12 @@ export const useCartProducts = () => {
             keys.cart_data(AuthUser?.uid),
             CartUpdatedData
           );
+        } else {
+          // queryClient.setQueryData(keys.cart_data(AuthUser?.uid), null);
         }
         return data;
       } else {
-        queryClient.setQueryData(keys.cart_data(AuthUser?.uid), data);
+        queryClient.setQueryData(keys.cart_data(AuthUser?.uid), []);
         return data;
       }
     },
@@ -126,9 +156,10 @@ export const useCartProducts = () => {
 
   return useQuery(
     keys.cart_data(AuthUser?.uid),
-    (): Promise<CartMetaItem[]> => getCartProducts(snapshotListener),
+    (): Promise<CartMetaItem[]> => getCartProducts(snapshotListener, AuthUser),
     {
       placeholderData: [],
+      enabled: !!AuthUser?.uid,
     }
   );
 };

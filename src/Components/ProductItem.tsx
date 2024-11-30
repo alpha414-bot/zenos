@@ -39,10 +39,10 @@ const ProductItem: React.FC<{
       })}
     >
       {/* Product image */}
-      <Link to={`/products/${product.id}`} className="bg-red-500 overflow-hidden inline-block">
+      <Link to={`/products/${product.id}`} className="overflow-hidden inline-block">
         <Img
           src={"/"}
-          className="w-full rounded-2xl md:rounded-3xl overflow-hidden bg-red-500"
+          className="w-full rounded-2xl md:rounded-3xl overflow-hidden"
           alt={image as string}
           container={(children) => {
             return <div className="foo bg-red-500">{children}</div>;
@@ -61,7 +61,7 @@ const ProductItem: React.FC<{
               )}
             >
               <Img
-                src="/zenosmainlogo.svg"
+                src="/assets/images/zenosmainlogo.svg"
                 className={classNames("w-full h-full border border-gray-700", {
                   "rounded-t-xl": true,
                 })}

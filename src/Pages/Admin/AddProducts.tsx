@@ -4,7 +4,7 @@ import Media from "@/Components/Media";
 import SelectDropdown from "@/Components/SelectDropdown";
 import TextArea from "@/Components/TextArea";
 import VariantsType from "@/Components/VariantsType";
-import MainLayout from "@/Layouts/MainLayout";
+import AdminLayout from "@/Layouts/AdminLayout";
 import PageMeta from "@/Layouts/PageMeta";
 import { addCollectionDoc } from "@/Services/Query";
 import _ from "lodash";
@@ -27,7 +27,7 @@ const AddProducts = () => {
     });
   };
   return (
-    <MainLayout>
+    <AdminLayout>
       <PageMeta
         title="Add Products"
         description="Administrator access to add products to the webapp"
@@ -135,7 +135,7 @@ const AddProducts = () => {
           </div>
         </form>
       </PageMeta>
-    </MainLayout>
+    </AdminLayout>
   );
 };
 

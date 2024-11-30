@@ -1,8 +1,7 @@
 // Sample React Component for Navbar
 
-import { useCartProducts } from "@/Services/Hook";
+import { useAuthUser, useCartProducts } from "@/Services/Hook";
 import { verifyAccount } from "@/Services/Query";
-import { auth } from "@/firebase-config";
 import { useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 import Button from "./Button";
@@ -11,29 +10,50 @@ import OutsideClick from "./OutsideClick";
 function Navbar() {
   const [showSideBarMenu, setShowSideBarMenu] = useState<boolean>(false);
   const { data: CartProducts } = useCartProducts() as { data: CartMetaItem[] };
+  const { data: currentUser } = useAuthUser();
   return (
     // Example of using TailwindCSS in the Navbar Component
     <>
-      {auth.currentUser &&
-        !auth.currentUser?.isAnonymous &&
-        !auth.currentUser?.emailVerified && (
+      {currentUser &&
+        !currentUser?.isAnonymous &&
+        !currentUser?.emailVerified && (
           <div className="bg-gray-900 px-6 py-3 relative z-50 text-center space-x-2">
-            <span className="text-base font-medium">
-              Verify your account to unlock new exciting features
-            </span>
-            <Button
-              onClick={() => {
-                verifyAccount();
-              }}
-              className="px-4 py-0.5 text-sm"
-            >
-              Verify Now
-            </Button>
+            {(currentUser?.admin && (
+              <>
+                <span className="text-base font-medium">
+                  You are currently logged in as an{" "}
+                  <span className="underline underline-offset-4 decoration-dotted">
+                    ADMINISTRATOR
+                  </span>
+                </span>
+                <Link to={"/admin/dashboard"} className="btn px-4">
+                  Go to Dashboard
+                </Link>
+              </>
+            )) || (
+              <>
+                <span className="text-base font-medium">
+                  Verify your account to unlock new exciting features
+                </span>
+                <Button
+                  onClick={() => {
+                    verifyAccount();
+                  }}
+                  className="px-4 py-0.5 text-sm"
+                >
+                  Verify Now
+                </Button>
+              </>
+            )}
           </div>
         )}
       <nav className="sticky top-0 z-50 flex items-center justify-between bg-gray-950 shadow-md w-full shadow-gray-900/50 px-4 py-3.5 md:px-10 md:py-3">
         <Link to="/">
-          <img src="/zenos.svg" className="w-40" alt="Zenos Logo" />
+          <img
+            src="/assets/images/zenos.svg"
+            className="w-40"
+            alt="Zenos Logo"
+          />
         </Link>
         <div className="flex items-center gap-4">
           <ul className="hidden md:inline-flex items-center space-x-4">
@@ -65,7 +85,7 @@ function Navbar() {
                 About
               </NavLink>
             </li>
-            {(auth.currentUser?.uid && !auth.currentUser.isAnonymous && (
+            {(currentUser?.uid && !currentUser.isAnonymous && (
               <li>
                 <NavLink
                   to="/user/carts"
@@ -189,7 +209,7 @@ function Navbar() {
                 About
               </Link>
             </li>
-            {(auth.currentUser?.uid && !auth.currentUser.isAnonymous && (
+            {(currentUser?.uid && !currentUser.isAnonymous && (
               <li>
                 <Link
                   to="/user/carts"

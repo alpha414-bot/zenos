@@ -7,9 +7,9 @@
   .firebase-emulator-warning{
     @apply !fixed !left-auto !right-4 !bottom-2 !rounded-full !w-12 !h-12 !text-white !bg-white !text-opacity-0 !bg-no-repeat !bg-contain !bg-center bg-[url('https://firebase.google.com/static/images/brand-guidelines/logo-logomark.png')] !shadow-sm !shadow-gray-200
   }
-  .firebase-emulator-warning 
-  :root {
-    --toastify-color-progress-success: 144, 97, 249;
+  /* Button */
+  .btn {
+    @apply bg-zenos-700 hover:bg-zenos-800 hover:border-gray-800 hover:ring-2 hover:outline-none hover:ring-zenos-600 inline-flex items-center px-6 py-1 text-lg font-medium text-center rounded-lg border-4 border-transparent
   }
   /* Toastify Setup */
   .Toastify__progress-bar--success {

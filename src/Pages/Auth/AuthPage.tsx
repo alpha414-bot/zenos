@@ -2,7 +2,7 @@ import Button from "@/Components/Button";
 import Input from "@/Components/Input";
 import MainLayout from "@/Layouts/MainLayout";
 import PageMeta from "@/Layouts/PageMeta";
-import { createUser, loginUser } from "@/Services/Query";
+import { loginUser } from "@/Services/Query";
 import {
   EmailPattern,
   NumberPattern,
@@ -22,7 +22,7 @@ const AuthPage = () => {
       mode: "all",
     });
   const onSignUpFormSubmit: SubmitHandler<UserSignUpFormInput> = (data) => {
-    createUser(data).then(() => navigate("/"));
+    // createUser(data).then(() => navigate("/"));
   };
   const onSignInFormSubmit: SubmitHandler<UserSignInFormInput> = (data) => {
     loginUser(data).then(() => navigate("/"));

@@ -99,7 +99,7 @@ export const keys = {
   amazon_media: (key: string) => ["image_gallery_from_amazon", key],
 };
 
-export const DummyData: ProductItemType[] = [
+export const DummyData = [
   {
     name: "Super 30",
     description: "A high-performance laptop with the latest features.",

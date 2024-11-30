@@ -64,7 +64,7 @@ const Home = () => {
             </div>
           </div>
           <div className="py-6 relative">
-            <img src="/Banner.svg" alt="Banner Zenos" className="w-full" />
+            <img src="/assets/images/Banner.svg" alt="Banner Zenos" className="w-full" />
             {/* <div className="block md:hidden bg-cover bg-no-repeat bg-top bg-[url('/Banner.png')] w-full h-96"></div> */}
           </div>
           <div className="py-10 px-3 md:px-10 space-y-10">

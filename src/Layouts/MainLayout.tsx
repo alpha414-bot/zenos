@@ -19,7 +19,7 @@ const MainLayout: React.FC<{
         <LoadingBar
           height={3}
           color="#fc6902"
-          // transitionTime={800}
+          transitionTime={800}
           progress={100}
         />
       )}

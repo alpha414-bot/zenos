@@ -6,7 +6,7 @@ const Footer = () => {
     <div className="mt-8 px-3 py-5 md:px-10 md:py-3">
       <div className="pt-5 pb-2 flex flex-col items-center justify-center gap-2 md:px-5 md:flex-col">
         <div>
-          <img src="/zenos.svg" alt="" className="max-w-56" />
+          <img src="/assets/images/zenos.svg" alt="" className="max-w-56" />
         </div>
         <div>
           <p className="text-sm text-center font-mono font-normal underline underline-offset-2 decoration-double md:decoration-dotted">
@@ -46,7 +46,7 @@ const Footer = () => {
           <div>
             <span className="text-xs font-bold">Powered By</span>
           </div>
-          <img src="/bumialogo.svg" alt="Bumia Agency Logo" className="w-8" />
+          <img src="/assets/images/bumialogo.svg" alt="Bumia Agency Logo" className="w-8" />
         </Link>
         <p className="text-center text-xs">
           <small>&copy;&nbsp;Copyright {new Date().getFullYear()}</small>

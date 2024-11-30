@@ -6,7 +6,7 @@ import TextArea from "@/Components/TextArea";
 import MainLayout from "@/Layouts/MainLayout";
 import PageMeta from "@/Layouts/PageMeta";
 import { useCartProducts } from "@/Services/Hook";
-import { createUser, newOrderQuery } from "@/Services/Query";
+import { newOrderQuery } from "@/Services/Query";
 import {
   EmailPattern,
   NigeriaState,
@@ -37,9 +37,9 @@ const Checkout = () => {
         setIsForm((current) => current + 1);
       } else {
         // user is anonymous and needs to create a permanent account
-        createUser(data).then(() => {
-          setIsForm((current) => current + 1);
-        });
+        // createUser(data).then(() => {
+        //   setIsForm((current) => current + 1);
+        // });
       }
     } else if (isForm !== 2) {
       // form of where to ship to (not related to profile, as it might different in each orders)

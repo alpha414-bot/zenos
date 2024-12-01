@@ -9,9 +9,6 @@ const Footer = () => {
           <img src="/assets/images/zenos.svg" alt="" className="max-w-56" />
         </div>
         <div>
-          <p className="text-sm text-center font-mono font-normal underline underline-offset-2 decoration-double md:decoration-dotted">
-            Power Up Your Life: The Latest in Laptops, Gadgets, and Software
-          </p>
           <div className="flex flex-row items-center justify-center gap-4 mt-2">
             <NavLink to="/about" className="text-base font-medium">
               Home
@@ -37,11 +34,11 @@ const Footer = () => {
         </div>
       </div>
 
-      <div className="">
+      <div className="flex flex-col items-center justify-center">
         <Link
           target="_blank"
           to="https://bumiaagency.com/"
-          className="inline-flex items-center justify-center py-2 gap-1 w-full"
+          className="inline-flex items-center justify-center py-2 gap-1 w-auto"
         >
           <div>
             <span className="text-xs font-bold">Powered By</span>

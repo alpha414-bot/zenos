@@ -23,6 +23,7 @@ const AuthPage = () => {
     });
   const onSignUpFormSubmit: SubmitHandler<UserSignUpFormInput> = (data) => {
     // createUser(data).then(() => navigate("/"));
+    console.log("sign up", data)
   };
   const onSignInFormSubmit: SubmitHandler<UserSignInFormInput> = (data) => {
     loginUser(data).then(() => navigate("/"));

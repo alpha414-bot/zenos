@@ -1,3 +1,4 @@
+import MediaModal from "@/Components/MediaModal";
 import Sidebar from "@/Components/Sidebar";
 import { FC, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
@@ -49,6 +50,7 @@ const AdminLayout: FC<AdminLayoutInterface> = ({ children }) => {
           <div className="px-4 sm:ml-64">{children}</div>
         </>
       </div>
+      <MediaModal />
     </>
   );
 };

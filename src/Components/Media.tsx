@@ -38,6 +38,7 @@ const Media: React.FC<{
             <div
               className={`p-3 flex flex-col items-stretch gap-4 md:flex-${align} md:p-0`}
             >
+              {/* {JSON.stringify(modal)} */}
               <button
                 id={`${name}MediaButton`}
                 onClick={() => {

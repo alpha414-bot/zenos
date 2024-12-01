@@ -105,7 +105,7 @@ export const DummyData = [
     description: "A high-performance laptop with the latest features.",
     category: "laptop",
     price: 20000,
-    salePrice: 25000,
+    salesPrice: 25000,
     image: "products/laptop1.jpeg",
     variants: [
       {
@@ -130,7 +130,7 @@ export const DummyData = [
       "Ultra-thin laptop with a stunning display, fast performance, and all-day battery life. Ideal for on-the-go productivity.",
     category: "laptop",
     price: 90000,
-    salePrice: 100000,
+    salesPrice: 100000,
     image: "products/laptop2.jpeg",
     variants: [
       {
@@ -155,7 +155,7 @@ export const DummyData = [
       "Compact, powerful laptop with vibrant display and long battery life. Perfect for everyday use.",
     category: "laptop",
     price: 75000,
-    salePrice: 80000,
+    salesPrice: 80000,
     image: "products/laptop3.jpeg",
     variants: [
       {
@@ -180,7 +180,7 @@ export const DummyData = [
       "Lightweight laptop with sharp display and speedy performance. Ideal for work and travel.",
     category: "laptop",
     price: 90000,
-    salePrice: 100000,
+    salesPrice: 100000,
     image: "products/laptop4.jpeg",
     variants: [
       {
@@ -200,7 +200,7 @@ export const DummyData = [
       "Sleek and powerful laptop with a crisp display and extended battery life. Perfect for all your needs.",
     category: "laptop",
     price: 12000,
-    salePrice: 10000,
+    salesPrice: 10000,
     image: "products/laptop5.jpeg",
     variants: [
       {
@@ -220,7 +220,7 @@ export const DummyData = [
       "High-performance laptop with a vivid display and long-lasting battery. Ideal for productivity and entertainment.",
     category: "laptop",
     price: 70000,
-    salePrice: 80000,
+    salesPrice: 80000,
     image: "products/laptop6.jpeg",
     variants: [
       {
@@ -240,7 +240,7 @@ export const DummyData = [
       "Slim, fast laptop with brilliant display and enduring battery. Perfect for work and play.",
     category: "laptop",
     price: 12000,
-    salePrice: 8000,
+    salesPrice: 8000,
     image: "products/laptop7.jpeg",
     variants: [
       {
@@ -260,7 +260,7 @@ export const DummyData = [
       "Lightweight laptop with fast performance, clear display, and long battery life. Ideal for on-the-go use.",
     category: "laptop",
     price: 8000,
-    salePrice: 5000,
+    salesPrice: 5000,
     image: "products/laptop8.jpeg",
     variants: [
       {
@@ -280,7 +280,7 @@ export const DummyData = [
       "Sleek iPhone with stunning display, powerful performance, and advanced camera technology. Redefining mobile excellence.",
     category: "mobile",
     price: 10000,
-    salePrice: 5000,
+    salesPrice: 5000,
     image: "products/mobilei1.jpeg",
     variants: [
       {
@@ -458,7 +458,7 @@ export const DummyData = [
       "Versatile tablet with vibrant display, fast performance, and long battery life. Ideal for productivity and entertainment.",
     category: "gadget",
     price: 24000,
-    salePrice: 22000,
+    salesPrice: 22000,
     image: "products/gadget4.jpeg",
     weight: 1.1,
     star: 3,

@@ -186,6 +186,7 @@ export const useOrders = () => {
 
 export const useMediaFile = (
   path: any,
+  notify_if_not_found: boolean = true,
   dont_look_into_firebase_instead_public_folder: boolean = false
 ) => {
   const queryClient = useQueryClient();
@@ -208,35 +209,37 @@ export const useMediaFile = (
         snapshotListener,
         dont_look_into_firebase_instead_public_folder
       ).catch((error: any) => {
-        let ErrorText;
-        switch (error.code) {
-          case "storage/object-not-found":
-            // File doesn't exist
-            ErrorText = "No object exists at the desired reference.";
-            break;
-          case "storage/unauthorized":
-            // User doesn't have permission to access the object
-            ErrorText =
-              "User is not authorized to perform the desired action, check your security rules to ensure they are correct.";
-            break;
-          case "storage/quota-exceeded":
-            ErrorText =
-              "Quota on your Cloud Storage bucket has been exceeded. If you're on the no-cost tier, upgrade to a paid plan. If you're on a paid plan, reach out to Firebase support.";
-            break;
-          case "storage/unknown":
-            // Unknown error occurred, inspect the server response
-            ErrorText = "Unknow error when accessing storage";
-            break;
-          default:
-            ErrorText = "There was a problem with the storage. ";
-            break;
+        if (notify_if_not_found) {
+          let ErrorText;
+          switch (error.code) {
+            case "storage/object-not-found":
+              // File doesn't exist
+              ErrorText = "No object exists at the desired reference.";
+              break;
+            case "storage/unauthorized":
+              // User doesn't have permission to access the object
+              ErrorText =
+                "User is not authorized to perform the desired action, check your security rules to ensure they are correct.";
+              break;
+            case "storage/quota-exceeded":
+              ErrorText =
+                "Quota on your Cloud Storage bucket has been exceeded. If you're on the no-cost tier, upgrade to a paid plan. If you're on a paid plan, reach out to Firebase support.";
+              break;
+            case "storage/unknown":
+              // Unknown error occurred, inspect the server response
+              ErrorText = "Unknow error when accessing storage";
+              break;
+            default:
+              ErrorText = "There was a problem with the storage. ";
+              break;
+          }
+          notify.error(
+            {
+              text: ErrorText,
+            },
+            error
+          );
         }
-        notify.error(
-          {
-            text: ErrorText,
-          },
-          error
-        );
       }),
     placeholderData: typeof path === "object" ? [] : "",
   });

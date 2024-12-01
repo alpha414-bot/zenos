@@ -71,7 +71,7 @@ interface ProductItemType {
   description: string;
   category: { key: string; value: string };
   price: number;
-  salePrice?: number;
+  salesPrice?: number;
   variants?: ProductVariantType[];
   image?: string;
   createdAt?: FirestoreDate | Date;

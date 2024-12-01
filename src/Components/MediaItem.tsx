@@ -51,7 +51,7 @@ const MediaItem: React.FC<{
       onBlur={onBlur}
       className={`relative z-10 ${
         showThumbnail ? "h-full" : "h-auto"
-      } bg-zenos-400 bg-opacity-50 rounded-md overflow-hidden group`}
+      } bg-zenos-400 bg-opacity-50 rounded-md border-0 overflow-hidden group`}
     >
       {/* Button to Select media */}
       {!showThumbnail && multiSelect && (
@@ -147,7 +147,7 @@ const MediaItem: React.FC<{
       <button
         type="button"
         // data-modal-hide="mediaModal"
-        className={`relative w-full ${
+        className={`border-0 relative w-full ${
           showThumbnail ? "h-full" : "h-auto"
         } rounded-md bg-center group ${
           !src

@@ -16,3 +16,15 @@ interface AuthUserInterface {
 }
 
 type AuthUserType = AuthUserInterface | null;
+
+
+
+type RemovePerson = {
+  firstName: string;
+  lastName: string;
+  age: number;
+  visits: number;
+  progress: number;
+  status: "relationship" | "complicated" | "single";
+  subRows?: RemovePerson[];
+};

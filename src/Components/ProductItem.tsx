@@ -139,9 +139,9 @@ const ProductItem: React.FC<{
                     />
                   )}
                 </p>
-                {product.salePrice && (
+                {product.salesPrice && (
                   <p className="text-sm text-left text-zenos-600 font-semibold line-through lg:text-right">
-                    {price(product.salePrice, "currency", 0)}
+                    {price(product.salesPrice, "currency", 0)}
                   </p>
                 )}
               </div>

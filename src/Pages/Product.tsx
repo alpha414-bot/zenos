@@ -26,7 +26,9 @@ const Product = () => {
   return (
     <MainLayout>
       <PageMeta
-        title={`${product?.name} - ${_.startCase(product?.category.value)}`}
+        title={`${product?.name} - ${_.startCase(
+          product?.category && product?.category?.value
+        )}`}
         description={`Zenos product ${product?.name}, ${product?.description}`}
       >
         <div className="px-1.5 py-10 space-y-5 md:px-4">
@@ -38,7 +40,9 @@ const Product = () => {
                   <div
                     className={`bg-no-repeat bg-cover bg-center w-full h-80 rounded-xl md:bg-contain md:w-full md:min-h-full md:h-96 bg-white/5`}
                     style={{
-                      backgroundImage: `url('${image || "/assets/images/favicon.svg"}')`,
+                      backgroundImage: `url('${
+                        image || "/assets/images/favicon.svg"
+                      }')`,
                     }}
                   ></div>
                 </div>
@@ -89,9 +93,9 @@ const Product = () => {
                           />
                         )}
                       </p>
-                      {product.salePrice && (
+                      {product.salesPrice && (
                         <p className="text-sm text-left text-zenos-600 font-semibold line-through lg:text-right">
-                          {price(product.salePrice, "currency", 0)}
+                          {price(product.salesPrice, "currency", 0)}
                         </p>
                       )}
                     </div>
@@ -100,7 +104,7 @@ const Product = () => {
                         Category:
                       </p>
                       <p className="text-xs font-medium underline underline-offset-4 decoration-double">
-                        {_.startCase(product.category.value)}
+                        {_.startCase(product?.category?.value)}
                       </p>
                     </div>
                   </div>

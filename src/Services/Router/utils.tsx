@@ -38,7 +38,6 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
       }
       // middleware is for admin guest, currentUser needs to be authenticated
       if (middlewares && middlewares.includes("admin_guest")) {
-        console.log("currentUser", currentUser)
         if (currentUser?.uid && currentUser.admin) {
           // user is authenticated, user is not anonymous and user is an administrator.
           return navigate("/admin/dashboard", { replace: true });
@@ -65,7 +64,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     }
   }, [currentUser, PauseAuthorization, navigate]);
   if (PauseAuthorization) {
-    return <p>Loading...</p>;
+    return <></>;
   }
   return children;
 };

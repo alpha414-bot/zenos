@@ -37,6 +37,8 @@ const Checkout = () => {
         setIsForm((current) => current + 1);
       } else {
         // user is anonymous and needs to create a permanent account
+        console.log("sign up", data);
+
         // createUser(data).then(() => {
         //   setIsForm((current) => current + 1);
         // });

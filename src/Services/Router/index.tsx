@@ -92,6 +92,7 @@ const RootRouter: RouteObject[] = [
         <Product />
       </ProtectedRoute>
     ),
+    errorElement: <ErrorPage />,
   },
   // checkout
   {

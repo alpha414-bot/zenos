@@ -3,7 +3,7 @@
 import GenerateSitemap from "react-router-sitemap-maker";
 import router from "./Services/Router";
 
-const sitemapData = await GenerateSitemap(router, {
+const sitemapData = await GenerateSitemap(router as any, {
 	baseUrl: "https://zenos.web.app",
 	hashrouting: true,
 	changeFrequency: "monthly"

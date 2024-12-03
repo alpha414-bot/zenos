@@ -15,6 +15,7 @@ function Navbar() {
     // Example of using TailwindCSS in the Navbar Component
     <>
       {currentUser &&
+        currentUser?.uid &&
         !currentUser?.isAnonymous &&
         !currentUser?.emailVerified && (
           <div className="bg-gray-900 px-6 py-3 relative z-50 text-center space-x-2">

@@ -88,7 +88,7 @@ export const seAuthUser = () => {
   );
 };
 
-export const useProductsData = (product_id?: any) => {
+export const useProductsData = <T>(product_id?: any) => {
   const queryClient = useQueryClient();
   // listener to subscribe to firestore snappshot
   const snapshotListener = useCallback((data: any) => {
@@ -97,10 +97,10 @@ export const useProductsData = (product_id?: any) => {
   }, []);
   return useQuery(
     keys.product_data(product_id),
-    () => getProductData(snapshotListener, product_id),
+    ():Promise<T> => getProductData(snapshotListener, product_id),
     {
       keepPreviousData: true,
-      placeholderData: !!product_id ? [] : {},
+      placeholderData: !!product_id ? [] : {} as T,
     }
   );
 };

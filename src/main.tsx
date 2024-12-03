@@ -12,6 +12,8 @@ import "./Assets/index.css";
 import { QueryClient } from "./Services/Queries/QueryClient";
 import router from "./Services/Router";
 import { store } from "./Services/Store";
+import "slick-carousel/slick/slick-theme.css";
+import "slick-carousel/slick/slick.css";
 
 localStorage.theme = "dark";
 window._ = _;

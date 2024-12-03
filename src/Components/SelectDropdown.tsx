@@ -1,21 +1,23 @@
 import { NOAUTOCOMPLETE } from "@/System/function";
+import classNames from "classnames";
 import _ from "lodash";
 import { forwardRef, useEffect, useRef, useState } from "react";
 import { Control, Controller, RegisterOptions } from "react-hook-form";
 import OutsideClick from "./OutsideClick";
-import classNames from "classnames";
 
 interface SelectDropdownInterface {
   name: string;
   value?: string;
   placeholder?: string;
   label?: string;
+  className?: string;
+  containerClassName?: string;
   options: DropdownOptionsType[];
   defaultValue?: DropdownOptionsType;
   disableOptionKeys?: string[];
   defaultOptionKey?: string;
   required?: boolean;
-  onChange?: any;
+  onDropdownSelect?: any;
   isFocused?: boolean;
   control?: Control;
   rules?: RegisterOptions;
@@ -29,10 +31,12 @@ const SelectDropdown = forwardRef<HTMLInputElement, SelectDropdownInterface>(
       placeholder,
       label,
       options,
+      className,
+      containerClassName,
       disableOptionKeys,
       defaultOptionKey,
       required,
-      onChange = () => {},
+      onDropdownSelect = (data?: any) => data,
       isFocused,
       defaultValue,
       control,
@@ -86,7 +90,7 @@ const SelectDropdown = forwardRef<HTMLInputElement, SelectDropdownInterface>(
           }
         }}
       >
-        <div className="relative w-full">
+        <div className={classNames("relative w-full", containerClassName)}>
           <Controller
             name={name}
             control={control}
@@ -114,7 +118,7 @@ const SelectDropdown = forwardRef<HTMLInputElement, SelectDropdownInterface>(
                 : false;
               return (
                 <div className="relative">
-                  <div className="relative z-20">
+                  <div className="relative z-0">
                     <div className="relative">
                       <input
                         id={name}
@@ -157,13 +161,15 @@ const SelectDropdown = forwardRef<HTMLInputElement, SelectDropdownInterface>(
                                   InputValue.toLowerCase()
                             )
                           ) {
-                            onChange({
-                              key: InputValue.toLowerCase(),
-                              value:
-                                InputValue.toLowerCase() === "fct"
-                                  ? "Federal Capital Territory"
-                                  : _.upperFirst(InputValue),
-                            });
+                            onChange(
+                              onDropdownSelect({
+                                key: InputValue.toLowerCase(),
+                                value:
+                                  InputValue.toLowerCase() === "fct"
+                                    ? "Federal Capital Territory"
+                                    : _.upperFirst(InputValue),
+                              })
+                            );
                             const element = document.getElementById(
                               name
                             ) as HTMLInputElement | null;
@@ -175,7 +181,7 @@ const SelectDropdown = forwardRef<HTMLInputElement, SelectDropdownInterface>(
                                   : _.startCase(InputValue);
                             }
                           } else {
-                            onChange(null);
+                            onChange(onDropdownSelect(null));
                           }
 
                           setDropdownQuery(InputValue.toLowerCase());
@@ -185,7 +191,9 @@ const SelectDropdown = forwardRef<HTMLInputElement, SelectDropdownInterface>(
                       />
 
                       <div
-                        className="absolute top-0 bottom-0 right-2 px-2 flex items-center justify-center cursor-pointer"
+                        className={
+                          "absolute top-0 bottom-0 right-2 px-2 flex items-center justify-center cursor-pointer"
+                        }
                         onClick={() => {
                           setDropdowFiltering(options);
                           setFocus(true);
@@ -220,7 +228,12 @@ const SelectDropdown = forwardRef<HTMLInputElement, SelectDropdownInterface>(
                       ></span>
                     )}
                     {showDropdown && (
-                      <div className="absolute top-full mt-0.5 left-0 z-50 rounded shadow-md bg-gray-200 space-y-0 w-full max-h-[14rem] overflow-y-auto select-none">
+                      <div
+                        className={classNames(
+                          "absolute top-full mt-0.5 left-0 z-50 rounded shadow-md bg-gray-200 space-y-0 w-full max-h-[14rem] overflow-y-auto select-none",
+                          className
+                        )}
+                      >
                         {(dropdownFiltering &&
                           ((dropdownFiltering.length > 0 &&
                             dropdownFiltering.map((item, index) => {
@@ -237,7 +250,8 @@ const SelectDropdown = forwardRef<HTMLInputElement, SelectDropdownInterface>(
                                   }`}
                                   onClick={() => {
                                     if (!disable) {
-                                      onChange(item);
+                                      // select is not disabled...
+                                      onChange(onDropdownSelect(item));
                                       if (TextInputRef?.current) {
                                         TextInputRef.current.value =
                                           item.value.toString();

@@ -1,6 +1,5 @@
 // ProductItem: Components containing a visual display of the product metadata
 
-import { useMediaFile } from "@/Services/Hook";
 import {
   addToCartQuery,
   removeCartProduct,
@@ -8,14 +7,15 @@ import {
   updateCartProductDiscount,
   updateCartQuantity,
 } from "@/Services/Query";
-import { price, short } from "@/System/function";
+import { createSlug, price, short } from "@/System/function";
 import classNames from "classnames";
 import _ from "lodash";
 import { useRef, useState } from "react";
-import { Img } from "react-image";
 import { Link } from "react-router-dom";
+import Slider from "react-slick";
 import Button from "./Button";
-import Spinner from "./Spinner";
+import Image from "./Image";
+import SliderArrow from "./SliderArrow";
 
 const ProductItem: React.FC<{
   product: ProductItemType;
@@ -25,65 +25,103 @@ const ProductItem: React.FC<{
   const TypeSimilarListing = type === "similar_listing";
   const TypeOrderListing = type === "order_listing";
   const TypeProductListing = type === "product_listing";
-  const { data: image } = useMediaFile(product.image);
   const QuantityInputRef = useRef<HTMLInputElement>(null);
   const [, setQuantity] = useState<number>(product.cartQuantity || 1);
   return (
     // TailwindCSS styles in ProductItem Component
     <div
-      className={classNames("flex justify-start leading-normal rounded-xl", {
-        "flex-col items-stretch gap-2 md:flex-row shadow-sm shadow-gray-600":
-          TypeCartListing || TypeSimilarListing,
-        "pb-0 flex-col": TypeOrderListing,
-        "pb-4 flex-col items-start justify-center shadow-sm shadow-gray-600": TypeProductListing,
-      })}
+      data-product-name={`${createSlug(product?.name.toLowerCase())}`}
+      data-price={product?.price}
+      className={classNames(
+        `mix-target product-category-${createSlug(
+          product?.category.value.toLowerCase()
+        )} product-subcategory-${createSlug(
+          product?.subcategory?.value.toLowerCase()
+        )} ${createSlug(
+          product?.name.toLowerCase()
+        )} flex justify-start leading-normal rounded-xl`,
+        {
+          "flex-col items-center px-2 gap-2 md:flex-row shadow-sm shadow-gray-600":
+            TypeCartListing || TypeSimilarListing,
+          "pb-0 flex-col": TypeOrderListing,
+          "pb-4 flex-col items-start justify-center bg-gray-950 shadow-sm shadow-gray-600":
+            TypeProductListing,
+        }
+      )}
     >
       {/* Product image */}
-      <Link to={`/products/${product.id}`} className="overflow-hidden inline-block">
-        <Img
-          src={"/"}
-          className="w-full rounded-2xl md:rounded-3xl overflow-hidden"
-          alt={image as string}
-          container={(children) => {
-            return <div className="foo bg-red-500">{children}</div>;
-          }}
-          unloader={
-            <div
-              className={classNames(
-                `w-full p-0 max-h-[27rem] flex flex-col gap-5 items-center justify-center bg-ray-100/95 md:max-h-auto`,
-                {
-                  "w-56 h-full rounded-t-xl md:rounded-t-none md:rounded-ss-xl md:rounded-es-xl":
-                    TypeCartListing,
-                  "w-32 h-32 rounded-t-xl md:rounded-t-none md:rounded-ss-xl md:rounded-es-xl":
-                    TypeSimilarListing,
-                  "h-auto rounded-xl": TypeProductListing,
-                }
-              )}
-            >
-              <Img
-                src="/assets/images/zenosmainlogo.svg"
-                className={classNames("w-full h-full border border-gray-700", {
-                  "rounded-t-xl": true,
-                })}
+      <div
+        className={classNames("relative group", {
+          "w-full h-auto": TypeProductListing,
+          "w-24": TypeSimilarListing,
+        })}
+      >
+        <Slider
+          {...{
+            dots: false,
+            autoplay: true,
+            // speed: 2000,
+            autoplaySpeed: _.random(4000, 10000),
+            cssEase: "linear",
+            infinite: true,
+            slidesToShow: 1,
+            slidesToScroll: 1,
+            nextArrow: TypeSimilarListing ? (
+              <></>
+            ) : (
+              <SliderArrow
+                type="next"
+                arrowClassName="hidden group-hover:block animate-slideright"
               />
-            </div>
-          }
-          loader={
-            <div
-              className={`w-full min-w-56 h-[20rem] flex flex-col gap-5 items-center justify-center bg-ray-100/95`}
-            >
-              <Spinner className="w-12 h-12" />
-            </div>
-          }
-        />
-      </Link>
+            ),
+            prevArrow: TypeSimilarListing ? (
+              <></>
+            ) : (
+              <SliderArrow
+                type="prev"
+                arrowClassName="hidden group-hover:block animate-slideleft"
+              />
+            ),
+            adaptiveHeight: true,
+          }}
+          // className="h-full bg-white p-0 m-0 relative"
+        >
+          {typeof product?.image == "object" &&
+            product?.image?.map((item, i) => {
+              return (
+                <Image
+                  key={i}
+                  src={item}
+                  asDiv
+                  className={classNames(
+                    "bg-no-repeat  bg-center overflow-hidden",
+                    {
+                      "!h-96 !w-full bg-cover sm:!h-96 xl:!h-96 rounded-ss-2xl rounded-se-2xl":
+                        TypeProductListing,
+                      "bg-cover !h-24 !w-24 md:!h-24": TypeSimilarListing,
+                    },
+                    [
+                      "bg-zenos-600/20",
+                      "bg-blue-500/20",
+                      "bg-violet-800/20",
+                      "bg-white/20",
+                      "bg-green-500/20",
+                      "bg-fuchsia-500/20",
+                      "bg-lime-500/20",
+                    ][_.random(0, 5)]
+                  )}
+                />
+              );
+            })}
+        </Slider>
+      </div>
       {/* Product metadata */}
       <div
         className={classNames("flex flex-col justify-between", {
           "px-3 py-4 grow": TypeCartListing,
           "px-2 py-1": TypeSimilarListing,
           "p-0": TypeOrderListing,
-          "px-4 mt-4 grow": TypeProductListing,
+          "px-4 mt-4 grow w-full": TypeProductListing,
         })}
       >
         <div>
@@ -112,13 +150,13 @@ const ProductItem: React.FC<{
                   </p>
                 </div>
               </div>
-              {type === "carts_listing" && (
+              {TypeCartListing && (
                 <p className={"text-gray-800 text-sm mt-4"}>
                   {product.description}
                 </p>
               )}
             </Link>
-            {type !== "similar_listing" && (
+            {!TypeSimilarListing && (
               <div>
                 <p
                   className={`${
@@ -147,19 +185,17 @@ const ProductItem: React.FC<{
               </div>
             )}
           </div>
-          {type !== "carts_listing" && type !== "order_listing" && (
+          {!TypeCartListing && !TypeOrderListing && !TypeSimilarListing && (
             <Link to={`/products/${product.id}`}>
               <p className="hidden lg:block text-gray-200 text-sm">
-                {type === "similar_listing"
-                  ? short(product.description, 37)
-                  : product.description}
+                {short(product.description, 120)}
               </p>
               <p className="block lg:hidden text-gray-200 text-sm">
-                {product.description}
+                {short(product.description, 37)}
               </p>
             </Link>
           )}
-          {type == "similar_listing" && (
+          {TypeSimilarListing && (
             <p className={`text-lg text-zenos-600 font-bold`}>
               {price(
                 product.price * (product.cartQuantity || 1),
@@ -169,7 +205,7 @@ const ProductItem: React.FC<{
             </p>
           )}
         </div>
-        {type === "carts_listing" && (
+        {TypeCartListing && (
           <div className="border-b border-dotted py-2">
             {/* Discount page */}
             <p className="text-xs py-2 italic font-medium border-y border-dotted decoration-dotted md:py-1">
@@ -279,14 +315,14 @@ const ProductItem: React.FC<{
             </div>
           </div>
         )}
-        {(type === "carts_listing" || TypeProductListing) && (
+        {(TypeCartListing || TypeProductListing) && (
           <div
             className={`mt-3 flex ${
               TypeCartListing ? "justify-between" : "justify-end"
             } flex-wrap items-start gap-y-2`}
           >
             {/* Product Quantity reading */}
-            {type === "carts_listing" && (
+            {TypeCartListing && (
               <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-x-1.5">
                   <p className="text-base font-bold underline underline-offset-2 decoration-dotted">
@@ -374,16 +410,45 @@ const ProductItem: React.FC<{
               </div>
             )}
             <Button
-              text={type !== "carts_listing" ? "Add to cart" : "Remove"}
+              className="w-full !text-center !justify-center gap-2 group"
               onClick={() => {
-                if (type === "carts_listing") {
+                if (TypeCartListing) {
                   // remove products from cart
                   removeCartProduct(product).then(() => {});
                 } else {
                   addToCartQuery(product).then(() => {});
                 }
               }}
-            />
+            >
+              {(!TypeCartListing && (
+                <>
+                  <svg
+                    className="w-8 h-8 text-white"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M4 4h1.5L8 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm.75-3H7.5M11 7H6.312M17 4v6m-3-3h6"
+                    />
+                  </svg>
+                  <span className="hidden transition-all delay-0 duration-200 group-hover:block group-hover:animate-slideleft">
+                    Add to cart
+                  </span>
+                </>
+              )) || (
+                <>
+                  <span>Remove</span>
+                </>
+              )}
+            </Button>
           </div>
         )}
       </div>

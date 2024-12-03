@@ -1,10 +1,13 @@
 import Button from "@/Components/Button";
+import Filter from "@/Components/Filter";
 import {
   default as AwsImage,
   default as ImageAnime,
 } from "@/Components/ImageAnime";
 import Input from "@/Components/Input";
 import ProductList from "@/Components/ProductList";
+import Spinner from "@/Components/Spinner";
+import Title from "@/Components/Title";
 import MainLayout from "@/Layouts/MainLayout";
 import PageMeta from "@/Layouts/PageMeta";
 import { useProductsData } from "@/Services/Hook";
@@ -14,15 +17,18 @@ import { useForm } from "react-hook-form";
 import Slider from "react-slick";
 
 const Home = () => {
-  const { data } = useProductsData() as {
-    data: ProductItemType[];
-  };
+  const {
+    data,
+    isLoading,
+    isFetching,
+  } = useProductsData<ProductItemType[]>();
   const { control, handleSubmit } = useForm();
   const JoinNewsletter = () => {
     notify.success({
       text: "You have successfully being added to our newsletter",
     });
   };
+
   return (
     <MainLayout>
       <PageMeta
@@ -64,16 +70,40 @@ const Home = () => {
             </div>
           </div>
           <div className="py-6 relative">
-            <img src="/assets/images/Banner.svg" alt="Banner Zenos" className="w-full" />
-            {/* <div className="block md:hidden bg-cover bg-no-repeat bg-top bg-[url('/Banner.png')] w-full h-96"></div> */}
+            <img
+              src="/assets/images/Banner.svg"
+              alt="Banner Zenos"
+              className="w-full"
+            />
           </div>
           <div className="py-10 px-3 md:px-10 space-y-10">
             <div id="shop">
-              <p className="text-xl font-bold underline underline-offset-2 decoration-dotted md:text-3xl">
-                Best Selling Products
-              </p>
-              <div className="mt-4">
-                <ProductList products={data || []} />
+              <Title>Best Selling Products</Title>
+              <div className="mt-6 grid grid-cols-1 sm:grid-cols-[1fr_2fr] xl:grid-cols-[1fr_3fr] gap-10">
+                <div className="grow">
+                  <Filter products={data} />
+                </div>
+                <div className="">
+                  {isLoading ||
+                    (isFetching && (
+                      <Spinner
+                        className="w-20 h-20"
+                        text="Loading Products.."
+                        textClassName="text-xl"
+                      />
+                    )) || (
+                      <>
+                        <ProductList products={data || []} />
+                        <>
+                          {/* <div className="container">
+                            <div className="mix" />
+                            <div className="mix" />
+                          </div> */}
+                          <div className="mixitup-page-list" />
+                        </>
+                      </>
+                    )}
+                </div>
               </div>
             </div>
           </div>

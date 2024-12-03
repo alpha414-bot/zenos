@@ -51,6 +51,4 @@ amplifytools.xcconfig
 firebase.json
 firestore.indexes.json
 firestore.rules
-
-
 firebase-export-*/

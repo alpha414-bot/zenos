@@ -70,10 +70,11 @@ interface ProductItemType {
   name: string;
   description: string;
   category: { key: string; value: string };
+  subcategory?: { key: string; value: string };
   price: number;
   salesPrice?: number;
   variants?: ProductVariantType[];
-  image?: string;
+  image?: string | any[];
   createdAt?: FirestoreDate | Date;
   updatedAt?: FirestoreDate | Date;
   weight?: number;

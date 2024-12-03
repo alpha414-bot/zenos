@@ -1,6 +1,7 @@
 import { queryToLogout } from "@/Services/Queries/AuthQuery";
 import classNames from "classnames";
 import ButtonAsLink from "./ButtonAsLink";
+import { Link } from "react-router-dom";
 
 const Sidebar = () => {
   return (
@@ -33,13 +34,13 @@ const Sidebar = () => {
         aria-label="Sidebar"
       >
         <div className="h-full px-3 py-4 overflow-y-auto bg-gray-800">
-          <div className="py-2">
+          <Link to="/admin/dashboard" className="block py-2">
             <img
               src="/assets/images/zenos.svg"
               alt="Zenos Ecommerce Logo"
               className="w-32 mx-auto"
             />
-          </div>
+          </Link>
           <ul className="space-y-2 font-medium py-5">
             <li>
               <ButtonAsLink

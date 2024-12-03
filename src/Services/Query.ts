@@ -24,7 +24,10 @@ import {
   where,
 } from "firebase/firestore";
 
-export const getProductData = (listener: any, product_id?: any) =>
+export const getProductData = <T>(
+  listener: any,
+  product_id?: any
+): Promise<T> =>
   new Promise(async (resolve, reject) => {
     try {
       const ProductCollection = collection(firestore, "Products");

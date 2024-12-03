@@ -94,7 +94,6 @@ const MediaModal = () => {
         return null;
       },
       onError: (err) => {
-        console.log("Error is ", err);
         if (err.name || err.message) {
           notify.error({
             title: "File Upload error",

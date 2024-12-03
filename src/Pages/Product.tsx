@@ -10,6 +10,8 @@ import {
 import { addToCartQuery } from "@/Services/Query";
 import { price } from "@/System/function";
 import _ from "lodash";
+import ImageGallery from "react-image-gallery";
+import "react-image-gallery/styles/css/image-gallery.css";
 import { Link, useParams } from "react-router-dom";
 
 const Product = () => {
@@ -22,7 +24,6 @@ const Product = () => {
     data: ProductItemType[];
   };
   const { data: image } = useMediaFile(product.image);
-
   return (
     <MainLayout>
       <PageMeta
@@ -34,17 +35,74 @@ const Product = () => {
         <div className="px-1.5 py-10 space-y-5 md:px-4">
           <div className="flex flex-col items-start justify-between gap-x-12 gap-y-32  px-2 lg:flex-row lg:px-6">
             <div className="w-full lg:w-3/4">
-              {/* Products styler */}
+              {/* Products Image and Metadata */}
               <div className="flex flex-col items-start justify-between gap-x-8 gap-y-2 md:flex-row md:items-stretch">
                 <div className="w-full md:w-full">
-                  <div
-                    className={`bg-no-repeat bg-cover bg-center w-full h-80 rounded-xl md:bg-contain md:w-full md:min-h-full md:h-96 bg-white/5`}
-                    style={{
-                      backgroundImage: `url('${
-                        image || "/assets/images/favicon.svg"
-                      }')`,
-                    }}
-                  ></div>
+                  <ImageGallery
+                    items={_.map(image, (value, key) => ({
+                      key,
+                      original: value,
+                      thumbnail: value,
+                      // loading: "eager",
+                      originalClass:
+                        "bg-zenos-400/20 rounded-xl overflow-hidden",
+                      thumbnailClass: "border foc",
+                    }))}
+                    showFullscreenButton={false}
+                    useBrowserFullscreen={false}
+                    renderRightNav={(onClick, disabled) => (
+                      <button
+                        type="button"
+                        onClick={onClick}
+                        disabled={disabled}
+                        className="absolute top-2/4 right-2 z-20 bg-zenos-500/60 rounded-lg inline !w-auto !p-0 disabled:hidden"
+                      >
+                        <svg
+                          className="w-12 h-12 text-white"
+                          aria-hidden="true"
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            stroke="currentColor"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="m10 16 4-4-4-4"
+                          />
+                        </svg>
+                      </button>
+                    )}
+                    renderLeftNav={(onClick, disabled) => (
+                      <button
+                        type="button"
+                        onClick={onClick}
+                        disabled={disabled}
+                        className="absolute top-2/4 left-2 z-20 bg-zenos-500/60 rounded-lg inline !w-auto !p-0 disabled:hidden"
+                      >
+                        <svg
+                          className="w-12 h-12 text-white"
+                          aria-hidden="true"
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            stroke="currentColor"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="1.5"
+                            d="m14 8-4 4 4 4"
+                          />
+                        </svg>
+                      </button>
+                    )}
+                  />
                 </div>
                 <div className="w-full md:min-w-1/2">
                   <div className="w-full inline-flex justify-end">
@@ -129,7 +187,7 @@ const Product = () => {
                           <p className="text-lg text-center">Add to cart</p>
                         </div>
                       }
-                      className="w-full py-0.5"
+                      className="w-full py-2"
                       onClick={() => {
                         addToCartQuery(product).then(() => {});
                       }}

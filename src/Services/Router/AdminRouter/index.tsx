@@ -1,11 +1,11 @@
 // Route list for accounts, authentication and other related personal settings
-import AdminLogin from "@/Pages/Admin/Auth/login";
 import AdminDashoard from "@/Pages/Admin/Dashboard";
 import ErrorPage from "@/Pages/ErrorPage";
 import { queryToRegisterUser } from "@/Services/Queries/AuthQuery";
 import { Button } from "flowbite-react";
 import { Navigate, Outlet, RouteObject } from "react-router-dom";
 import { ProtectedRoute } from "../utils";
+import AdminLogin from "@/Pages/Admin/Auth/Login";
 
 const AdminRouter: RouteObject[] = [
   // admin authenticated routes

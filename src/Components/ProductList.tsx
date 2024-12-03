@@ -7,14 +7,16 @@ const ProductList: React.FC<ProductListInterface> = ({
   products,
   type = "product_listing",
 }) => {
+  const TypeCartListing = type === "carts_listing";
+  const TypeSimilarListing = type === "similar_listing";
+  const TypeOrderListing = type === "order_listing";
+  const TypeProductListing = type === "product_listing";
   return (
     <div
-      className={classNames("grid", {
-        "grid-cols-1 gap-6":
-          type === "carts_listing" || type === "similar_listing",
-        "grid-cols-1 gap-1.5": type == "order_listing",
-        "grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6":
-          type == "product_listing",
+      className={classNames("relative grid mixitup-product-wrapper", {
+        "grid-cols-1 gap-6": TypeCartListing || TypeSimilarListing,
+        "grid-cols-1 gap-1.5": TypeOrderListing,
+        "grid-cols-1 xl:grid-cols-3 gap-x-4 gap-y-12": TypeProductListing,
       })}
     >
       {products.length > 0 &&
@@ -25,6 +27,9 @@ const ProductList: React.FC<ProductListInterface> = ({
             type={type}
           />
         ))}
+      <p className="hidden no-product-data bottom-0">
+        No Record Found
+      </p>
     </div>
   );
 };

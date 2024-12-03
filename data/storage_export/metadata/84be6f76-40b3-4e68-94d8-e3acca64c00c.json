@@ -1,0 +1,21 @@
+{
+  "name": "uploads/pZGWn93ZDGiBA7xYdVnt8apXOXoS/8MSyOBTMUahp.webp",
+  "bucket": "vint-ecommerce.appspot.com",
+  "metageneration": 1,
+  "generation": 1733129681217,
+  "contentType": "image/webp",
+  "storageClass": "STANDARD",
+  "contentDisposition": "inline",
+  "downloadTokens": [
+    "8999ac7d-2e35-4f85-a292-dd85710635fa"
+  ],
+  "etag": "EnlMhAFNllPEtQcerhJJrKxMXMQ",
+  "customMetadata": {
+    "mime_type": "image/webp"
+  },
+  "timeCreated": "2024-12-02T08:54:41.218Z",
+  "updated": "2024-12-02T08:54:41.218Z",
+  "size": 48402,
+  "md5Hash": "mO+jIKnCPTtOQLvnhus6wg==",
+  "crc32c": "2854079087"
+}

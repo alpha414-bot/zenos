@@ -10,6 +10,11 @@ import VariantsType from "@/Components/VariantsType";
 import { useProductsData } from "@/Services/Hook";
 import { queryToDeleteProduct } from "@/Services/Queries/ProductQuery";
 import { addCollectionDoc, updateCollectionDoc } from "@/Services/Query";
+import {
+  ZenosCategory,
+  ZenosNewAgeSubCategory,
+  ZenosOraimoSubCategory,
+} from "@/System/Constants";
 import { price } from "@/System/function";
 import { ColumnDef } from "@tanstack/react-table";
 import { Timestamp } from "firebase/firestore";
@@ -217,13 +222,10 @@ const ProductsAction = ({ values }: { values: ProductItemType }) => {
                 />
                 <SelectDropdown
                   name={`category`}
-                  options={[
-                    { key: "oraimo", value: "Oraimo" },
-                    { key: "new_age", value: "New Age" },
-                    { key: "fairly_used", value: "UK Used" },
-                  ]}
+                  options={ZenosCategory}
                   control={control}
                   placeholder="Category"
+                  containerClassName="z-20"
                   rules={{ required: "Category is required" }}
                   defaultOptionKey={values?.category?.key}
                 />
@@ -336,9 +338,11 @@ const AdminProductsComponent = () => {
       {
         header: "Status",
         accessorFn: (row) => row,
-        cell: (info) => (
-          <div>{JSON.stringify((info.getValue() as any).id)}</div>
-        ),
+        // cell: (info) => (
+        //   <>
+        //   {/* <div>{JSON.stringify((info.getValue() as any).id)}</div> */}
+        //   </>
+        // ),
         footer: (props) => props.column.id,
         enableSorting: false,
       },
@@ -359,6 +363,7 @@ const AdminProductsComponent = () => {
         ),
         header: () => <span>Product Image</span>,
         footer: (props) => props.column.id,
+        enableSorting: false,
       },
       {
         accessorFn: (row) => row.name,
@@ -384,7 +389,7 @@ const AdminProductsComponent = () => {
       },
       {
         accessorKey: "createdAt",
-        header: "Date Created",
+        header: "Created",
         cell: (info) => (
           <span>
             {moment((info.getValue() as Timestamp).seconds * 1000).format(
@@ -407,6 +412,9 @@ const AdminProductsComponent = () => {
     []
   );
   const [addProductModal, setAddProductModal] = useState<Modal>();
+  const [categoryType, setCategoryType] = useState<
+    "oraimo" | "new-age" | "uk-used"
+  >();
   const { control, handleSubmit, reset } = useForm({ mode: "all" });
   const [variants, setVariants] = useState([{}]);
   const submitProductsForm = (data: any) => {
@@ -487,7 +495,7 @@ const AdminProductsComponent = () => {
         id="add-product-modal"
         tabIndex={-1}
         aria-hidden="true"
-        className="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 py-6 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full bg-gray-800/50"
+        className="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 py-6 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full bg-gray-800/30"
       >
         <div className="relative w-full max-w-4xl max-h-full">
           {/* Modal content */}
@@ -558,15 +566,37 @@ const AdminProductsComponent = () => {
                   />
                   <SelectDropdown
                     name="category"
-                    options={[
-                      { key: "oraimo", value: "Oraimo" },
-                      { key: "new_age", value: "New Age" },
-                      { key: "fairly_used", value: "UK Used" },
-                    ]}
+                    options={ZenosCategory}
                     control={control}
                     placeholder="Category"
+                    containerClassName="z-30"
                     rules={{ required: "Category is required" }}
+                    onDropdownSelect={(data: any) => {
+                      console.log(data);
+                      setCategoryType(data?.key);
+                      return data;
+                    }}
                   />
+                  {categoryType == "oraimo" && (
+                    <SelectDropdown
+                      name="subcategory"
+                      options={ZenosOraimoSubCategory}
+                      control={control}
+                      containerClassName="z-20"
+                      placeholder="Sub Category"
+                      rules={{ required: "Sub category is required" }}
+                    />
+                  )}
+                  {categoryType == "new-age" && (
+                    <SelectDropdown
+                      name="subcategory"
+                      options={ZenosNewAgeSubCategory}
+                      control={control}
+                      containerClassName="z-20"
+                      placeholder="Sub Category"
+                      rules={{ required: "Sub category is required" }}
+                    />
+                  )}
                   <Input
                     control={control}
                     name="price"

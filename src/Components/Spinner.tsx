@@ -1,9 +1,16 @@
+import classNames from "classnames";
+
 interface SpinnerProps {
   className?: string;
   text?: string;
+  textClassName?: string;
 }
 
-const Spinner: React.FC<SpinnerProps> = ({ className = "w-10 h-10", text }) => {
+const Spinner: React.FC<SpinnerProps> = ({
+  className = "w-10 h-10",
+  text,
+  textClassName,
+}) => {
   return (
     <div
       role="status"
@@ -26,7 +33,12 @@ const Spinner: React.FC<SpinnerProps> = ({ className = "w-10 h-10", text }) => {
         />
       </svg>
       <span className="sr-only">Loading...</span>
-      <span className="font-medium text-white underline underline-offset-2 decoration-dotted tracking-wide">
+      <span
+        className={classNames(
+          "font-medium text-white underline underline-offset-2 decoration-dotted tracking-wide",
+          textClassName
+        )}
+      >
         {text}
       </span>
     </div>

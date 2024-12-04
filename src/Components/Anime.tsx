@@ -1,29 +1,23 @@
+import classNames from "classnames";
 import { useEffect, useRef, useState } from "react";
-import { Img } from "react-image";
 import Globe from "vanta/dist/vanta.globe.min";
 import HALO from "vanta/dist/vanta.halo.min";
 import NET from "vanta/dist/vanta.net.min";
-import Spinner from "./Spinner";
 
 interface ImagePropsType {
-  path?: string;
-  className?: string | undefined;
   height: number;
-  displayCanva?: boolean;
+  className?: string | undefined;
   typeOfCanva?: "halo" | "net" | "globe";
   animationConfig?: VantaEffectOptions;
 }
 
-const ImageAnime: React.FC<ImagePropsType> = ({
+const Anime: React.FC<ImagePropsType> = ({
   // path,
   height,
   className,
-  displayCanva,
   typeOfCanva = "halo",
   animationConfig,
 }) => {
-  // const { data } = useMediaFile(path) as QueryUseType;
-  const data = "";
   const [vantaEffect, setVantaEffect] = useState<{ destroy: any } | null>(null);
   const myRef = useRef<HTMLDivElement>(null);
   const AnimationConfig = {
@@ -65,35 +59,22 @@ const ImageAnime: React.FC<ImagePropsType> = ({
 
   return (
     <>
-      <div
-        className={`${
-          !data || displayCanva ? "block" : "hidden"
-          // } overflow-hidden w-full h-[25rem] md:h-[30rem]`}
-        } overflow-hidden w-full h-[${height}rem] md:h-[${height + 5}rem]  `}
-      >
+      <div className="w-full h-full">
         <div
           ref={myRef}
           // className="rounded-lg min-w-full min-h-[35rem] md:min-h-[50rem]"
-          className={`rounded-lg min-w-full min-h-[${
-            height + 10
-          }rem] md:min-h-[${height * 2}rem]`}
+          className={classNames(
+            `rounded-lg min-w-full min-h-[${height + 10}rem] md:min-h-[${
+              height * 2
+            }rem]`,
+            className
+          )}
         >
           <></>
         </div>
-      </div>
-      <div className={`${!data || displayCanva ? "hidden" : "block"}`}>
-        <Img
-          loader={
-            <div className={`${className} flex items-center justify-center`}>
-              <Spinner text="loading..." className="fill-palma-700 w-10 h-10" />
-            </div>
-          }
-          src={data}
-          className={className}
-        />
       </div>
     </>
   );
 };
 
-export default ImageAnime;
+export default Anime;

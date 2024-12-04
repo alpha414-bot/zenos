@@ -4,8 +4,11 @@ import { ErrorFilter } from "@/System/function";
 import { AuthUserType } from "@/Types/Auth";
 import {
   createUserWithEmailAndPassword,
+  sendEmailVerification,
+  sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signOut,
+  User,
 } from "firebase/auth";
 import {
   collection,
@@ -26,28 +29,49 @@ import { QueryClient } from "./QueryClient";
  * @param user_uid the id of the authenticated user
  * @returns promise returns UserMetaDataInterface
  */
-export const queryToGetUserData = (user: AuthUserType): Promise<AuthUserType> =>
+export const queryToGetUserData = (
+  user: AuthUserType,
+  type?: "admin" | "user"
+): Promise<AuthUserType> =>
   new Promise((resolve, reject) => {
     try {
       if (user?.uid) {
         if (user?.isAnonymous) {
-          return resolve({
-            ...user,
-            ...{
-              role: "guest",
-              admin: false,
-            },
-          });
+          if (type == "user") {
+            return resolve({
+              ...user,
+              ...{
+                role: "guest",
+                admin: false,
+              },
+            });
+          } else if (type == "admin") {
+            return resolve({});
+          }
         }
         const UserCollectionQuery = query(
           collection(firestore, "Users"),
           where("uid", "==", user?.uid),
           limit(1)
         );
+        console.log(type);
         getDocs(UserCollectionQuery)
           .then((user_firestore) => {
             if (user_firestore.docs.length > 0) {
-              resolve(user_firestore.docs[0].data() as AuthUserType);
+              const data: AuthUserType = user_firestore.docs[0].data();
+              if (type == "admin" && !!data.admin) {
+                resolve({
+                  ...user,
+                  ...data,
+                });
+              } else if (type == "user" && !data.admin) {
+                resolve({
+                  ...user,
+                  ...data,
+                });
+              } else {
+                resolve(null);
+              }
             }
           })
           .catch((err) => {
@@ -57,7 +81,7 @@ export const queryToGetUserData = (user: AuthUserType): Promise<AuthUserType> =>
             });
           });
       } else {
-        resolve({});
+        resolve(null);
       }
     } catch (error) {
       reject(error);
@@ -147,12 +171,12 @@ export const queryToLoginUser = (payload: UserSignInFormInput) =>
   new Promise((resolve, reject) => {
     try {
       const UsersCollection = collection(firestore, "Users");
-      const QueryForAdmin = query(
+      const QueryForUser = query(
         UsersCollection,
         where("admin", "==", payload.admin || false),
         where("email", "==", payload.email)
       );
-      getDocs(QueryForAdmin).then((user) => {
+      getDocs(QueryForUser).then((user) => {
         if (user.docs.length > 0) {
           // There is such user or such administrator
           signInWithEmailAndPassword(
@@ -185,6 +209,60 @@ export const queryToLoginUser = (payload: UserSignInFormInput) =>
     }
   });
 
+export const queryToVerifyAccount = () =>
+  new Promise((resolve, reject) => {
+    try {
+      sendEmailVerification(auth.currentUser as User)
+        .then((res) => {
+          notify.success({
+            text: "Email verification sent successfully. Please check your inbox.",
+          });
+          resolve(res);
+        })
+        .catch((error) => {
+          notify.error({
+            text: `[Error @vemI]: Failed to send email verification. <br/>${JSON.stringify(
+              error
+            )} <br/> Contact administrator`,
+          });
+          reject(error);
+        });
+    } catch (error) {
+      notify.error({
+        title: "Error",
+        text: `[Error #KinS]: try/catch: ${JSON.stringify(
+          error
+        )}. <br/>Contact administrator.`,
+      });
+      reject(error);
+    }
+  });
+
+export const resetPasswordStepA = (email: string) =>
+  new Promise((resolve, reject) => {
+    try {
+      sendPasswordResetEmail(auth, email)
+        .then((data) => {
+          notify.success({
+            text: "Password reset email sent successfully. Check your inbox",
+          });
+          resolve(data);
+        })
+        .catch((error) => {
+          notify.error({ text: ErrorFilter(error, "forgot-password") });
+          reject(error);
+        });
+    } catch (error) {
+      notify.error({
+        title: "Error",
+        text: `[Error #GnbH]: try/catch: ${JSON.stringify(
+          error
+        )}. <br/>Contact administrator.`,
+      });
+      reject(error);
+    }
+  });
+
 /**
  * QUERY TO LOGOUT FROM ACCOUNT.
  *
@@ -200,6 +278,7 @@ export const queryToLogout = (dontinform: boolean = false) =>
             notify.success({ text: "You have successfully being logged out." });
           }
           QueryClient.setQueryData(["auth_user"], null);
+          QueryClient.setQueryData(["auth_admin"], null);
           resolve(res);
         })
         .catch((error) => {

@@ -1,9 +1,6 @@
+import Anime from "@/Components/Anime";
 import Button from "@/Components/Button";
 import Filter from "@/Components/Filter";
-import {
-  default as AwsImage,
-  default as ImageAnime,
-} from "@/Components/ImageAnime";
 import Input from "@/Components/Input";
 import ProductList from "@/Components/ProductList";
 import Spinner from "@/Components/Spinner";
@@ -13,15 +10,12 @@ import PageMeta from "@/Layouts/PageMeta";
 import { useProductsData } from "@/Services/Hook";
 import { EmailPattern } from "@/System/function";
 import { notify } from "@/notify";
+import classNames from "classnames";
 import { useForm } from "react-hook-form";
 import Slider from "react-slick";
 
 const Home = () => {
-  const {
-    data,
-    isLoading,
-    isFetching,
-  } = useProductsData<ProductItemType[]>();
+  const { data, isLoading, isFetching } = useProductsData<ProductItemType[]>();
   const { control, handleSubmit } = useForm();
   const JoinNewsletter = () => {
     notify.success({
@@ -36,45 +30,70 @@ const Home = () => {
         description="The ecommerce with the latest in laptops, mobile and gadgets"
       >
         <div className="space-y-0">
-          <div className="relative flex flex-col items- justify-between py-20 gap-8 min-h-[25rem] md:flex-row md:min-h-[30rem] md:px-6 md:py-28">
-            <div className="relative z-50 px-2 space-y-2 w-full md:w-auto md:px-2">
-              {/* Text overlay */}
-              <div className="flex flex-col items-start">
-                <p className="p-4 inline-block text-4xl font-extrabold md:text-6xl lg:text-8xl rounded-t-xl bg-gray-400/25">
-                  Laptop .
+          <div
+            className={classNames("relative items-stretch", {
+              "min-h-[25rem] md:min-h-screen": true,
+            })}
+          >
+            <Slider
+              {...{
+                fade: true,
+                slidesToShow: 1,
+                slidesToScroll: 1,
+                // autoplay: true,
+                autoplaySpeed: 6000,
+                adaptiveHeight: true,
+                arrows: false,
+                // infinite: false,
+                swipe: true,
+                dots: true,
+              }}
+              className=""
+            >
+              <div
+                className={classNames("py-40 h-full relative space-y-6", {
+                  "min-h-[25rem] md:min-h-screen": true,
+                })}
+                data-main
+              >
+                <div className="flex flex-col items-start">
+                  <div className="px-6 py-6 inline-block mx-auto rounded-t-3xl bg-gray-400/40 md:px-4">
+                    <p className="text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-zenos-100/65 via-zenos-300/80 to-zenos-500 md:text-6xl lg:text-9xl">
+                      Grooming
+                    </p>
+                  </div>
+                  <div className="px-6 py-6 inline-block mx-auto rounded-3xl bg-gray-400/40 md:px-4">
+                    <p className="text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-zenos-500 via-zenos-300/80 to-zenos-100/65 md:text-6xl lg:text-9xl">
+                      Ultimate . Series
+                    </p>
+                  </div>
+                </div>
+                <p className="text-lg font-semibold text-center tracking-wide md:text-xl">
+                  Power Up Your Life: The Latest in Mobile; Accessories and
+                  Gadgets
                 </p>
-                <p className="p-4 inline-block text-3xl font-extrabold md:text-6xl lg:text-8xl rounded-es-xl rounded-e-xl bg-gray-400/25 md:whitespace-nowrap">
-                  Mobile . Gadgets .
-                </p>
+                {/* Animation */}
+                <div className="bg-white absolute inset-0 bottom-0 -z-10 w-full flex items-end">
+                  <Anime
+                    height={25}
+                    typeOfCanva="globe"
+                    className="w-full h-[40rem] md:h-[40rem]"
+                  />
+                </div>
               </div>
-              <p className="text-sm font-semibold md:text-base">
-                Power Up Your Life: The Latest in Laptops, Mobile, and Gadgets
-              </p>
-            </div>
-            <div className="w-1/2 h-full">
-              <p className="text-2xl font-bold">Featuring</p>
-              <Slider>
-                <div></div>
-                <div></div>
-                <div></div>
-              </Slider>
-            </div>
-            <div className="absolute inset-0 bottom-0 -z-10 w-full flex items-end">
-              <ImageAnime
-                // path="hero.svg"
-                height={25}
-                typeOfCanva="globe"
-                className="w-full h-[40rem] md:h-[40rem]"
-                displayCanva
-              />
-            </div>
-          </div>
-          <div className="py-6 relative">
-            <img
-              src="/assets/images/Banner.svg"
-              alt="Banner Zenos"
-              className="w-full"
-            />
+              <div
+                className={classNames("relative h-full bg-red-500", {
+                  "min-h-[25rem] md:min-h-screen": true,
+                })}
+              >
+                <div
+                  className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
+                  style={{
+                    backgroundImage: `url("https://cdn-img.oraimo.com/2024/10/24/20241023-185521.jpg")`,
+                  }}
+                ></div>
+              </div>
+            </Slider>
           </div>
           <div className="py-10 px-3 md:px-10 space-y-10">
             <div id="shop">
@@ -91,18 +110,18 @@ const Home = () => {
                         text="Loading Products.."
                         textClassName="text-xl"
                       />
-                    )) || (
-                      <>
-                        <ProductList products={data || []} />
+                    )) ||
+                    (data &&
+                      ((data?.length > 0 && (
                         <>
-                          {/* <div className="container">
-                            <div className="mix" />
-                            <div className="mix" />
-                          </div> */}
+                          <ProductList products={data || []} />
                           <div className="mixitup-page-list" />
                         </>
-                      </>
-                    )}
+                      )) || (
+                        <div className="mixitup-container-failed">
+                          <p className="no-product-data">No Product found! Start listing Product</p>
+                        </div>
+                      )))}
                 </div>
               </div>
             </div>
@@ -136,10 +155,9 @@ const Home = () => {
               </form>
             </div>
             <div className="absolute z-30 overflow-hidden w-full top-0 md:right-0 h-[25rem]">
-              <AwsImage
+              <Anime
                 height={25}
                 className="w-full h-[25rem] md:h-[30rem]"
-                displayCanva
                 typeOfCanva="net"
               />
             </div>

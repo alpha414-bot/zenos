@@ -1,7 +1,7 @@
 import MainLayout from "@/Layouts/MainLayout";
 import PageMeta from "@/Layouts/PageMeta";
 import { useCartProducts } from "@/Services/Hook";
-import { logoutUser } from "@/Services/Query";
+import { queryToLogout } from "@/Services/Queries/AuthQuery";
 import { auth } from "@/firebase-config";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 
@@ -50,7 +50,7 @@ const Dashboard = () => {
                 <div
                   className="mt-0 lg:mt-12"
                   onClick={() =>
-                    logoutUser().then(() => {
+                    queryToLogout().then(() => {
                       navigate("/");
                     })
                   }

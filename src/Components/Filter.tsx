@@ -9,7 +9,13 @@ import mixitupmultifilter from "mixitup-multifilter";
 import mixitupPagination from "mixitup-pagination";
 import { useEffect, useState } from "react";
 
-const Filter = ({ products }: { products: any }) => {
+const Filter = ({
+  products,
+  paginateLimit = 12,
+}: {
+  products: any;
+  paginateLimit?: number;
+}) => {
   const [categoryType, setCategoryType] = useState<
     | ""
     | ".product-category-oraimo"
@@ -28,7 +34,7 @@ const Filter = ({ products }: { products: any }) => {
             enable: true,
           },
           pagination: {
-            limit: 2, // 12
+            limit: paginateLimit, // 12
           },
           // load: {
           //   filter: "",
@@ -53,7 +59,7 @@ const Filter = ({ products }: { products: any }) => {
         })
       );
     }
-  }, [products]);
+  }, [products, paginateLimit]);
   return (
     <form
       onSubmit={(e) => {

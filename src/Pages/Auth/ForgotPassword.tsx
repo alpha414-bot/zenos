@@ -2,7 +2,7 @@ import Button from "@/Components/Button";
 import Input from "@/Components/Input";
 import MainLayout from "@/Layouts/MainLayout";
 import PageMeta from "@/Layouts/PageMeta";
-import { resetPasswordStepA } from "@/Services/Query";
+import { resetPasswordStepA } from "@/Services/Queries/AuthQuery";
 import { EmailPattern } from "@/System/function";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";

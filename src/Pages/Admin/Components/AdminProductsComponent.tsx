@@ -8,8 +8,8 @@ import Table from "@/Components/Table";
 import TextArea from "@/Components/TextArea";
 import VariantsType from "@/Components/VariantsType";
 import { useProductsData } from "@/Services/Hook";
+import { addCollectionDoc, updateCollectionDoc } from "@/Services/Queries";
 import { queryToDeleteProduct } from "@/Services/Queries/ProductQuery";
-import { addCollectionDoc, updateCollectionDoc } from "@/Services/Query";
 import {
   ZenosCategory,
   ZenosNewAgeSubCategory,

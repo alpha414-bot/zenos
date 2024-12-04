@@ -22,10 +22,10 @@
     @apply bg-purple-500;
   }
   /* Mixitup setup */
-  .mixitup-product-wrapper.mixitup-container-failed {
+  .mixitup-container-failed {
     @apply !py-4 !w-full bg-gray-800 !block rounded-md;
   }
-  .mixitup-product-wrapper.mixitup-container-failed > p.no-product-data {
+  .mixitup-container-failed > p.no-product-data {
     @apply !block text-center font-bold grid-cols-3 text-lg tracking-tight underline underline-offset-2 decoration-dotted
   }
   .mixitup-page-list {

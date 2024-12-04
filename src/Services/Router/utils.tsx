@@ -1,6 +1,7 @@
 import { useLayoutEffect } from "react";
 import { RouteObject, useLocation, useNavigate } from "react-router-dom";
-import { useAuthUser, useCartProducts } from "../Hook";
+import { useCartProducts } from "../Hook";
+import { useAuthUser } from "../Hooks";
 
 // Creating a higher-order component to wrap the router with scroll-to-top functionality
 export const withScrollToTop = (routerConfig: RouteObject[]) => {
@@ -18,19 +19,35 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   middlewares,
 }) => {
   const navigate = useNavigate();
-  const { data: currentUser, isLoading, isFetching, isFetched } = useAuthUser();
+  const {
+    data: currentUser,
+    isLoading: isUserLoading,
+    isFetching: isUserFetching,
+    isFetched: isUserFetched,
+  } = useAuthUser();
+  const {
+    data: currentAdmin,
+    isLoading: isAdminLoading,
+    isFetching: isAdminFetching,
+    isFetched: isAdminFetched,
+  } = useAuthUser();
   const {
     data: carts,
     isLoading: cartIsLoading,
     isFetching: cartIsFetching,
   } = useCartProducts();
   const PauseAuthorization =
-    isLoading || isFetching || cartIsLoading || cartIsFetching;
+    isUserLoading ||
+    isUserFetching ||
+    isAdminLoading ||
+    isAdminFetching ||
+    cartIsLoading ||
+    cartIsFetching;
   useLayoutEffect(() => {
-    if (!PauseAuthorization && isFetched) {
+    if (!PauseAuthorization && isUserFetched && isAdminFetched) {
       // middleware is for admin, currentuser needs to be authenticated and must be an administrator
       if (middlewares && middlewares.includes("admin")) {
-        if (!currentUser?.uid || !currentUser.admin) {
+        if (!currentAdmin?.uid || !currentAdmin.admin) {
           return navigate("/admin/login", {
             replace: true,
           });
@@ -38,7 +55,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
       }
       // middleware is for admin guest, currentUser needs to be authenticated
       if (middlewares && middlewares.includes("admin_guest")) {
-        if (currentUser?.uid && currentUser.admin) {
+        if (currentAdmin?.uid && currentAdmin.admin) {
           // user is authenticated, user is not anonymous and user is an administrator.
           return navigate("/admin/dashboard", { replace: true });
         }
@@ -71,6 +88,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
 // Define ScrollToTop component
 const ScrollToTop = ({ children }: { children?: any }) => {
+  // useAuthUser();
   const location = useLocation();
   useLayoutEffect(() => {
     document.documentElement.scrollTo(0, 0);

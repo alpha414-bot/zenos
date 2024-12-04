@@ -7,7 +7,7 @@ import {
   useProductsData,
   useSimilarProductsData,
 } from "@/Services/Hook";
-import { addToCartQuery } from "@/Services/Query";
+import { addToCartQuery } from "@/Services/Queries/CartQuery";
 import { price } from "@/System/function";
 import _ from "lodash";
 import ImageGallery from "react-image-gallery";

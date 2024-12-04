@@ -1,7 +1,8 @@
 // Sample React Component for Navbar
 
-import { useAuthUser, useCartProducts } from "@/Services/Hook";
-import { verifyAccount } from "@/Services/Query";
+import { useCartProducts } from "@/Services/Hook";
+import { useAuthUser } from "@/Services/Hooks";
+import { queryToVerifyAccount } from "@/Services/Queries/AuthQuery";
 import { useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 import Button from "./Button";
@@ -38,7 +39,7 @@ function Navbar() {
                 </span>
                 <Button
                   onClick={() => {
-                    verifyAccount();
+                    queryToVerifyAccount();
                   }}
                   className="px-4 py-0.5 text-sm"
                 >

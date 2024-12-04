@@ -6,7 +6,7 @@ import TextArea from "@/Components/TextArea";
 import MainLayout from "@/Layouts/MainLayout";
 import PageMeta from "@/Layouts/PageMeta";
 import { useCartProducts } from "@/Services/Hook";
-import { newOrderQuery } from "@/Services/Query";
+import { newOrderQuery } from "@/Services/Queries/OrderQuery";
 import {
   EmailPattern,
   NigeriaState,

@@ -1,12 +1,4 @@
 // ProductItem: Components containing a visual display of the product metadata
-
-import {
-  addToCartQuery,
-  removeCartProduct,
-  removeCartProductDiscount,
-  updateCartProductDiscount,
-  updateCartQuantity,
-} from "@/Services/Query";
 import { createSlug, price, short } from "@/System/function";
 import classNames from "classnames";
 import _ from "lodash";
@@ -16,6 +8,7 @@ import Slider from "react-slick";
 import Button from "./Button";
 import Image from "./Image";
 import SliderArrow from "./SliderArrow";
+import { addToCartQuery, removeCartProduct, removeCartProductDiscount, updateCartProductDiscount, updateCartQuantity } from "@/Services/Queries/CartQuery";
 
 const ProductItem: React.FC<{
   product: ProductItemType;
@@ -34,9 +27,9 @@ const ProductItem: React.FC<{
       data-price={product?.price}
       className={classNames(
         `mix-target product-category-${createSlug(
-          product?.category.value.toLowerCase()
+          product?.category?.value?.toLowerCase()
         )} product-subcategory-${createSlug(
-          product?.subcategory?.value.toLowerCase()
+          product?.subcategory?.value?.toLowerCase()
         )} ${createSlug(
           product?.name.toLowerCase()
         )} flex justify-start leading-normal rounded-xl`,
@@ -338,7 +331,7 @@ const ProductItem: React.FC<{
                       if (QuantityInputRef.current) {
                         QuantityInputRef.current.value = "";
                       }
-                      updateCartQuantity(product, -1);
+                      updateCartQuantity(product, -1, undefined);
                       setQuantity((count) => count - 1);
                     }}
                     className="inline-flex items-center px-2 py-1 text-sm font-medium bg-transparent border rounded-s-md  focus:z-10 focus:ring-2 focus:ring-gray-500 focus:text-white border-white text-white hover:text-white hover:bg-gray-700 focus:bg-gray-700"
@@ -383,7 +376,7 @@ const ProductItem: React.FC<{
                       if (QuantityInputRef.current) {
                         QuantityInputRef.current.value = "";
                       }
-                      updateCartQuantity(product, 1);
+                      updateCartQuantity(product, 1, undefined);
                       setQuantity((count) => count + 1);
                     }}
                     className="inline-flex items-center px-2 py-1 text-sm font-medium bg-transparent border rounded-e-md  focus:z-10 focus:ring-2 focus:ring-gray-500 focus:text-white border-white text-white hover:text-white hover:bg-gray-700 focus:bg-gray-700"

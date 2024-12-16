@@ -6,7 +6,7 @@ import {
   useMediaFile,
   useProductsData,
   useSimilarProductsData,
-} from "@/Services/Hook";
+} from "@/Services/Hooks";
 import { addToCartQuery } from "@/Services/Queries/CartQuery";
 import { price } from "@/System/function";
 import _ from "lodash";
@@ -36,8 +36,8 @@ const Product = () => {
           <div className="flex flex-col items-start justify-between gap-x-12 gap-y-32  px-2 lg:flex-row lg:px-6">
             <div className="w-full lg:w-3/4">
               {/* Products Image and Metadata */}
-              <div className="flex flex-col items-start justify-between gap-x-8 gap-y-2 md:flex-row md:items-stretch">
-                <div className="w-full md:w-full">
+              <div className="grid grid-cols-1 gap-x-8 gap-y-2 md:grid-cols-2">
+                <div className="">
                   <ImageGallery
                     items={_.map(image, (value, key) => ({
                       key,
@@ -104,7 +104,7 @@ const Product = () => {
                     )}
                   />
                 </div>
-                <div className="w-full md:min-w-1/2">
+                <div className="">
                   <div className="w-full inline-flex justify-end">
                     {/* Favourite */}
                     <button>
@@ -197,17 +197,16 @@ const Product = () => {
               </div>
               {/* Product details */}
               <div className="py-4 mt-5">
-                <p className="text-2xl font-semibold">Product details</p>
-                <hr />
+                {/* <p className="text-2xl font-semibold">Product details</p> */}
                 {/* share */}
-                <div className="mt-2 py-0.5 flex items-center gap-2.5">
+                <div className="mt-2 mb-2 py-0.5 flex items-center gap-2.5">
                   <Link
                     to="#"
                     target="_blank"
                     className="inline-block border p-1 border-gray-200 rounded-full"
                   >
                     <svg
-                      className="w-4 h-4 text-white"
+                      className="w-6 h-6 text-white"
                       aria-hidden="true"
                       xmlns="http://www.w3.org/2000/svg"
                       width="24"
@@ -228,7 +227,7 @@ const Product = () => {
                     className="inline-block border p-1 border-gray-200 rounded-full"
                   >
                     <svg
-                      className="w-4 h-4 text-white"
+                      className="w-6 h-6 text-white"
                       aria-hidden="true"
                       xmlns="http://www.w3.org/2000/svg"
                       width="24"
@@ -244,9 +243,13 @@ const Product = () => {
                     </svg>
                   </Link>
                 </div>
-                <p className="mt-8 text-base font-normal">
-                  {product?.description}
-                </p>
+                <hr />
+                <div
+                  className="rich-editor py-4"
+                  dangerouslySetInnerHTML={{
+                    __html: product?.description,
+                  }}
+                />
                 <div className="mt-4">
                   <span className="font-bold text-xl">Features:</span>
                   <div className="w-full pt-5 space-y-12">

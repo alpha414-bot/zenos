@@ -4,6 +4,8 @@ import { ErrorFilter } from "@/System/function";
 import { AuthUserType } from "@/Types/Auth";
 import {
   createUserWithEmailAndPassword,
+  EmailAuthProvider,
+  linkWithCredential,
   sendEmailVerification,
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
@@ -29,49 +31,32 @@ import { QueryClient } from "./QueryClient";
  * @param user_uid the id of the authenticated user
  * @returns promise returns UserMetaDataInterface
  */
-export const queryToGetUserData = (
-  user: AuthUserType,
-  type?: "admin" | "user"
-): Promise<AuthUserType> =>
+export const queryToGetUserData = (user: AuthUserType): Promise<AuthUserType> =>
   new Promise((resolve, reject) => {
     try {
       if (user?.uid) {
         if (user?.isAnonymous) {
-          if (type == "user") {
-            return resolve({
-              ...user,
-              ...{
-                role: "guest",
-                admin: false,
-              },
-            });
-          } else if (type == "admin") {
-            return resolve({});
-          }
+          return resolve({
+            ...user,
+            ...{
+              role: "guest",
+              admin: false,
+            },
+          });
         }
         const UserCollectionQuery = query(
           collection(firestore, "Users"),
           where("uid", "==", user?.uid),
           limit(1)
         );
-        console.log(type);
         getDocs(UserCollectionQuery)
           .then((user_firestore) => {
             if (user_firestore.docs.length > 0) {
               const data: AuthUserType = user_firestore.docs[0].data();
-              if (type == "admin" && !!data.admin) {
-                resolve({
-                  ...user,
-                  ...data,
-                });
-              } else if (type == "user" && !data.admin) {
-                resolve({
-                  ...user,
-                  ...data,
-                });
-              } else {
-                resolve(null);
-              }
+              resolve({
+                ...user,
+                ...data,
+              });
             }
           })
           .catch((err) => {
@@ -115,6 +100,7 @@ export const queryToRegisterUser = (
             const UsersCollection = collection(firestore, "Users");
             const { user: currentUser } = user;
             const UserDoc = doc(UsersCollection, currentUser.uid);
+            delete(payload.password)
             setDoc(
               UserDoc,
               JSON.parse(
@@ -148,6 +134,46 @@ export const queryToRegisterUser = (
                   err
                 );
               });
+          })
+          .catch((error) => {
+            notify.error({ text: ErrorFilter(error) });
+            reject(error);
+          });
+      } else {
+        const Credential = EmailAuthProvider.credential(
+          payload.email as string,
+          payload.password as string
+        );
+        linkWithCredential(auth.currentUser as User, Credential)
+          .then((newuser) => {
+            notify.success({
+              text: "Your account has successfully being created",
+            });
+            const UsersCollection = collection(firestore, "Users");
+            const { user: currentUser } = newuser;
+            const UserDoc = doc(UsersCollection, currentUser.uid);
+            delete(payload.password)
+            setDoc(
+              UserDoc,
+              JSON.parse(
+                JSON.stringify({
+                  ...payload,
+                  admin: !!admin,
+                  uid: currentUser.uid,
+                  displayName: payload.username,
+                  isAnonymous: currentUser.isAnonymous,
+                  createdAt: Timestamp.now(),
+                  updatedAt: Timestamp.now(),
+                } as AuthUserType)
+              )
+            ).catch((error) => {
+              notify.error({
+                text: `[Error @usme]: Account is created successfully, but there was problem with updating user profile. <br/>${JSON.stringify(
+                  error
+                )} <br/> Contact administrator`,
+              });
+            });
+            resolve(newuser);
           })
           .catch((error) => {
             notify.error({ text: ErrorFilter(error) });
@@ -195,7 +221,9 @@ export const queryToLoginUser = (payload: UserSignInFormInput) =>
               reject(error);
             });
         } else {
-          notify.error({ text: "User not found!" });
+          notify.error({
+            text: "User authentication failed! Please try again later",
+          });
         }
       });
     } catch (error) {

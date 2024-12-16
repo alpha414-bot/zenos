@@ -2,10 +2,24 @@ import { Timestamp } from "firebase/firestore";
 import { FullMetadata } from "firebase/storage";
 import { Modal } from "flowbite";
 
+interface MediaMetaDataInterface {
+  directory?: string;
+  extension: string;
+  md5Hash?: string;
+  mimetype?: string;
+  name: string;
+  srcset: {
+    path: string;
+    type?: string;
+    width?: string;
+    unique_filename?: string;
+  }[];
+}
+
 interface MediaItemInterface {
   id?: string;
   user_uid?: string;
-  media: FullMetadata;
+  media: MediaMetaDataInterface;
   createdAt: Timestamp;
   reuploadAttempt?: number;
   updatedAt: Timestamp;

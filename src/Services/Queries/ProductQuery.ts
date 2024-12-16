@@ -8,7 +8,7 @@ import {
   onSnapshot,
   orderBy,
   query,
-  where
+  where,
 } from "firebase/firestore";
 
 export const queryToDeleteProduct = (id?: string) =>
@@ -39,7 +39,8 @@ export const queryToDeleteProduct = (id?: string) =>
 
 export const getProductData = <T>(
   listener: any,
-  product_id?: any
+  product_id?: any,
+  admin: boolean = false
 ): Promise<T> =>
   new Promise(async (resolve, reject) => {
     try {
@@ -64,7 +65,12 @@ export const getProductData = <T>(
         );
       } else {
         // return all the products in the ProductCollection with pagination
+
         let productQuery = query(ProductCollection, orderBy("createdAt"));
+        if (!admin) {
+          // user is the one quering
+          productQuery = query(productQuery, where("status", "==", "active"));
+        }
 
         onSnapshot(
           productQuery,
@@ -170,8 +176,9 @@ export const getCartProducts = (listener: any): Promise<CartMetaItem[]> =>
                 .catch((error) => {
                   console.error("Error fetching product data:", error);
                 });
+            } else {
+              resolve(listener([]));
             }
-            // resolve(listener(DocDataProducts || []));
           },
           (error) => {
             notify.error({

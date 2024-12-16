@@ -7,7 +7,28 @@
   .firebase-emulator-warning {
     @apply !fixed !left-auto !right-4 !bottom-2 !rounded-full !w-12 !h-12 !text-white !bg-white !text-opacity-0 !bg-no-repeat !bg-contain !bg-center bg-[url('https://firebase.google.com/static/images/brand-guidelines/logo-logomark.png')] !shadow-sm !shadow-gray-200;
   }
-
+  /* Rich Text Editor */
+  .rich-editor h1 {
+    @apply text-3xl font-semibold;
+  }
+  .rich-editor h2 {
+    @apply text-2xl font-medium !important;
+  }
+  .rich-editor ol {
+    @apply list-decimal pl-4 !important;
+  }
+  .rich-editor ul {
+    @apply list-disc pl-4 !important;
+  }
+  .rich-editor blockquote {
+    @apply border-l-2 border-gray-500 ml-5 pl-2 text-gray-500 italic  !important;
+  }
+  .rich-editor code {
+    @apply inline-block font-mono bg-gray-300 p-0.5 my-1 !important;
+  }
+  .rich-editor a span {
+    @apply font-mono underline underline-offset-2 text-blue-400 !important;
+  }
   /* Button */
   .btn {
     @apply bg-zenos-700 hover:bg-zenos-800 hover:border-gray-800 hover:ring-2 hover:outline-none hover:ring-zenos-600 inline-flex items-center px-6 py-1 text-lg font-medium text-center rounded-lg;
@@ -22,17 +43,23 @@
     @apply bg-purple-500;
   }
   /* Mixitup setup */
-  .mixitup-container-failed {
+  .mixitup-product-wrapper.mixitup-container-failed,
+  .no-container-products {
     @apply !py-4 !w-full bg-gray-800 !block rounded-md;
   }
-  .mixitup-container-failed > p.no-product-data {
-    @apply !block text-center font-bold grid-cols-3 text-lg tracking-tight underline underline-offset-2 decoration-dotted
+
+  .mixitup-product-wrapper.mixitup-container-failed > .product-placeholder {
+    @apply !hidden;
+  }
+  .mixitup-product-wrapper.mixitup-container-failed > p.no-product-data,
+  .no-container-products > p.no-product-data {
+    @apply !block text-center font-bold grid-cols-3 text-lg tracking-tight underline underline-offset-2 decoration-dotted;
   }
   .mixitup-page-list {
     @apply w-full !py-8 flex items-center justify-center gap-x-3;
   }
-  .mixitup-page-list.mixitup-page-list-disabled{
-    @apply !hidden
+  .mixitup-page-list.mixitup-page-list-disabled {
+    @apply !hidden;
   }
   .mixitup-page-list > .mixitup-control:first-child,
   .mixitup-page-list > .mixitup-control:last-child {

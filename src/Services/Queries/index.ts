@@ -1,6 +1,6 @@
 import { firestore } from "@/firebase-config";
 import { notify } from "@/notify";
-import { addDoc, collection, doc, setDoc } from "firebase/firestore";
+import { addDoc, collection, doc, updateDoc } from "firebase/firestore";
 
 export const addCollectionDoc = (
   CollectionName: any,
@@ -47,7 +47,7 @@ export const addCollectionDoc = (
 export const updateCollectionDoc = (
   CollectionName: any,
   DocReference: any,
-  data: ProductItemType,
+  data: any,
   successMessage?: string
 ) =>
   new Promise((resolve, reject) => {
@@ -60,7 +60,7 @@ export const updateCollectionDoc = (
           updatedAt: new Date(),
         },
       };
-      setDoc(ProductDoc, DataObject)
+      updateDoc(ProductDoc, DataObject)
         .then((data) => {
           notify.success({
             text: successMessage || `${CollectionName} successfully updated.`,

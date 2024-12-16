@@ -7,7 +7,7 @@ import Spinner from "@/Components/Spinner";
 import Title from "@/Components/Title";
 import MainLayout from "@/Layouts/MainLayout";
 import PageMeta from "@/Layouts/PageMeta";
-import { useProductsData } from "@/Services/Hook";
+import { useProductsData } from "@/Services/Hooks";
 import { EmailPattern } from "@/System/function";
 import { notify } from "@/notify";
 import classNames from "classnames";
@@ -43,7 +43,7 @@ const Home = () => {
                 // autoplay: true,
                 autoplaySpeed: 6000,
                 adaptiveHeight: true,
-                arrows: false,
+                arrows: !false,
                 // infinite: false,
                 swipe: true,
                 dots: true,
@@ -89,7 +89,7 @@ const Home = () => {
                 <div
                   className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
                   style={{
-                    backgroundImage: `url("https://cdn-img.oraimo.com/2024/10/24/20241023-185521.jpg")`,
+                    backgroundImage: `url("/assets/images/BannerD.png")`,
                   }}
                 ></div>
               </div>
@@ -118,7 +118,7 @@ const Home = () => {
                           <div className="mixitup-page-list" />
                         </>
                       )) || (
-                        <div className="mixitup-container-failed">
+                        <div className="no-container-products">
                           <p className="no-product-data">No Product found! Start listing Product</p>
                         </div>
                       )))}

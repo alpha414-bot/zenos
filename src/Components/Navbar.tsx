@@ -1,6 +1,6 @@
 // Sample React Component for Navbar
 
-import { useCartProducts } from "@/Services/Hook";
+import { useCartProducts } from "@/Services/Hooks";
 import { useAuthUser } from "@/Services/Hooks";
 import { queryToVerifyAccount } from "@/Services/Queries/AuthQuery";
 import { useState } from "react";
@@ -90,7 +90,7 @@ function Navbar() {
             {(currentUser?.uid && !currentUser.isAnonymous && (
               <li>
                 <NavLink
-                  to="/user/carts"
+                  to={!!currentUser.admin ? "/admin/dashboard" : "/user/carts"}
                   className={({ isActive }) =>
                     `tracking-wide ${
                       isActive
@@ -122,7 +122,11 @@ function Navbar() {
           <div className="flex items-center gap-x-1 md:gap-x-2">
             {/* Cart viewer */}
             <Link
-              to="/user/carts"
+              to={
+                currentUser && currentUser.admin
+                  ? "/admin/dashboard"
+                  : "/user/carts"
+              }
               className="relative inline-flex items-center px-1 py-1 rounded-full"
             >
               <svg
@@ -214,7 +218,7 @@ function Navbar() {
             {(currentUser?.uid && !currentUser.isAnonymous && (
               <li>
                 <Link
-                  to="/user/carts"
+                  to={!!currentUser.admin ? "/admin/dashboard" : "/user/carts"}
                   className="underline underline-offset-4 tracking-wide decoration-dotted hover:text-gray-500 font-medium"
                 >
                   My account

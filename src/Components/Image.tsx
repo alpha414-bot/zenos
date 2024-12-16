@@ -1,11 +1,13 @@
-import { useMediaFile } from "@/Services/Hook";
 import classNames from "classnames";
 import { FC } from "react";
 import { Img, ImgProps } from "react-image";
 import Spinner from "./Spinner";
+import { useMediaFile } from "@/Services/Hooks";
 
 interface ImagePropsInterface extends ImgProps {
   asDiv?: boolean;
+  w?: string;
+  type?: string;
 }
 
 const Image: FC<ImagePropsInterface> = ({
@@ -13,9 +15,10 @@ const Image: FC<ImagePropsInterface> = ({
   className,
   asDiv = false,
   children,
+  w,
   ...props
 }) => {
-  const { data: image, isLoading } = useMediaFile(src, false);
+  const { data: image, isLoading } = useMediaFile(src, w, "image");
   return (
     (isLoading && (
       <div

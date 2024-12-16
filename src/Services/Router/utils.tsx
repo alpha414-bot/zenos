@@ -1,7 +1,6 @@
 import { useLayoutEffect } from "react";
 import { RouteObject, useLocation, useNavigate } from "react-router-dom";
-import { useCartProducts } from "../Hook";
-import { useAuthUser } from "../Hooks";
+import { useAuthUser, useCartProducts } from "../Hooks";
 
 // Creating a higher-order component to wrap the router with scroll-to-top functionality
 export const withScrollToTop = (routerConfig: RouteObject[]) => {
@@ -26,12 +25,6 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     isFetched: isUserFetched,
   } = useAuthUser();
   const {
-    data: currentAdmin,
-    isLoading: isAdminLoading,
-    isFetching: isAdminFetching,
-    isFetched: isAdminFetched,
-  } = useAuthUser();
-  const {
     data: carts,
     isLoading: cartIsLoading,
     isFetching: cartIsFetching,
@@ -39,15 +32,13 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   const PauseAuthorization =
     isUserLoading ||
     isUserFetching ||
-    isAdminLoading ||
-    isAdminFetching ||
     cartIsLoading ||
     cartIsFetching;
   useLayoutEffect(() => {
-    if (!PauseAuthorization && isUserFetched && isAdminFetched) {
+    if (!PauseAuthorization && isUserFetched) {
       // middleware is for admin, currentuser needs to be authenticated and must be an administrator
       if (middlewares && middlewares.includes("admin")) {
-        if (!currentAdmin?.uid || !currentAdmin.admin) {
+        if (!currentUser?.uid || !currentUser.admin) {
           return navigate("/admin/login", {
             replace: true,
           });
@@ -55,7 +46,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
       }
       // middleware is for admin guest, currentUser needs to be authenticated
       if (middlewares && middlewares.includes("admin_guest")) {
-        if (currentAdmin?.uid && currentAdmin.admin) {
+        if (currentUser?.uid && currentUser.admin) {
           // user is authenticated, user is not anonymous and user is an administrator.
           return navigate("/admin/dashboard", { replace: true });
         }

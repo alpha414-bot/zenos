@@ -46,8 +46,8 @@ const AdminLayout: FC<AdminLayoutInterface> = ({ children }) => {
         )}
 
         <>
-          <Sidebar />
-          <div className="px-4 sm:ml-64">{children}</div>
+          <Sidebar type="admin" />
+          <div className="px-2 sm:px-4 sm:ml-64">{children}</div>
         </>
       </div>
       <MediaModal />

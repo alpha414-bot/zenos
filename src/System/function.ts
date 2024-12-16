@@ -1,8 +1,11 @@
 import { MimeType } from "@/Types/Media";
+import escapeHtml from "escape-html";
 import { AuthError } from "firebase/auth";
 import { Timestamp } from "firebase/firestore";
 import _ from "lodash";
 import { useEffect } from "react";
+import { Text } from "slate";
+import { jsx } from "slate-hyperscript";
 
 export const getErrorMessageViaStatus = (error: RouteErrorInterface) => {
   switch (error.status) {
@@ -23,6 +26,14 @@ export const getErrorMessageViaStatus = (error: RouteErrorInterface) => {
       };
   }
 };
+
+export const isUrl = (url: string): boolean => {
+  const pattern =
+    /^(https?:\/\/)?(www\.)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/[^\s]*)?$/;
+  // const pattern = new RegExp("^(?:[a-z]+:)?//", "i");
+  return pattern.test(encodeURI(url));
+};
+
 /**
  * Function to convert value to human readable output
  *
@@ -77,10 +88,10 @@ export const keys = {
     "auth_user_profile",
     auth_uid || "",
   ],
-  product_data: (product_id?: string, page_id?: any) => [
+  product_data: (product_id?: string, admin?: any) => [
     "product_data",
     product_id || "all",
-    page_id || "single_query",
+    admin ? "admin" : "users",
   ],
   similar_product_data: (except_product_id?: string) => [
     "product_data",
@@ -584,13 +595,16 @@ export const ErrorFilter = (
 
 // shorten string text to some characters and add ...
 export const shorten = (text: string, maxLines: number) => {
-  const lines = text.split("\n");
-  const maxTextLength = maxLines * 20; // Assuming an average line length of 40 characters
-  let shortenedText = lines[0]; // Get the first line
-  if (shortenedText.length > maxTextLength) {
-    shortenedText = shortenedText.substring(0, maxTextLength) + "...";
+  if (text) {
+    const lines = text?.split("\n");
+    const maxTextLength = maxLines * 20; // Assuming an average line length of 40 characters
+    let shortenedText = lines[0]; // Get the first line
+    if (shortenedText.length > maxTextLength) {
+      shortenedText = shortenedText.substring(0, maxTextLength) + "...";
+    }
+    return _.trim(shortenedText);
   }
-  return _.trim(shortenedText);
+  return "";
 };
 
 // firebase date converter to understandable momentjs date
@@ -667,4 +681,165 @@ export const MIME_TYPE: MimeType = {
     // ".plain",
     // ".txt"
   ],
+};
+
+const ELEMENT_TAGS: object = {
+  A: (el: any) => ({ type: "link", url: el.getAttribute("href") }),
+  BLOCKQUOTE: () => ({ type: "quote" }),
+  H1: () => ({ type: "heading-one" }),
+  H2: () => ({ type: "heading-two" }),
+  H3: () => ({ type: "heading-three" }),
+  H4: () => ({ type: "heading-four" }),
+  H5: () => ({ type: "heading-five" }),
+  H6: () => ({ type: "heading-six" }),
+  IMG: (el: any) => ({ type: "image", url: el.getAttribute("src") }),
+  LI: () => ({ type: "list-item" }),
+  OL: () => ({ type: "numbered-list" }),
+  P: () => ({ type: "paragraph" }),
+  PRE: () => ({ type: "code" }),
+  UL: () => ({ type: "bulleted-list" }),
+};
+
+// COMPAT: `B` is omitted here because Google Docs uses `<b>` in weird ways.
+const TEXT_TAGS = {
+  CODE: () => ({ code: true }),
+  DEL: () => ({ strikethrough: true }),
+  EM: () => ({ italic: true }),
+  I: () => ({ italic: true }),
+  S: () => ({ strikethrough: true }),
+  STRONG: () => ({ bold: true }),
+  U: () => ({ underline: true }),
+};
+
+// function to strip html tags css classes and everything else
+export const stripHtml = (text?: string, replace_with: string = ""): string => {
+  if (typeof text === "string") {
+    const regex = /(<([^>]+)>)/gi;
+    const result = (text || ("" as string)).replace(regex, replace_with);
+    return (result as string).toString().trim();
+  }
+  return "";
+};
+
+// Function with working with Slate Rich TextEditor
+export const __serialize = (Node: any) => {
+  if (Text.isText(Node)) {
+    let string = escapeHtml(Node.text);
+    const node = Node as any;
+    if (node.bold) {
+      string = `<strong>${string}</strong>`;
+    }
+    if (node.italic) {
+      string = `<i>${string}</i>`;
+    }
+    if (node.underline) {
+      string = `<u>${string}</u>`;
+    }
+    if (node.code) {
+      string = `<code>${string}</code>`;
+    }
+    return string;
+  }
+
+  const children = Node?.children.map((n: any) => __serialize(n)).join("");
+  let style: string = "";
+  if (Node.align) {
+    style = ` style='text-align: ${Node.align};'`;
+  }
+  switch (Node.type) {
+    case "bold":
+      return `<strong>${children}</strong>`;
+    case "italic":
+      return `<i>${children}</i>`;
+    case "underline":
+      return `<u>${children}</u>`;
+    case "code":
+      return `<code>${children}</code>`;
+    case "heading-one":
+      return `<h1${style}>${children}</h1>`;
+    case "heading-two":
+      return `<h2${style}>${children}</h2>`;
+    case "block-quote":
+      return `<blockquote${style}><p>${children}</p></blockquote>`;
+    case "numbered-list":
+      return `<ol>${children}</ol>`;
+    case "bulleted-list":
+      return `<ul>${children}</ul>`;
+    case "list-item":
+      return `<li${style}>${children}</li>`;
+    case "paragraph":
+      return `<p${style}>${children}</p>`;
+    case "link":
+      let url: any = escapeHtml(stripHtml(Node.url));
+      let children_url = escapeHtml(stripHtml(children));
+      if (isUrl(children_url)) {
+        url = children_url;
+      }
+      return `<a href="${url}">${children}</a>`;
+    default:
+      return children;
+  }
+};
+
+export const slate_serialize = (node: any) => {
+  if (node) {
+    return _.join(
+      node?.map((item: any) => __serialize(item)),
+      ""
+    );
+  }
+  return "";
+};
+
+export const deserialize = (el: any): any => {
+  if (el?.nodeType === 3) {
+    return el?.textContent;
+  } else if (el?.nodeType !== 1) {
+    return null;
+  } else if (el?.nodeName === "BR") {
+    return "\n";
+  }
+
+  const { nodeName } = el;
+  let parent = el;
+
+  if (
+    nodeName === "PRE" &&
+    el.childNodes[0] &&
+    el.childNodes[0].nodeName === "CODE"
+  ) {
+    parent = el.childNodes[0];
+  }
+  let children = Array.from(parent.childNodes).map(deserialize).flat();
+
+  if (children.length === 0) {
+    children = [{ text: "" }];
+  }
+
+  if (el.nodeName === "BODY") {
+    return jsx("fragment", {}, children);
+  }
+
+  if ((ELEMENT_TAGS as any)[nodeName]) {
+    const attrs = (ELEMENT_TAGS as any)[nodeName](el);
+    // attrs.align = "center";
+    const alignment = el?.style?.textAlign;
+    if (alignment) {
+      attrs.align = alignment;
+    }
+    return jsx("element", attrs, children);
+  }
+
+  if ((TEXT_TAGS as any)[nodeName]) {
+    const attrs = (TEXT_TAGS as any)[nodeName](el);
+    return children.map((child) => jsx("text", attrs, child));
+  }
+
+  return children;
+};
+
+export const slate_deserialize = (html: any) => {
+  const parsed = new DOMParser().parseFromString(html, "text/html");
+  const fragment = deserialize(parsed.body);
+  return fragment;
 };

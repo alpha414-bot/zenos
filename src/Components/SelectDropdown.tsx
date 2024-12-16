@@ -187,6 +187,7 @@ const SelectDropdown = forwardRef<HTMLInputElement, SelectDropdownInterface>(
                           setDropdownQuery(InputValue.toLowerCase());
                         }}
                         autoComplete={NOAUTOCOMPLETE}
+                        defaultValue={defaultValue?.value}
                         {...props}
                       />
 

@@ -1,4 +1,4 @@
-import { useMediaFile } from "@/Services/Hook";
+import { useMediaFile } from "@/Services/Hooks";
 import { queryToDeleteFiles } from "@/Services/Queries/MediaQuery";
 import { fm, shorten } from "@/System/function";
 import { MediaItemInterface, ModalInterface } from "@/Types/Media";
@@ -27,8 +27,8 @@ const MediaItem: React.FC<{
   onSelect,
   clearSelect,
 }) => {
-  const type = _.split(item?.media?.contentType, "/")[0];
-  const { data: src } = useMediaFile(item?.media?.fullPath);
+  const type = _.split(item?.media?.mimetype, "/")[0];
+  const { data: src } = useMediaFile(item?.media?.name, "w800", type);
   const { media, createdAt, updatedAt } = item;
   const createdAtDate = moment(fm(createdAt));
   const updateAtDate = moment(fm(updatedAt));
@@ -92,7 +92,7 @@ const MediaItem: React.FC<{
           )}
           onClick={() => {
             // if modal is opened,
-            queryToDeleteFiles(media.fullPath);
+            queryToDeleteFiles(media.name);
           }}
         >
           <svg

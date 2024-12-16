@@ -1,14 +1,15 @@
 import Button from "@/Components/Button";
 import Input from "@/Components/Input";
-import PayDesk from "@/Components/PayDesk";
 import SelectDropdown from "@/Components/SelectDropdown";
 import TextArea from "@/Components/TextArea";
 import MainLayout from "@/Layouts/MainLayout";
 import PageMeta from "@/Layouts/PageMeta";
-import { useCartProducts } from "@/Services/Hook";
+import { useCartProducts } from "@/Services/Hooks";
+import { queryToRegisterUser } from "@/Services/Queries/AuthQuery";
 import { newOrderQuery } from "@/Services/Queries/OrderQuery";
 import {
   EmailPattern,
+  generateRandomString,
   NigeriaState,
   NumberPattern,
   PasswordPattern,
@@ -16,12 +17,16 @@ import {
 } from "@/System/function";
 import { auth } from "@/firebase-config";
 import _ from "lodash";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 
 const Checkout = () => {
   const { data: carts } = useCartProducts() as { data: CartMetaItem[] };
+  const reference = useMemo(
+    () => generateRandomString(_.random(24, 32)),
+    [carts]
+  );
   const [isForm, setIsForm] = useState<number>(0);
   const navigate = useNavigate();
   const { control, handleSubmit, reset, watch } =
@@ -37,11 +42,9 @@ const Checkout = () => {
         setIsForm((current) => current + 1);
       } else {
         // user is anonymous and needs to create a permanent account
-        console.log("sign up", data);
-
-        // createUser(data).then(() => {
-        //   setIsForm((current) => current + 1);
-        // });
+        queryToRegisterUser(data, false).then(() => {
+          setIsForm((current) => current + 1);
+        });
       }
     } else if (isForm !== 2) {
       // form of where to ship to (not related to profile, as it might different in each orders)
@@ -80,7 +83,7 @@ const Checkout = () => {
             className="w-full px-4 md:w-[75%] md:px-8 py-12"
           >
             <div className="flex">
-              <ol className="flex items-center w-full space-x-2 text-sm font-medium text-center bg-gray-800 shadow-sm text-gray-400 sm:text-base sm:space-x-4 rtl:space-x-reverse">
+              <ol className="flex items-center w-full space-x-2 text-sm font-medium text-center shadow-sm text-white sm:text-base sm:space-x-4 rtl:space-x-reverse">
                 {CheckoutRoute.map((item, index) => (
                   <button
                     type="submit"
@@ -272,6 +275,7 @@ const Checkout = () => {
                         name="state"
                         defaultValue={FormValue.state}
                         options={NigeriaState}
+                        containerClassName="z-20"
                         rules={{
                           required:
                             "State is required. <em>Enter the name of state/province and choose from options</em>",
@@ -424,8 +428,8 @@ const Checkout = () => {
                     Payment & Billing
                   </h3>
                   <p className="mt-1 text-xs font-medium italic">
-                    Please take note that this would only be a test development
-                    payment. As no real money is involved. Thank you.
+                    To complete and make payment reach out to our customer
+                    support to receive logistic support and track your order.
                   </p>
                   <div className="mt-5">
                     <p className="text-base font-medium">Billing Address:</p>
@@ -477,16 +481,40 @@ const Checkout = () => {
                     </div>
                   </div>
                   <div className="mt-8 flex flex-wrap items-stretch gap-4">
-                    <PayDesk
-                      metadata={carts}
-                      amount={TotalProductPrice}
-                      onSuccess={(reference: any) => {
-                        newOrderQuery(reference, carts, FormValue).then(() => {
+                    <Button
+                      className="gap-2"
+                      onClick={() => {
+                        newOrderQuery(
+                          {
+                            reference,
+                            amount: TotalProductPrice,
+                            status: "pending",
+                          },
+                          carts,
+                          FormValue
+                        ).then(() => {
                           reset();
-                          navigate("/user/orders");
+                          navigate("/user/inbox");
                         });
                       }}
-                    />
+                    >
+                      Chat with{" "}
+                      <svg
+                        className="w-6 h-6 text-white"
+                        aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        fill="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M12 2a7 7 0 0 0-7 7 3 3 0 0 0-3 3v2a3 3 0 0 0 3 3h1a1 1 0 0 0 1-1V9a5 5 0 1 1 10 0v7.083A2.919 2.919 0 0 1 14.083 19H14a2 2 0 0 0-2-2h-1a2 2 0 0 0-2 2v1a2 2 0 0 0 2 2h1a2 2 0 0 0 1.732-1h.351a4.917 4.917 0 0 0 4.83-4H19a3 3 0 0 0 3-3v-2a3 3 0 0 0-3-3 7 7 0 0 0-7-7Zm1.45 3.275a4 4 0 0 0-4.352.976 1 1 0 0 0 1.452 1.376 2.001 2.001 0 0 1 2.836-.067 1 1 0 1 0 1.386-1.442 4 4 0 0 0-1.321-.843Z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </Button>
                   </div>
                 </div>
               )}

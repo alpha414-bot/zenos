@@ -67,6 +67,7 @@ interface VantaEffectOptions {
 
 interface ProductItemType {
   id?: string;
+  status?: string;
   name: string;
   description: string;
   category: { key: string; value: string };
@@ -81,6 +82,17 @@ interface ProductItemType {
   star?: number;
   cartQuantity?: number;
   discount?: { name: "#chameleon" | "#hackathonchameleon"; value: number };
+}
+
+interface PaymentOnSuccessProps {
+  reference: string;
+  amount: any;
+  status: string;
+  // message: string;
+  // redirecturl: string;
+  // trans: string;
+  // transaction: string;
+  // trxref: string;
 }
 
 interface ProductVariantType {
@@ -110,17 +122,6 @@ interface UserSignInFormInput {
   admin?: boolean;
 }
 
-interface PaymentOnSuccessProps {
-  message: string;
-  redirecturl: string;
-  reference: string;
-  status: string;
-  trans: string;
-  transaction: string;
-  trxref: string;
-  amount: any;
-}
-
 interface BillingInputInterface {
   first_name?: string;
   last_name?: string;
@@ -137,7 +138,7 @@ interface BillingInputInterface {
 
 interface OrderDataInterface {
   id?: string;
-  payment_instance: PaymentOnSuccessProps;
+  instance: PaymentOnSuccessProps;
   products: CartMetaItem[];
   billing_info: BillingInputInterface;
   user_uid: string;

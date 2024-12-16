@@ -14,22 +14,30 @@ const ProductList: React.FC<ProductListInterface> = ({
   return (
     <div
       className={classNames("relative grid mixitup-product-wrapper", {
-        "grid-cols-1 gap-6": TypeCartListing || TypeSimilarListing,
-        "grid-cols-1 gap-1.5": TypeOrderListing,
+        "grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-1": TypeSimilarListing,
+        "grid-cols-1 gap-6": TypeCartListing,
+        "grid-cols-1 gap-4": TypeOrderListing,
         "grid-cols-1 xl:grid-cols-3 gap-x-4 gap-y-12": TypeProductListing,
       })}
     >
-      {products.length > 0 &&
-        products?.map((product, index) => (
-          <ProductItem
-            key={product.id || index}
-            product={product}
-            type={type}
-          />
-        ))}
-      <p className="hidden no-product-data bottom-0">
-        No Record Found
-      </p>
+      {products.length > 0 && (
+        <>
+          {products?.map((product, index) => (
+            <ProductItem
+              key={product.id || index}
+              product={product}
+              type={type}
+            />
+          ))}
+          {TypeProductListing && (
+            <img
+              src="/assets/images/BannerE.png"
+              className="w-full rounded-lg transition-all duration-700 product-placeholder"
+            />
+          )}
+        </>
+      )}
+      <p className="hidden no-product-data bottom-0">No Record Found</p>
     </div>
   );
 };

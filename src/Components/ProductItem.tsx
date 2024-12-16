@@ -1,5 +1,12 @@
 // ProductItem: Components containing a visual display of the product metadata
-import { createSlug, price, short } from "@/System/function";
+import {
+  addToCartQuery,
+  removeCartProduct,
+  removeCartProductDiscount,
+  updateCartProductDiscount,
+  updateCartQuantity,
+} from "@/Services/Queries/CartQuery";
+import { createSlug, price, short, stripHtml } from "@/System/function";
 import classNames from "classnames";
 import _ from "lodash";
 import { useRef, useState } from "react";
@@ -8,7 +15,6 @@ import Slider from "react-slick";
 import Button from "./Button";
 import Image from "./Image";
 import SliderArrow from "./SliderArrow";
-import { addToCartQuery, removeCartProduct, removeCartProductDiscount, updateCartProductDiscount, updateCartQuantity } from "@/Services/Queries/CartQuery";
 
 const ProductItem: React.FC<{
   product: ProductItemType;
@@ -32,13 +38,14 @@ const ProductItem: React.FC<{
           product?.subcategory?.value?.toLowerCase()
         )} ${createSlug(
           product?.name.toLowerCase()
-        )} flex justify-start leading-normal rounded-xl`,
+        )} flex justify-start leading-normal rounded-xl bg-gray-800 shadow-sm shadow-gray-600`,
         {
-          "flex-col items-center px-2 gap-2 md:flex-row shadow-sm shadow-gray-600":
-            TypeCartListing || TypeSimilarListing,
-          "pb-0 flex-col": TypeOrderListing,
-          "pb-4 flex-col items-start justify-center bg-gray-950 shadow-sm shadow-gray-600":
-            TypeProductListing,
+          "py-2 px-2 md:py-4 md:px-4 flex-col items-start gap-2 md:flex-row":
+            TypeCartListing,
+          "py-2 px-2 flex-col items-start gap-2 md:flex-row":
+            TypeSimilarListing,
+          "px-2 py-2 flex-col items-start gap-2 md:flex-row": TypeOrderListing,
+          "pb-4 flex-col items-start justify-center ": TypeProductListing,
         }
       )}
     >
@@ -46,7 +53,8 @@ const ProductItem: React.FC<{
       <div
         className={classNames("relative group", {
           "w-full h-auto": TypeProductListing,
-          "w-24": TypeSimilarListing,
+          "w-full md:w-24": TypeSimilarListing || TypeOrderListing,
+          "w-full h-auto md:w-1/4": TypeCartListing,
         })}
       >
         <Slider
@@ -59,25 +67,27 @@ const ProductItem: React.FC<{
             infinite: true,
             slidesToShow: 1,
             slidesToScroll: 1,
-            nextArrow: TypeSimilarListing ? (
-              <></>
-            ) : (
-              <SliderArrow
-                type="next"
-                arrowClassName="hidden group-hover:block animate-slideright"
-              />
-            ),
-            prevArrow: TypeSimilarListing ? (
-              <></>
-            ) : (
-              <SliderArrow
-                type="prev"
-                arrowClassName="hidden group-hover:block animate-slideleft"
-              />
-            ),
+            nextArrow:
+              TypeSimilarListing || TypeOrderListing ? (
+                <></>
+              ) : (
+                <SliderArrow
+                  type="next"
+                  arrowClassName="hidden group-hover:block animate-slideright"
+                />
+              ),
+            prevArrow:
+              TypeSimilarListing || TypeOrderListing ? (
+                <></>
+              ) : (
+                <SliderArrow
+                  type="prev"
+                  arrowClassName="hidden group-hover:block animate-slideleft"
+                />
+              ),
             adaptiveHeight: true,
           }}
-          // className="h-full bg-white p-0 m-0 relative"
+          // className="h-full bg-white p-4 m-0 relative"
         >
           {typeof product?.image == "object" &&
             product?.image?.map((item, i) => {
@@ -87,11 +97,14 @@ const ProductItem: React.FC<{
                   src={item}
                   asDiv
                   className={classNames(
-                    "bg-no-repeat  bg-center overflow-hidden",
+                    "bg-no-repeat overflow-hidden",
                     {
-                      "!h-96 !w-full bg-cover sm:!h-96 xl:!h-96 rounded-ss-2xl rounded-se-2xl":
+                      "bg-cover bg-center !h-96 !w-full sm:!h-96 xl:!h-96 rounded-ss-2xl rounded-se-2xl":
                         TypeProductListing,
-                      "bg-cover !h-24 !w-24 md:!h-24": TypeSimilarListing,
+                      "bg-cover bg-center !h-56 w-full md:!w-24 md:!h-24 rounded-md":
+                        TypeSimilarListing || TypeOrderListing,
+                      "bg-cover bg-center w-full h-72 md:bg-contain md:bg-top md:h-60 rounded-xl":
+                        TypeCartListing,
                     },
                     [
                       "bg-zenos-600/20",
@@ -111,9 +124,9 @@ const ProductItem: React.FC<{
       {/* Product metadata */}
       <div
         className={classNames("flex flex-col justify-between", {
-          "px-3 py-4 grow": TypeCartListing,
+          "px-3 py-0 grow": TypeCartListing,
           "px-2 py-1": TypeSimilarListing,
-          "p-0": TypeOrderListing,
+          "p-0 grow": TypeOrderListing,
           "px-4 mt-4 grow w-full": TypeProductListing,
         })}
       >
@@ -144,8 +157,8 @@ const ProductItem: React.FC<{
                 </div>
               </div>
               {TypeCartListing && (
-                <p className={"text-gray-800 text-sm mt-4"}>
-                  {product.description}
+                <p className={"text-white text-sm font-medium mt-4"}>
+                  {stripHtml(product?.description, " ")}
                 </p>
               )}
             </Link>
@@ -181,10 +194,10 @@ const ProductItem: React.FC<{
           {!TypeCartListing && !TypeOrderListing && !TypeSimilarListing && (
             <Link to={`/products/${product.id}`}>
               <p className="hidden lg:block text-gray-200 text-sm">
-                {short(product.description, 120)}
+                {short(stripHtml(product?.description, " "), 120)}
               </p>
               <p className="block lg:hidden text-gray-200 text-sm">
-                {short(product.description, 37)}
+                {short(stripHtml(product.description, " "), 37)}
               </p>
             </Link>
           )}
@@ -199,7 +212,7 @@ const ProductItem: React.FC<{
           )}
         </div>
         {TypeCartListing && (
-          <div className="border-b border-dotted py-2">
+          <div className="hidden border-b border-dotted py-2">
             {/* Discount page */}
             <p className="text-xs py-2 italic font-medium border-y border-dotted decoration-dotted md:py-1">
               Use any of the discount code below to receive promo on this
@@ -310,9 +323,10 @@ const ProductItem: React.FC<{
         )}
         {(TypeCartListing || TypeProductListing) && (
           <div
-            className={`mt-3 flex ${
-              TypeCartListing ? "justify-between" : "justify-end"
-            } flex-wrap items-start gap-y-2`}
+            className={classNames("mt-3 flex gap-y-2", {
+              "justify-between items-center": TypeCartListing,
+              "justify-end flex-wrap items-start": !TypeCartListing,
+            })}
           >
             {/* Product Quantity reading */}
             {TypeCartListing && (
@@ -403,7 +417,13 @@ const ProductItem: React.FC<{
               </div>
             )}
             <Button
-              className="w-full !text-center !justify-center gap-2 group"
+              className={classNames(
+                "!text-center !justify-center gap-2 group",
+                {
+                  "!w-auto !bg-red-500": TypeCartListing,
+                  "!w-full": !TypeCartListing,
+                }
+              )}
               onClick={() => {
                 if (TypeCartListing) {
                   // remove products from cart

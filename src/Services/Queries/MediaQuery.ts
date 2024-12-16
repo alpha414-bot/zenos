@@ -1,13 +1,7 @@
 import { auth, firestore, storage } from "@/firebase-config";
 import { notify } from "@/notify";
-import {
-  createSlug,
-  generateRandomFileName,
-  getFileExtension,
-  isURL,
-  removeFileExtension,
-} from "@/System/function";
-import { MediaItemInterface } from "@/Types/Media";
+import { createSlug, isURL } from "@/System/function";
+import { MediaItemInterface, MediaMetaDataInterface } from "@/Types/Media";
 import {
   addDoc,
   collection,
@@ -22,13 +16,8 @@ import {
   updateDoc,
   where,
 } from "firebase/firestore";
-import {
-  deleteObject,
-  getDownloadURL,
-  ref,
-  uploadBytes,
-} from "firebase/storage";
-import _ from "lodash";
+import { deleteObject, ref } from "firebase/storage";
+import { backend_url } from "../../../package.json";
 
 /**
  * <read>
@@ -42,43 +31,21 @@ import _ from "lodash";
 export const queryToGetAssetFile = (
   path: any,
   listener: any,
-  dont_search: boolean = false
+  width?: string,
+  type?: string
 ): Promise<string | object> =>
   new Promise((resolve, reject) => {
-    if (isURL(path) || dont_search) {
-      resolve(path);
-      return path;
-    } else if (!!path) {
-      if (typeof path === "object") {
-        let ResolvedData: object = {};
-        path?.forEach(async (element: any) => {
-          try {
-            const data = await getDownloadURL(ref(storage, element));
-            ResolvedData = _.merge(ResolvedData, {
-              [_.replace(element, /[^a-zA-Z0-9]/g, "")]: data,
-            });
-          } catch (error: any) {
-            ResolvedData = _.merge(ResolvedData, {
-              [_.replace(element, /[^a-zA-Z0-9]/g, "")]: "",
-            });
-            reject(listener(ResolvedData));
-          }
-          if (Object.values(ResolvedData).length === 0) {
-            // no path was successfully retrieved
-            reject(listener({}));
-            return false;
-          }
-          resolve(listener(ResolvedData));
-        });
-        return true;
+    try {
+      if (isURL(path)) {
+        resolve(path);
+        return path;
+      } else if (!!path) {
+        return resolve(
+          listener(`${backend_url}/media/cdn/${type}s/${width}/${path}`)
+        );
       }
-      return getDownloadURL(ref(storage, path))
-        .then((url: any) => {
-          resolve(url);
-        })
-        .catch((error) => {
-          reject(error);
-        });
+    } catch (error) {
+      reject(null);
     }
   });
 
@@ -94,44 +61,32 @@ export const queryToGetAssetFile = (
  */
 export const queryToUploadFiles = (
   files: File[],
-  directory: string = "/uploads",
-  randomFileName: boolean = true, // system should generate random filename for each files
-  filename?: string[] // system should make use of specificed filename for each files index in the array
+  _directory: string = "/uploads",
+  randomFileName: boolean = true // system should generate random filename for each files
 ) =>
   new Promise((resolve, reject) => {
     try {
       const promises = [];
       for (let i = 0; i < files?.length; i++) {
         const file = files[i];
-        let FileName;
-        if (randomFileName) {
-          FileName = generateRandomFileName(12);
-        } else {
-          FileName = removeFileExtension(
-            filename && filename?.length > 0
-              ? filename[i] // make sure the current index as a specified name being sent in
-                ? filename[i]
-                : file?.name // if not, use the name of the file uploaded as the filename
-              : file?.name
-          );
-        }
-        const FileExtension = getFileExtension(file?.name);
-        const FileRef = ref(
-          storage,
-          directory
-            ? `${directory}/${FileName}.${FileExtension}`
-            : `${FileName}.${FileExtension}`
-        );
         promises.push(
           new Promise((resolve, reject) => {
-            uploadBytes(FileRef, file, {
-              customMetadata: { mime_type: file.type },
+            const formdata = new FormData();
+            formdata.append("file", file);
+            formdata.append(
+              "random_filename",
+              randomFileName ? "True" : "False"
+            );
+            fetch(`${backend_url}/media/upload-image/`, {
+              method: "POST",
+              body: formdata,
+              redirect: "follow",
             })
-              .then((snapshot) => {
-                const slug = createSlug(snapshot.metadata.fullPath);
+              .then(async (snap) => {
+                const snapshot: MediaMetaDataInterface = await snap.json();
+                const slug = createSlug(snapshot?.name);
                 const MediaCollection = collection(firestore, "Media");
                 const q = query(MediaCollection, where("slug", "==", slug));
-
                 getDocs(q).then((snap) => {
                   if (snap.empty && snap.size == 0) {
                     // prevent duplicate entry of the same file again after upload to storage
@@ -139,16 +94,11 @@ export const queryToUploadFiles = (
                       slug: slug,
                       reuploadAttempt: 1,
                       createdAt: Timestamp.now(),
-                      media: JSON.parse(
-                        JSON.stringify({ ...snapshot.metadata })
-                      ),
+                      media: JSON.parse(JSON.stringify({ ...snapshot })),
                       useruid: auth.currentUser?.uid || "app",
                     })
                       .then((data) => {
-                        resolve({
-                          ...data,
-                          ...{ path: snapshot.metadata.fullPath },
-                        });
+                        resolve(data);
                         notify.success({
                           text:
                             files.length == 1
@@ -176,7 +126,7 @@ export const queryToUploadFiles = (
                       .then(() => {
                         resolve({
                           ...{
-                            path: snapshot.metadata.fullPath,
+                            path: snapshot?.name,
                             id: ReferenceDoc.id,
                           },
                         });

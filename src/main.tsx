@@ -15,8 +15,8 @@ import { store } from "./Services/Store";
 import "slick-carousel/slick/slick-theme.css";
 import "slick-carousel/slick/slick.css";
 
-localStorage.theme = "dark";
-window._ = _;
+// localStorage.theme = /"dark";
+// window._ = _;
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <HelmetProvider>

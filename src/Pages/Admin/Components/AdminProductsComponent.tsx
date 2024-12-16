@@ -3,11 +3,11 @@ import ButtonAsLink from "@/Components/ButtonAsLink";
 import Image from "@/Components/Image";
 import Input from "@/Components/Input";
 import Media from "@/Components/Media";
+import RichEditor from "@/Components/RichEditor";
 import SelectDropdown from "@/Components/SelectDropdown";
 import Table from "@/Components/Table";
-import TextArea from "@/Components/TextArea";
 import VariantsType from "@/Components/VariantsType";
-import { useProductsData } from "@/Services/Hook";
+import { useProductsData } from "@/Services/Hooks";
 import { addCollectionDoc, updateCollectionDoc } from "@/Services/Queries";
 import { queryToDeleteProduct } from "@/Services/Queries/ProductQuery";
 import {
@@ -17,6 +17,7 @@ import {
 } from "@/System/Constants";
 import { price } from "@/System/function";
 import { ColumnDef } from "@tanstack/react-table";
+import classNames from "classnames";
 import { Timestamp } from "firebase/firestore";
 import { InstanceOptions, Modal } from "flowbite";
 import _ from "lodash";
@@ -26,7 +27,7 @@ import { useForm } from "react-hook-form";
 
 // Components to handle product in the ecommerce website
 const ProductsAction = ({ values }: { values: ProductItemType }) => {
-  const { control, handleSubmit, reset } = useForm();
+  const { control, handleSubmit, reset, watch } = useForm();
   const [editProductModal, setEditProductModal] = useState<Modal>();
   const updateProductSubmission = (data?: any) => {
     if (data.image && data.image.length > 0) {
@@ -35,7 +36,10 @@ const ProductsAction = ({ values }: { values: ProductItemType }) => {
       );
       data.image = image;
     }
-    const productData: ProductItemType = { ...values, ...data };
+    const productData: ProductItemType = {
+      ...values,
+      ...data,
+    };
     updateCollectionDoc(
       "Products",
       values?.id,
@@ -63,6 +67,10 @@ const ProductsAction = ({ values }: { values: ProductItemType }) => {
         placement: "bottom-right",
         backdrop: "dynamic",
         closable: true,
+        onHide: () => {
+          reset();
+          console.log("Hiding modal!");
+        },
       },
       instanceOptions
     );
@@ -211,34 +219,59 @@ const ProductsAction = ({ values }: { values: ProductItemType }) => {
                   defaultValue={values?.name}
                   rules={{ required: "Product name is required" }}
                 />
-                <TextArea
+                <RichEditor
+                  serialize="html"
+                  name="description"
                   control={control}
-                  name={`description`}
-                  placeholder="Product Description"
-                  label="Product Description"
-                  defaultValue={values?.description}
                   rules={{ required: "Product description is required" }}
-                  rows={7}
+                  defaultValue={values?.description}
                 />
                 <SelectDropdown
                   name={`category`}
                   options={ZenosCategory}
                   control={control}
                   placeholder="Category"
+                  label="Category"
                   containerClassName="z-20"
                   rules={{ required: "Category is required" }}
-                  defaultOptionKey={values?.category?.key}
+                  defaultValue={values?.category}
                 />
+                {watch("category")?.key == "oraimo" && (
+                  <SelectDropdown
+                    name="subcategory"
+                    options={ZenosOraimoSubCategory}
+                    control={control}
+                    containerClassName="z-10"
+                    placeholder="Subcategory"
+                    label="Subcategory"
+                    defaultValue={values?.subcategory}
+                    rules={{ required: "Subcategory is required" }}
+                  />
+                )}
+                {watch("category")?.key == "new-age" && (
+                  <SelectDropdown
+                    name="subcategory"
+                    options={ZenosNewAgeSubCategory}
+                    control={control}
+                    containerClassName="z-10"
+                    placeholder="Subcategory"
+                    label="Subcategory"
+                    defaultValue={values?.subcategory}
+                    rules={{ required: "Subcategory is required" }}
+                  />
+                )}
                 <Input
                   control={control}
                   name="price"
                   placeholder="Price"
+                  label="Price"
                   rules={{ required: "Price is required" }}
                   defaultValue={values?.price}
                 />
                 <Input
                   control={control}
                   name="salesPrice"
+                  label="Sales Price"
                   placeholder="Discounted/Old Price"
                   defaultValue={values?.salesPrice}
                 />
@@ -331,18 +364,105 @@ const ProductsAction = ({ values }: { values: ProductItemType }) => {
   );
 };
 
+const SelectProductAction = ({ id, status }: { id: string; status?: any }) => {
+  const [productStatus, setProductStatus] = useState<string>(status);
+  const [showProductStatusDropdown, setShowProductStatusDropdown] =
+    useState<boolean>(false);
+  const onChange = (status: string) => {
+    updateCollectionDoc(
+      "Products",
+      id,
+      {
+        status: status,
+      },
+      "Product status has been successfully updated"
+    ).finally(() => {
+      setProductStatus(status);
+      setShowProductStatusDropdown(false);
+    });
+  };
+  return (
+    <div className="space-y-1.5 flex flex-col items-center">
+      <button
+        type="button"
+        className="relative flex items-center justify-start gap-2"
+        onClick={() => {
+          setShowProductStatusDropdown(!showProductStatusDropdown);
+        }}
+      >
+        <span
+          className={classNames("block w-4 h-4 rounded-full", {
+            "bg-green-500": productStatus == "active",
+            "bg-red-500": productStatus == "draft",
+          })}
+        ></span>
+        <svg
+          className="w-4 h-4 text-gray-300"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="4"
+            d="m19 9-7 7-7-7"
+          />
+        </svg>
+      </button>
+      <div
+        className={classNames(
+          "overflow-hidden p-0 bg-gray-600 rounded-md transition-all duration-500 ease-in-out",
+          {
+            "h-0 opacity-0": !showProductStatusDropdown,
+            "h-auto opacity-100": !!showProductStatusDropdown,
+          }
+        )}
+      >
+        {[
+          { status: "active", color: "green" },
+          { status: "draft", color: "red" },
+        ].map((item, index) => (
+          <button
+            type="button"
+            key={index}
+            className="flex items-center text-xs gap-2 w-full px-4 py-2 hover:bg-gray-700"
+            onClick={() => onChange(item.status)}
+          >
+            <span
+              className={classNames("block w-2.5 h-2.5 rounded-full", {
+                "bg-red-500": item.color == "red",
+                "bg-green-500": item.color == "green",
+              })}
+            ></span>
+            {_.startCase(item.status)}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 const AdminProductsComponent = () => {
-  const { data: products } = useProductsData();
-  const columns = useMemo<ColumnDef<any>[]>(
+  const { data: products } = useProductsData(undefined, true);
+  const { control, handleSubmit, reset, watch } = useForm({ mode: "all" });
+  const columns = useMemo<ColumnDef<ProductItemType>[]>(
     () => [
       {
         header: "Status",
         accessorFn: (row) => row,
-        // cell: (info) => (
-        //   <>
-        //   {/* <div>{JSON.stringify((info.getValue() as any).id)}</div> */}
-        //   </>
-        // ),
+        cell: (info) => (
+          <>
+            <SelectProductAction
+              id={(info.getValue() as any).id}
+              status={(info.getValue() as any).status}
+            />
+          </>
+        ),
         footer: (props) => props.column.id,
         enableSorting: false,
       },
@@ -350,12 +470,14 @@ const AdminProductsComponent = () => {
         accessorKey: "image",
         cell: (info) => (
           <>
-            <div className="flex items-center gap-1 flex-wrap">
+            {/* <div className="flex items-center gap-1 flex-wrap"> */}
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-1 min-w-60">
               {(info.getValue() as any[]).map((item, index) => (
                 <Image
                   key={index}
                   src={item}
-                  className="w-16 md:w-16 max-w-full max-h-full bg-zenos-200 rounded-sm overflow-hidden"
+                  className="w-full max-w-full max-h-full bg-zenos-200 rounded-sm overflow-hidden"
+                  width={120}
                 />
               ))}
             </div>
@@ -369,7 +491,7 @@ const AdminProductsComponent = () => {
         accessorFn: (row) => row.name,
         id: "name",
         cell: (info) => (
-          <span className="underline underline-offset-4 decoration-dotted">
+          <span className="underline underline-offset-4 decoration-dotted whitespace-nowrap">
             {info.getValue() as any}
           </span>
         ),
@@ -385,6 +507,11 @@ const AdminProductsComponent = () => {
       {
         accessorKey: "category.value",
         header: () => <span>Category</span>,
+        footer: (props) => props.column.id,
+      },
+      {
+        accessorKey: "subcategory.value",
+        header: () => <span>Subcategory</span>,
         footer: (props) => props.column.id,
       },
       {
@@ -412,17 +539,23 @@ const AdminProductsComponent = () => {
     []
   );
   const [addProductModal, setAddProductModal] = useState<Modal>();
-  const [categoryType, setCategoryType] = useState<
-    "oraimo" | "new-age" | "uk-used"
-  >();
-  const { control, handleSubmit, reset } = useForm({ mode: "all" });
   const [variants, setVariants] = useState([{}]);
   const submitProductsForm = (data: any) => {
     let image = _.flatMap(data.image, (item) => item.media.fullPath);
-    data.image = image;
     addCollectionDoc(
       "Products",
-      [JSON.parse(JSON.stringify(data))],
+      [
+        JSON.parse(
+          JSON.stringify({
+            ...data,
+            ...{
+              image: image,
+              status: "active",
+              description: data.description?.replace(/\n/g, "\\n"),
+            },
+          })
+        ),
+      ],
       `<span class="font-extrabold underline underline-offset-4 decoration-dotted decoration-green-500">${data.name}</span> added successfully.`
     )
       .then(() => {
@@ -557,12 +690,11 @@ const AdminProductsComponent = () => {
                     placeholder="Product Name"
                     rules={{ required: "Product name is required" }}
                   />
-                  <TextArea
-                    control={control}
+                  <RichEditor
+                    serialize="html"
                     name="description"
-                    placeholder="Product Description"
+                    control={control}
                     rules={{ required: "Product description is required" }}
-                    rows={7}
                   />
                   <SelectDropdown
                     name="category"
@@ -571,30 +703,25 @@ const AdminProductsComponent = () => {
                     placeholder="Category"
                     containerClassName="z-30"
                     rules={{ required: "Category is required" }}
-                    onDropdownSelect={(data: any) => {
-                      console.log(data);
-                      setCategoryType(data?.key);
-                      return data;
-                    }}
                   />
-                  {categoryType == "oraimo" && (
+                  {watch("category")?.key == "oraimo" && (
                     <SelectDropdown
                       name="subcategory"
                       options={ZenosOraimoSubCategory}
                       control={control}
-                      containerClassName="z-20"
-                      placeholder="Sub Category"
-                      rules={{ required: "Sub category is required" }}
+                      containerClassName="z-10"
+                      placeholder="Subcategory"
+                      rules={{ required: "Subcategory is required" }}
                     />
                   )}
-                  {categoryType == "new-age" && (
+                  {watch("category")?.key == "new-age" && (
                     <SelectDropdown
                       name="subcategory"
                       options={ZenosNewAgeSubCategory}
                       control={control}
-                      containerClassName="z-20"
-                      placeholder="Sub Category"
-                      rules={{ required: "Sub category is required" }}
+                      containerClassName="z-10"
+                      placeholder="Subcategory"
+                      rules={{ required: "Subcategory is required" }}
                     />
                   )}
                   <Input

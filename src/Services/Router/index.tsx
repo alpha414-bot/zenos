@@ -1,14 +1,14 @@
 import About from "@/Pages/About";
-import ForgotPassword from "@/Pages/Auth/ForgotPassword";
 import AuthPage from "@/Pages/Auth/AuthPage";
+import ForgotPassword from "@/Pages/Auth/ForgotPassword";
 import Checkout from "@/Pages/Checkout";
-import Dashboard from "@/Pages/Dashboard";
 import ErrorPage from "@/Pages/ErrorPage";
 import Home from "@/Pages/Home";
+import Inbox from "@/Pages/Inbox";
 import Product from "@/Pages/Product";
 import Carts from "@/Pages/Subpages/Carts";
 import Orders from "@/Pages/Subpages/Orders";
-import { RouteObject, createBrowserRouter } from "react-router-dom";
+import { Outlet, RouteObject, createBrowserRouter } from "react-router-dom";
 import AdminRouter from "./AdminRouter";
 import { ProtectedRoute, withScrollToTop } from "./utils";
 
@@ -37,7 +37,7 @@ const RootRouter: RouteObject[] = [
     path: "/user",
     element: (
       <ProtectedRoute middlewares={["auth"]}>
-        <Dashboard />
+        <Outlet />
       </ProtectedRoute>
     ),
     errorElement: <ErrorPage />,
@@ -51,6 +51,11 @@ const RootRouter: RouteObject[] = [
       {
         path: "carts",
         element: <Carts />,
+      },
+      // inbox
+      {
+        path: "inbox",
+        element: <Inbox />,
       },
     ],
   },

@@ -1,7 +1,6 @@
 import { date, price, short } from "@/System/function";
 import _ from "lodash";
 import { useState } from "react";
-import OutsideClick from "./OutsideClick";
 import ProductList from "./ProductList";
 
 const OrderItem = ({ order }: { order: OrderDataInterface }) => {
@@ -17,13 +16,11 @@ const OrderItem = ({ order }: { order: OrderDataInterface }) => {
     }
   });
   return (
-    <OutsideClick
-      outsideClick={() => setViewProductDetails(false)}
-      className=""
-    >
+    <>
       <button
+        type="button"
         onClick={() => setViewProductDetails(!viewProductDetails)}
-        className="w-full flex-nowrap flex flex-row items-start justify-between"
+        className="w-full flex-nowrap flex flex-row items-center justify-between px-3 py-3 shadow shadow-gray-300 rounded-xl"
       >
         <div className="inline-flex flex-col items-start justify-between">
           {order.id && (
@@ -39,7 +36,7 @@ const OrderItem = ({ order }: { order: OrderDataInterface }) => {
         <div className="border border-gray-200 p-0.5 rounded group hover:bg-white">
           {(viewProductDetails && (
             <svg
-              className="w-6 h-6  text-white group-hover:text-zenos-700"
+              className="w-4 h-4  text-white group-hover:text-zenos-700"
               aria-hidden="true"
               xmlns="http://www.w3.org/2000/svg"
               width="24"
@@ -55,7 +52,7 @@ const OrderItem = ({ order }: { order: OrderDataInterface }) => {
             </svg>
           )) || (
             <svg
-              className="w-6 h-6 text-white group-hover:text-zenos-700"
+              className="w-4 h-4 text-white group-hover:text-zenos-700"
               aria-hidden="true"
               xmlns="http://www.w3.org/2000/svg"
               width="24"
@@ -75,7 +72,7 @@ const OrderItem = ({ order }: { order: OrderDataInterface }) => {
       {viewProductDetails && (
         <div className="flex mt-2 flex-col pl-8 justify-between gap-4 lg:pl-0 lg:gap-12 lg:flex-row lg:px-0">
           {/* product list */}
-          <div className="grow border border-gray-200 rounded-md py-2 px-4 lg:mt-2 lg:ml-9">
+          <div className="grow rounded-md py-2 px-4 lg:mt-2 lg:ml-9">
             <ProductList
               type="order_listing"
               products={order.products.map((item) => {
@@ -96,7 +93,7 @@ const OrderItem = ({ order }: { order: OrderDataInterface }) => {
             <div className="flex items-center justify-between gap-6">
               <p className="text-base font-semibold lg:text-sm">Amount Paid</p>
               <p className="text-base font-medium lg:text-sm">
-                {price(order.payment_instance.amount, "currency", 0)}
+                {price(order.instance.amount, "currency", 0)}
               </p>
             </div>
             {/* transaction fee */}
@@ -106,7 +103,7 @@ const OrderItem = ({ order }: { order: OrderDataInterface }) => {
               </p>
               <p className="text-base font-medium lg:text-sm">
                 {price(
-                  order.payment_instance.amount - TotalProductPrice,
+                  order.instance.amount - TotalProductPrice,
                   "currency",
                   0
                 )}
@@ -115,7 +112,7 @@ const OrderItem = ({ order }: { order: OrderDataInterface }) => {
           </div>
         </div>
       )}
-    </OutsideClick>
+    </>
   );
 };
 

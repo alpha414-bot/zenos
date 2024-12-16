@@ -12,7 +12,7 @@ import {
 import { clearCartProducts } from "./CartQuery";
 
 export const newOrderQuery = (
-  payment_instance: PaymentOnSuccessProps,
+  instance: PaymentOnSuccessProps,
   carts: CartMetaItem[],
   billing_info: BillingInputInterface
 ) =>
@@ -20,10 +20,7 @@ export const newOrderQuery = (
     try {
       if (auth.currentUser?.uid) {
         const OrderCollection = collection(firestore, "Orders");
-        const PaymentReferenceDoc = doc(
-          OrderCollection,
-          payment_instance.reference
-        );
+        const PaymentReferenceDoc = doc(OrderCollection, instance.reference);
 
         getDoc(PaymentReferenceDoc).then((UserProductItems) => {
           const UserOrderProducts =
@@ -33,7 +30,7 @@ export const newOrderQuery = (
             resolve(UserProductItems.data());
           } else {
             setDoc(PaymentReferenceDoc, {
-              payment_instance: payment_instance,
+              instance: instance,
               products: carts,
               billing_info: billing_info,
               user_uid: auth.currentUser?.uid,
@@ -46,6 +43,7 @@ export const newOrderQuery = (
                 });
                 clearCartProducts();
                 resolve(data);
+                // #notification to admin
               })
               .catch((error) => {
                 notify.error({

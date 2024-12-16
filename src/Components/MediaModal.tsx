@@ -1,6 +1,6 @@
 import { auth } from "@/firebase-config";
 import { notify } from "@/notify";
-import { useUserMedia } from "@/Services/Hook";
+import { useUserMedia } from "@/Services/Hooks";
 import { queryToUploadFiles } from "@/Services/Queries/MediaQuery.ts";
 import { useAppDispatch, useAppSelector } from "@/Services/Redux/Hook";
 import { setModalInstance } from "@/Services/Redux/MediaSlice";
@@ -303,9 +303,16 @@ const MediaModal = () => {
                                   {medias &&
                                     medias
                                       .filter((media) => {
-                                        const { media: File } = media;
+                                        const { media: file } = media;
+                                        // if (file.filename) {
+                                        //   console.log(
+                                        //     media,
+                                        //     file.name,
+                                        //     getFileExtension(file.filename)
+                                        //   );
+                                        // }
                                         const fileExtension = getFileExtension(
-                                          File.name
+                                          file.name
                                         );
                                         const MimeExtensions =
                                           MIME_TYPE[`${media_name}/*`];

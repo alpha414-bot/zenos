@@ -2,7 +2,7 @@ import Button from "@/Components/Button";
 import Input from "@/Components/Input";
 import MainLayout from "@/Layouts/MainLayout";
 import PageMeta from "@/Layouts/PageMeta";
-import { queryToLoginUser } from "@/Services/Queries/AuthQuery";
+import { queryToLoginUser,queryToRegisterUser } from "@/Services/Queries/AuthQuery";
 import {
   EmailPattern,
   NumberPattern,
@@ -22,8 +22,15 @@ const AuthPage = () => {
       mode: "all",
     });
   const onSignUpFormSubmit: SubmitHandler<UserSignUpFormInput> = (data) => {
-    // createUser(data).then(() => navigate("/"));
-    console.log("sign up", data);
+    queryToRegisterUser (data)
+    .then(() => {
+      // Optionally, you can navigate to a different page after successful signup
+      navigate("/"); // Redirect to home or dashboard
+    })
+    .catch((error) => {
+      // Handle any errors that occur during signup
+      console.error("Signup error:", error);
+    });
   };
   const onSignInFormSubmit: SubmitHandler<UserSignInFormInput> = (data) => {
     queryToLoginUser(data).then(() => navigate("/"));

@@ -2,13 +2,13 @@ import OrderItem from "@/Components/OrderItem";
 import PageMeta from "@/Layouts/PageMeta";
 import UserLayout from "@/Layouts/UserLayout";
 import { useOrders } from "@/Services/Hooks";
-import AdminProductsComponent from "@/Pages/Admin/Components/AdminProductsComponent";
+import UserProductsComponent from "@/Pages/Admin/Components/UserProductsComponent";
 const AddProduct = () => {
   
 
   return (
     <UserLayout>
-    <AdminProductsComponent/>  
+    <UserProductsComponent/>  
     </UserLayout>
   );
 };

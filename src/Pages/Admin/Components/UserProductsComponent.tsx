@@ -463,7 +463,9 @@ const UserProductsComponent = () => {
   let { data: products = [] } = useProductsData<ProductItemType[]>(undefined, true);
 
   // Reassign products to filtered products based on the user's UUID
-  products = products.filter(product => product.createdBy === userUuid);
+  if (Array.isArray(products)) {
+    products = products.filter((product) => product.createdBy === userUuid);
+  }
 
   const { control, handleSubmit, reset, watch } = useForm({ mode: "all" });
 

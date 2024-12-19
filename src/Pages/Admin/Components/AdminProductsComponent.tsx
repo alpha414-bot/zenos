@@ -3,6 +3,7 @@ import ButtonAsLink from "@/Components/ButtonAsLink";
 import Image from "@/Components/Image";
 import Input from "@/Components/Input";
 import Media from "@/Components/Media";
+import { getAuth } from "firebase/auth";
 import RichEditor from "@/Components/RichEditor";
 import SelectDropdown from "@/Components/SelectDropdown";
 import Table from "@/Components/Table";
@@ -541,30 +542,45 @@ const AdminProductsComponent = () => {
   const [addProductModal, setAddProductModal] = useState<Modal>();
   const [variants, setVariants] = useState([{}]);
   const submitProductsForm = (data: any) => {
-    let image = _.flatMap(data.image, (item) => item.media.fullPath);
-    addCollectionDoc(
-      "Products",
-      [
-        JSON.parse(
-          JSON.stringify({
-            ...data,
-            ...{
-              image: image,
-              status: "active",
-              description: data.description?.replace(/\n/g, "\\n"),
-            },
-          })
-        ),
-      ],
-      `<span class="font-extrabold underline underline-offset-4 decoration-dotted decoration-green-500">${data.name}</span> added successfully.`
-    )
-      .then(() => {
-        addProductModal?.hide();
-      })
-      .finally(() => {
-        // Be redirecting
-        reset();
-      });
+    const auth = getAuth();
+  const currentUser = auth.currentUser;
+
+  if (!currentUser) {
+    console.error("No user is signed in.");
+    return;
+  }
+
+  // Get the user's unique identifier (UUID)
+  const userUuid = currentUser.uid;
+
+  // Process images
+  let image = _.flatMap(data.image, (item) => item.media.fullPath);
+
+  // Add document to Firestore
+  addCollectionDoc(
+    "Products",
+    [
+      JSON.parse(
+        JSON.stringify({
+          ...data,
+          ...{
+            image: image,
+            status: "active",
+            createdBy: userUuid, // Assign the user UUID to the "createdBy" field
+            description: data.description?.replace(/\n/g, "\\n"),
+          },
+        })
+      ),
+    ],
+    `<span class="font-extrabold underline underline-offset-4 decoration-dotted decoration-green-500">${data.name}</span> added successfully.`
+  )
+    .then(() => {
+      addProductModal?.hide();
+    })
+    .finally(() => {
+      // Reset form or perform redirect
+      reset();
+    });
   };
   useLayoutEffect(() => {
     const $targetEl: HTMLElement | null =

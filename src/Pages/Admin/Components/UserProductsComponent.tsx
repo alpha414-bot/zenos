@@ -5,6 +5,7 @@ import Input from "@/Components/Input";
 import Media from "@/Components/Media";
 import RichEditor from "@/Components/RichEditor";
 import SelectDropdown from "@/Components/SelectDropdown";
+import { getAuth } from "firebase/auth";
 import Table from "@/Components/Table";
 import VariantsType from "@/Components/VariantsType";
 import { useProductsData } from "@/Services/Hooks";
@@ -448,24 +449,37 @@ const SelectProductAction = ({ id, status }: { id: string; status?: any }) => {
 };
 
 const UserProductsComponent = () => {
-  const { data: products } = useProductsData(undefined, true);
+  const auth = getAuth();
+  const currentUser = auth.currentUser;
+
+  if (!currentUser) {
+    console.error("No user is signed in.");
+    return <div>No user signed in</div>; // You can handle it appropriately
+  }
+
+  const userUuid = currentUser.uid;
+
+  // Fetch products
+  let { data: products = [] } = useProductsData<ProductItemType[]>(undefined, true);
+
+  // Reassign products to filtered products based on the user's UUID
+  products = products.filter(product => product.createdBy === userUuid);
+
   const { control, handleSubmit, reset, watch } = useForm({ mode: "all" });
+
+  
   const columns = useMemo<ColumnDef<ProductItemType>[]>(
     () => [
       {
         header: "Status",
-        accessorFn: (row) => row,
+        accessorFn: (row) => row.status,
         cell: (info) => (
-          <>
-            <SelectProductAction
-              id={(info.getValue() as any).id}
-              status={(info.getValue() as any).status}
-            />
-          </>
+          <span>{info.getValue() as any}</span>
         ),
         footer: (props) => props.column.id,
         enableSorting: false,
       },
+
       {
         accessorKey: "image",
         cell: (info) => (
@@ -526,45 +540,53 @@ const UserProductsComponent = () => {
         ),
         footer: (props) => props.column.id,
       },
-      {
-        header: "Action",
-        accessorFn: (row) => row,
-        cell: (info) => {
-          return <ProductsAction values={info.getValue() as any} />;
-        },
-        footer: (props) => props.column.id,
-        enableSorting: false,
-      },
+  
     ],
     []
   );
   const [addProductModal, setAddProductModal] = useState<Modal>();
   const [variants, setVariants] = useState([{}]);
+ 
   const submitProductsForm = (data: any) => {
-    let image = _.flatMap(data.image, (item) => item.media.fullPath);
-    addCollectionDoc(
-      "Products",
-      [
-        JSON.parse(
-          JSON.stringify({
-            ...data,
-            ...{
-              image: image,
-              status: "active",
-              description: data.description?.replace(/\n/g, "\\n"),
-            },
-          })
-        ),
-      ],
-      `<span class="font-extrabold underline underline-offset-4 decoration-dotted decoration-green-500">${data.name}</span> added successfully.`
-    )
-      .then(() => {
-        addProductModal?.hide();
-      })
-      .finally(() => {
-        // Be redirecting
-        reset();
-      });
+    const auth = getAuth();
+  const currentUser = auth.currentUser;
+
+  if (!currentUser) {
+    console.error("No user is signed in.");
+    return;
+  }
+
+  // Get the user's unique identifier (UUID)
+  const userUuid = currentUser.uid;
+
+  // Process images
+  let image = _.flatMap(data.image, (item) => item.media.fullPath);
+
+  // Add document to Firestore
+  addCollectionDoc(
+    "Products",
+    [
+      JSON.parse(
+        JSON.stringify({
+          ...data,
+          ...{
+            image: image,
+            status: "archived",
+            createdBy: userUuid,  
+            description: data.description?.replace(/\n/g, "\\n"),
+          },
+        })
+      ),
+    ],
+    `<span class="font-extrabold underline underline-offset-4 decoration-dotted decoration-green-500">${data.name}</span> added successfully.`
+  )
+    .then(() => {
+      addProductModal?.hide();
+    })
+    .finally(() => {
+      // Reset form or perform redirect
+      reset();
+    });
   };
   useLayoutEffect(() => {
     const $targetEl: HTMLElement | null =

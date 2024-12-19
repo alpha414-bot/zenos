@@ -245,61 +245,61 @@ const MediaModal = () => {
                           role="tabpanel"
                           aria-labelledby={`${media_name}-tab`}
                         >
-                          {(_.includes(mediaType, media_name) && (
-                            <>
-                              <div className="py-6 ">
-                                <div className="grid grid-col grid-cols-2 items-start flex-wrap gap-3 md:grid-cols-3">
-                                  {(isMediaUploading && (
-                                    <>
-                                      <div className="h-44 bg-zenos-400 rounded-md border-2 border-zenos-500 p-2 cursor-not-allowed flex flex-col items-center justify-center gap-y-1.5">
-                                        <svg
-                                          className="w-12 h-12 text-red-700"
-                                          aria-hidden="true"
-                                          xmlns="http://www.w3.org/2000/svg"
-                                          width={24}
-                                          height={24}
-                                          fill="currentColor"
-                                          viewBox="0 0 24 24"
-                                        >
-                                          <path d="M13.383 4.076a6.5 6.5 0 0 0-6.887 3.95A5 5 0 0 0 7 18h3v-4a2 2 0 0 1-1.414-3.414l2-2a2 2 0 0 1 2.828 0l2 2A2 2 0 0 1 14 14v4h4a4 4 0 0 0 .988-7.876 6.5 6.5 0 0 0-5.605-6.048Z" />
-                                          <path d="M12.707 9.293a1 1 0 0 0-1.414 0l-2 2a1 1 0 1 0 1.414 1.414l.293-.293V19a1 1 0 1 0 2 0v-6.586l.293.293a1 1 0 0 0 1.414-1.414l-2-2Z" />
-                                        </svg>
-
-                                        <p className="text-red-700  font-semibold text-center text-sm">
-                                          Wait!, upload is in progress...
-                                        </p>
-                                      </div>
-                                    </>
-                                  )) || (
-                                    <div
-                                      {...getRootProps()}
-                                      className="h-44 bg-zenos-400 rounded-md border-2 border-zenos-500 p-2 flex items-center justify-center cursor-pointer select-none"
+                          <div className="py-6 ">
+                            <div className="grid grid-col grid-cols-2 items-start flex-wrap gap-3 md:grid-cols-3">
+                              {(isMediaUploading && (
+                                <>
+                                  <div className="h-44 bg-zenos-400 rounded-md border-2 border-zenos-500 p-2 cursor-not-allowed flex flex-col items-center justify-center gap-y-1.5">
+                                    <svg
+                                      className="w-12 h-12 text-red-700"
+                                      aria-hidden="true"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      width={24}
+                                      height={24}
+                                      fill="currentColor"
+                                      viewBox="0 0 24 24"
                                     >
-                                      <input {...getInputProps()} />
-                                      {isDragActive ? (
-                                        <p className="text-center text-sm text-white font-bold">
-                                          Drop the files here ...
-                                        </p>
-                                      ) : (
-                                        <div className="flex flex-col items-center justify-center gap-y-1.5">
-                                          <svg
-                                            className="w-[45px] h-[45px] text-white"
-                                            aria-hidden="true"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            fill="currentColor"
-                                            viewBox="0 0 20 20"
-                                          >
-                                            <path d="m14.707 4.793-4-4a1 1 0 0 0-1.416 0l-4 4a1 1 0 1 0 1.416 1.414L9 3.914V12.5a1 1 0 0 0 2 0V3.914l2.293 2.293a1 1 0 0 0 1.414-1.414Z" />
-                                            <path d="M18 12h-5v.5a3 3 0 0 1-6 0V12H2a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2Zm-3 5a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z" />
-                                          </svg>
-                                          <p className="text-center text-sm text-white font-bold">
-                                            Drag & drop some files here, or
-                                            click to select files.
-                                          </p>
-                                        </div>
-                                      )}
+                                      <path d="M13.383 4.076a6.5 6.5 0 0 0-6.887 3.95A5 5 0 0 0 7 18h3v-4a2 2 0 0 1-1.414-3.414l2-2a2 2 0 0 1 2.828 0l2 2A2 2 0 0 1 14 14v4h4a4 4 0 0 0 .988-7.876 6.5 6.5 0 0 0-5.605-6.048Z" />
+                                      <path d="M12.707 9.293a1 1 0 0 0-1.414 0l-2 2a1 1 0 1 0 1.414 1.414l.293-.293V19a1 1 0 1 0 2 0v-6.586l.293.293a1 1 0 0 0 1.414-1.414l-2-2Z" />
+                                    </svg>
+
+                                    <p className="text-red-700  font-semibold text-center text-sm">
+                                      Wait!, upload is in progress...
+                                    </p>
+                                  </div>
+                                </>
+                              )) || (
+                                <div
+                                  {...getRootProps()}
+                                  className="h-44 bg-zenos-400 rounded-md border-2 border-zenos-500 p-2 flex items-center justify-center cursor-pointer select-none"
+                                >
+                                  <input {...getInputProps()} />
+                                  {isDragActive ? (
+                                    <p className="text-center text-sm text-white font-bold">
+                                      Drop the files here ...
+                                    </p>
+                                  ) : (
+                                    <div className="flex flex-col items-center justify-center gap-y-1.5">
+                                      <svg
+                                        className="w-[45px] h-[45px] text-white"
+                                        aria-hidden="true"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="currentColor"
+                                        viewBox="0 0 20 20"
+                                      >
+                                        <path d="m14.707 4.793-4-4a1 1 0 0 0-1.416 0l-4 4a1 1 0 1 0 1.416 1.414L9 3.914V12.5a1 1 0 0 0 2 0V3.914l2.293 2.293a1 1 0 0 0 1.414-1.414Z" />
+                                        <path d="M18 12h-5v.5a3 3 0 0 1-6 0V12H2a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2Zm-3 5a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z" />
+                                      </svg>
+                                      <p className="text-center text-sm text-white font-bold">
+                                        Drag & drop some files here, or click to
+                                        select files.
+                                      </p>
                                     </div>
                                   )}
+                                </div>
+                              )}
+                              {_.includes(mediaType, media_name) && (
+                                <>
                                   {medias &&
                                     medias
                                       .filter((media) => {
@@ -349,10 +349,10 @@ const MediaModal = () => {
                                           }
                                         />
                                       ))}
-                                </div>
-                              </div>
-                            </>
-                          )) || <p>No Media</p>}
+                                </>
+                              )}
+                            </div>
+                          </div>
                         </div>
                       );
                     })}

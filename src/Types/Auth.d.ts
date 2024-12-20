@@ -1,12 +1,12 @@
 import { Timestamp } from "firebase/firestore";
 
-interface AuthUserInterface {
+export interface AuthUserInterface {
   displayName?: any;
   email?: any;
   first_name?: any;
   last_name?: any;
   // role?: "admin" | "user" | "guest" | "admin";
-  uid?: any;
+  uid?: string;
   username?: any;
   isAnonymous?: boolean;
   emailVerified?: boolean;

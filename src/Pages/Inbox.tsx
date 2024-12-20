@@ -1,194 +1,147 @@
-import { useEffect, useState } from "react";
-import { collection, query, where, getDocs, addDoc, serverTimestamp } from "firebase/firestore";
-import { useAuthUser } from "@/Services/Hooks"; // Import the hook to get the current user
-import { firestore } from "@/firebase-config"; // Corrected import for firestore
-import UserLayout from "@/Layouts/UserLayout";
-import PageMeta from "@/Layouts/PageMeta";
+import { useState, useEffect } from "react";
+import { queryToCreateChat, queryToFetchChatMessages, queryToSendChatMessage } from "@/Services/Queries/ChatQuery";
+import { auth } from "@/firebase-config";
+import { notify } from "@/notify";
+import { Timestamp } from "firebase/firestore";
 
-interface Message {
-  id: string;
-  message: string;
-  userId: string;
-  timestamp: { seconds: number };
-  orderReference: string;
+// Define AuthUserType interface inline
+interface AuthUserType {
+  uid: string;
+  email: string;
+  displayName?: string;
 }
 
+// Define Message interface
+interface Message {
+  text: string;
+  sender_uid: string;
+  recipient_uid: string;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+  id?: string;
+}
+
+// Define ChatData interface for the chat data returned by queryToCreateChat
+interface ChatData {
+  id: string;
+  has_messages: boolean;
+  text: string;
+  unread: boolean;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+  members: string[];
+  sent_by_uid?: string;
+}
+
+const admin_uid = "admin_uid_placeholder"; // Replace with actual admin UID
+
 const Inbox = () => {
-  const { data: currentUser } = useAuthUser(); // Use the hook to get current user data
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState<string>("");
-
+  const [chatId, setChatId] = useState<string | undefined>(undefined);
   const [loading, setLoading] = useState<boolean>(true);
 
-  const adminUserId = "mDzZh62EFydOFZeOZm0oVP5ciso2"; // Admin user ID
+  const user = auth.currentUser as AuthUserType;
+  const { uid } = user;
 
-  // Fetch messages from Firestore
   useEffect(() => {
-    if (!currentUser) return;
+    const fetchChat = async () => {
+      try {
+        // Assert the type of chatData as ChatData
+        const chatData = await queryToCreateChat(admin_uid, user) as ChatData;
+        setChatId(chatData.id);
+      } catch (error) {
+        console.error("Error during chat creation:", error);
+        notify.error({ text: "Unable to fetch or create chat" });
+        setLoading(false);
+      }
+    };
+
+    if (uid) {
+      fetchChat();
+    }
+  }, [uid]);
+
+  useEffect(() => {
+    if (!chatId) return;
 
     const fetchMessages = async () => {
       try {
-        // Query for messages where userId is the current user's ID or it's an admin message
-        const q = query(
-          collection(firestore, "UserMessages"),
-          where("orderReference", "==", "order_reference") // Replace with actual order reference
-        );
-
-        const querySnapshot = await getDocs(q);
-        const messagesList = querySnapshot.docs
-          .map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-          }))
-          .filter(
-            (msg) =>
-              (msg as Message).userId === currentUser.uid || (msg as Message).userId === adminUserId // Admin or user messages
-          ) as Message[];
-
-        // Sort messages by timestamp (newest first)
-        messagesList.sort((a, b) => b.timestamp.seconds - a.timestamp.seconds);
-
-        setMessages(messagesList);
+        await queryToFetchChatMessages((data: { data: Message[] }) => {
+          setMessages(data.data); // This is where you set the messages
+        }, admin_uid, user);
       } catch (error) {
         console.error("Error fetching messages:", error);
+        notify.error({ text: "Unable to fetch chat messages" });
       } finally {
         setLoading(false);
       }
     };
 
     fetchMessages();
-  }, [currentUser]);
+  }, [chatId]);
 
-  // Send a message to Firestore
-  const sendMessage = async () => {
-    if (newMessage.trim() === "" || !currentUser) return;
-
-    // Fallback to "Anonymous" if the displayName is not set
-    const displayName = currentUser.displayName || "Anonymous";
-    const messageWithUserName = `From ${displayName}: ${newMessage}`;
+  const handleSendMessage = async () => {
+    if (newMessage.trim() === "") return;
 
     try {
-      console.log(currentUser.uid)
-      // Send the message to Firestore
-      await addDoc(collection(firestore, "UserMessages"), {
-        message: messageWithUserName,
-        userId: currentUser.uid, // Always use the authenticated user's UID
-        timestamp: serverTimestamp(),
-        orderReference: "order_reference", // Replace with actual order reference
-      });
-
-      // Immediately update the UI with the new message
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        {
-          id: "temp-id", // Use a temporary ID or omit it if it's not needed for UI updates
-          message: messageWithUserName,
-          userId: currentUser.uid,
-          timestamp: { seconds: Math.floor(Date.now() / 1000) }, // Use current time
-          orderReference: "order_reference", // Replace with actual order reference
-        },
-      ]);
-      setNewMessage(""); // Reset input after sending
+      await queryToSendChatMessage(
+        { text: newMessage, sender_uid: uid, recipient_uid: admin_uid },
+        chatId!
+      );
+      setNewMessage(""); // Clear input after sending
     } catch (error) {
-      console.error("Error sending message:", error);
+      notify.error({ text: "There was an issue sending your message" });
     }
   };
 
+  if (loading) return <div>Loading...</div>;
+
   return (
-    <PageMeta title="User - My Inbox" description="View, Manage and place your order">
-      <UserLayout>
-        <div className="inbox-container">
-          <h1>Inbox</h1>
-          <div className="chat-box">
-            {loading ? (
-              <p>Loading messages...</p>
-            ) : (
-              <div className="messages-list">
-                {messages.map((msg) => (
-                  <div
-                    key={msg.id}
-                    className={`message ${msg.userId === currentUser?.uid ? "user-message" : "admin-message"}`}
-                  >
-                    <p>{msg.message}</p>
-                    <span>{new Date(msg.timestamp.seconds * 1000).toLocaleString()}</span>
-                  </div>
-                ))}
+    <div className="container mx-auto p-4">
+      <h1 className="text-2xl font-semibold mb-4">Chat with Admin</h1>
+
+      <div className="bg-gray-100 p-4 rounded-md shadow-md max-h-[60vh] overflow-y-auto mb-4">
+        {messages.length > 0 ? (
+          messages.map((msg, index) => (
+            <div
+              key={index}
+              className={`flex mb-2 ${
+                msg.sender_uid === uid ? "justify-end" : "justify-start"
+              }`}
+            >
+              <div
+                className={`p-3 rounded-lg max-w-[75%] ${
+                  msg.sender_uid === uid
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-300 text-black"
+                }`}
+              >
+                {msg.text}
               </div>
-            )}
-          </div>
+            </div>
+          ))
+        ) : (
+          <p className="text-gray-500">No messages yet. Start the conversation!</p>
+        )}
+      </div>
 
-          <div className="send-message">
-            <textarea
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              placeholder="Type your message here..."
-            ></textarea>
-            <button onClick={sendMessage} disabled={!newMessage.trim()}>
-              Send
-            </button>
-          </div>
-        </div>
-
-        <style>{`
-          .inbox-container {
-            padding: 20px;
-          }
-          .chat-box {
-            border: 1px solid #ddd;
-            padding: 10px;
-            max-height: 400px;
-            overflow-y: scroll;
-            background-color: #333;
-          }
-          .messages-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-          }
-          .message {
-            padding: 10px;
-            border-radius: 5px;
-            color: white;
-          }
-          .user-message {
-            background-color: #4caf50;
-            align-self: flex-end;
-          }
-          .admin-message {
-            background-color: #f1f1f1;
-            color: #333;
-            align-self: flex-start;
-          }
-          .send-message {
-            margin-top: 20px;
-            display: flex;
-            flex-direction: column;
-          }
-          textarea {
-            width: 100%;
-            height: 100px;
-            padding: 10px;
-            margin-bottom: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            resize: none;
-            background-color: #444;
-            color: white;
-          }
-          button {
-            padding: 10px 20px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-          }
-          button:disabled {
-            background-color: #ccc;
-          }
-        `}</style>
-      </UserLayout>
-    </PageMeta>
+      <div className="flex space-x-2">
+        <input
+          type="text"
+          className="flex-1 p-2 border border-gray-300 rounded-md"
+          placeholder="Type your message"
+          value={newMessage}
+          onChange={(e) => setNewMessage(e.target.value)}
+        />
+        <button
+          className="px-4 py-2 bg-blue-500 text-white rounded-md"
+          onClick={handleSendMessage}
+        >
+          Send Message
+        </button>
+      </div>
+    </div>
   );
 };
 

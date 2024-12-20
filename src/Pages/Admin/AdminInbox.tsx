@@ -20,13 +20,15 @@ const AdminInbox = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [replyToUserId, setReplyToUserId] = useState<string | null>(null); // Track the user being replied to
 
+  // Admin UUID (to identify messages from the admin)
+  const adminUid = "mDzZh62EFydOFZeOZm0oVP5ciso2"; // Replace with actual admin UID
+
   // Set up an observer on the Auth object to get the current user
   useEffect(() => {
     const auth = getAuth();
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setAuthUser(user);
     });
-    console.log(auth);
 
     // Clean up the subscription on unmount
     return () => unsubscribe();
@@ -109,7 +111,7 @@ const AdminInbox = () => {
                 {messages.map((msg) => (
                   <div
                     key={msg.id}
-                    className={`message ${msg.userId === authUser?.uid ? "admin-message" : "user-message"}`}
+                    className={`message ${msg.userId === adminUid ? "admin-message" : "user-message"}`}
                   >
                     <p>{msg.message}</p>
                     <span>{new Date(msg.timestamp.seconds * 1000).toLocaleString()}</span>

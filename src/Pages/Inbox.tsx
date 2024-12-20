@@ -1,10 +1,10 @@
-// Inbox.tsx
 import { useEffect, useState } from "react";
 import { collection, query, where, getDocs, addDoc, serverTimestamp } from "firebase/firestore";
 import { getAuth, onAuthStateChanged, User } from "firebase/auth";
 import { firestore } from "@/firebase-config"; // Corrected import for firestore
 import UserLayout from "@/Layouts/UserLayout";
 import PageMeta from "@/Layouts/PageMeta";
+import { useLocation } from "react-router-dom";
 
 interface Message {
   id: string;
@@ -19,6 +19,16 @@ const Inbox = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
+  const [initialOrderData, setInitialOrderData] = useState<{
+    reference: string;
+    amount: number;
+    carts: any[];
+  } | null>(null);
+
+  const location = useLocation();
+
+  // Admin UID constant (use this to identify admin messages)
+  const adminUid = "mDzZh62EFydOFZeOZm0oVP5ciso2";
 
   // Set up an observer on the Auth object to get the current user
   useEffect(() => {
@@ -31,6 +41,13 @@ const Inbox = () => {
     return () => unsubscribe();
   }, []);
 
+  // Fetch initial order data from the state if available
+  useEffect(() => {
+    if (location.state) {
+      setInitialOrderData(location.state);
+    }
+  }, [location]);
+
   // Fetch messages from Firestore
   useEffect(() => {
     if (!authUser) return;
@@ -39,7 +56,7 @@ const Inbox = () => {
       try {
         const q = query(
           collection(firestore, "UserMessages"),
-          where("orderReference", "==", "order_reference") // Replace with actual order reference
+          where("orderReference", "==", initialOrderData?.reference || "") // Fetch messages based on the orderReference
         );
         const querySnapshot = await getDocs(q);
         const messagesList = querySnapshot.docs.map((doc) => ({
@@ -54,8 +71,10 @@ const Inbox = () => {
       }
     };
 
-    fetchMessages();
-  }, [authUser]);
+    if (initialOrderData?.reference) {
+      fetchMessages();
+    }
+  }, [authUser, initialOrderData]);
 
   // Send a message to Firestore
   const sendMessage = async () => {
@@ -69,7 +88,7 @@ const Inbox = () => {
         message: messageWithUserName,
         userId: authUser.uid,
         timestamp: serverTimestamp(),
-        orderReference: "order_reference", // Replace with actual order reference
+        orderReference: initialOrderData?.reference || "", // Use the order reference
       });
 
       // Immediately update the UI with the new message
@@ -80,7 +99,7 @@ const Inbox = () => {
           message: messageWithUserName,
           userId: authUser.uid,
           timestamp: { seconds: Math.floor(Date.now() / 1000) }, // Use current time
-          orderReference: "order_reference", // Replace with actual order reference
+          orderReference: initialOrderData?.reference || "", // Use the order reference
         },
       ]);
       setNewMessage(""); // Reset input after sending
@@ -88,6 +107,30 @@ const Inbox = () => {
       console.error("Error sending message:", error);
     }
   };
+
+  // Send initial order data message to the admin if order data is available
+  useEffect(() => {
+    if (initialOrderData && messages.length === 0) {
+      const initialMessage = `New order placed! Reference: ${initialOrderData.reference}, Amount: ${initialOrderData.amount}, Cart Items: ${JSON.stringify(initialOrderData.carts)}`;
+
+      // Send the initial message to the admin (message from user to admin)
+      const sendInitialMessage = async () => {
+        try {
+          await addDoc(collection(firestore, "UserMessages"), {
+            message: initialMessage,
+            userId: adminUid, // Admin's UID
+            timestamp: serverTimestamp(),
+            orderReference: initialOrderData.reference, // Order reference
+          });
+          setMessages([{ id: "temp-id", message: initialMessage, userId: adminUid, timestamp: { seconds: Math.floor(Date.now() / 1000) }, orderReference: initialOrderData.reference }]);
+        } catch (error) {
+          console.error("Error sending initial order message:", error);
+        }
+      };
+
+      sendInitialMessage();
+    }
+  }, [initialOrderData, messages]);
 
   return (
     <PageMeta title="User - My Inbox" description="View, Manage and place your order">

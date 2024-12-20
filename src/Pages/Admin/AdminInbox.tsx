@@ -1,9 +1,8 @@
-// Inbox.tsx
 import { useEffect, useState } from "react";
 import { collection, query, where, getDocs, addDoc, serverTimestamp } from "firebase/firestore";
 import { getAuth, onAuthStateChanged, User } from "firebase/auth";
+import AdminLayout from "@/Layouts/AdminLayout";
 import { firestore } from "@/firebase-config"; // Corrected import for firestore
-import UserLayout from "@/Layouts/UserLayout";
 import PageMeta from "@/Layouts/PageMeta";
 
 interface Message {
@@ -14,11 +13,12 @@ interface Message {
   orderReference: string;
 }
 
-const Inbox = () => {
+const AdminInbox = () => {
   const [authUser, setAuthUser] = useState<User | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
+  const [replyToUserId, setReplyToUserId] = useState<string | null>(null); // Track the user being replied to
 
   // Set up an observer on the Auth object to get the current user
   useEffect(() => {
@@ -26,6 +26,7 @@ const Inbox = () => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setAuthUser(user);
     });
+    console.log(auth);
 
     // Clean up the subscription on unmount
     return () => unsubscribe();
@@ -59,15 +60,15 @@ const Inbox = () => {
 
   // Send a message to Firestore
   const sendMessage = async () => {
-    if (newMessage.trim() === "" || !authUser) return;
+    if (newMessage.trim() === "" || !authUser || !replyToUserId) return;
 
     const messageWithUserName = `From ${authUser.displayName || "Anonymous"}: ${newMessage}`;
 
     try {
-      // Send the message to Firestore
+      // Send the message to Firestore with the userId to reply to the specific user
       await addDoc(collection(firestore, "UserMessages"), {
         message: messageWithUserName,
-        userId: authUser.uid,
+        userId: replyToUserId, // Message is sent to the user being replied to
         timestamp: serverTimestamp(),
         orderReference: "order_reference", // Replace with actual order reference
       });
@@ -76,7 +77,7 @@ const Inbox = () => {
       setMessages((prevMessages) => [
         ...prevMessages,
         {
-          id: "temp-id", // Use a temporary ID or omit it if it's not needed for UI updates
+          id: "temp-id", // Use a temporary ID for UI update
           message: messageWithUserName,
           userId: authUser.uid,
           timestamp: { seconds: Math.floor(Date.now() / 1000) }, // Use current time
@@ -84,16 +85,22 @@ const Inbox = () => {
         },
       ]);
       setNewMessage(""); // Reset input after sending
+      setReplyToUserId(null); // Clear the user being replied to
     } catch (error) {
       console.error("Error sending message:", error);
     }
   };
 
+  // Handle replying to a specific user
+  const handleReply = (userId: string) => {
+    setReplyToUserId(userId);
+  };
+
   return (
-    <PageMeta title="User - My Inbox" description="View, Manage and place your order">
-      <UserLayout>
+    <PageMeta title="Admin - Inbox" description="Manage and view user messages">
+      <AdminLayout>
         <div className="inbox-container">
-          <h1>Inbox</h1>
+          <h1>Admin Inbox</h1>
           <div className="chat-box">
             {loading ? (
               <p>Loading messages...</p>
@@ -102,10 +109,13 @@ const Inbox = () => {
                 {messages.map((msg) => (
                   <div
                     key={msg.id}
-                    className={`message ${msg.userId === authUser?.uid ? "user-message" : "admin-message"}`}
+                    className={`message ${msg.userId === authUser?.uid ? "admin-message" : "user-message"}`}
                   >
                     <p>{msg.message}</p>
                     <span>{new Date(msg.timestamp.seconds * 1000).toLocaleString()}</span>
+                    {msg.userId !== authUser?.uid && (
+                      <button onClick={() => handleReply(msg.userId)}>Reply</button> // Set the userId to reply to
+                    )}
                   </div>
                 ))}
               </div>
@@ -118,8 +128,8 @@ const Inbox = () => {
               onChange={(e) => setNewMessage(e.target.value)}
               placeholder="Type your message here..."
             ></textarea>
-            <button onClick={sendMessage} disabled={!newMessage.trim()}>
-              Send
+            <button onClick={sendMessage} disabled={!newMessage.trim() || !replyToUserId}>
+              Send Reply
             </button>
           </div>
         </div>
@@ -150,8 +160,8 @@ const Inbox = () => {
             align-self: flex-end;
           }
           .admin-message {
-            background-color: #f1f1f1;
-            color: #333;
+            background-color: #007bff;
+            color: white;
             align-self: flex-start;
           }
           .send-message {
@@ -182,9 +192,9 @@ const Inbox = () => {
             background-color: #ccc;
           }
         `}</style>
-      </UserLayout>
+      </AdminLayout>
     </PageMeta>
   );
 };
 
-export default Inbox;
+export default AdminInbox;

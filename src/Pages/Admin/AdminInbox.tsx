@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { collection, query, where, getDocs, addDoc, serverTimestamp } from "firebase/firestore";
-import { getAuth, onAuthStateChanged, User } from "firebase/auth";
+import { useAuthUser } from "@/Services/Hooks"; // Custom hook for fetching auth user
 import AdminLayout from "@/Layouts/AdminLayout";
-import { firestore } from "@/firebase-config"; // Corrected import for firestore
+import { firestore } from "@/firebase-config";
 import PageMeta from "@/Layouts/PageMeta";
 
 interface Message {
@@ -13,43 +13,52 @@ interface Message {
   orderReference: string;
 }
 
+interface UserSummary {
+  userId: string;
+  latestMessage: string;
+  latestTimestamp: number;
+}
+
 const AdminInbox = () => {
-  const [authUser, setAuthUser] = useState<User | null>(null);
+  const { data: authUser, isLoading: authUserLoading } = useAuthUser(); // Use custom hook for auth user
   const [messages, setMessages] = useState<Message[]>([]);
+  const [userSummaries, setUserSummaries] = useState<UserSummary[]>([]);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [newMessage, setNewMessage] = useState<string>("");
+
   const [loading, setLoading] = useState<boolean>(true);
-  const [replyToUserId, setReplyToUserId] = useState<string | null>(null); // Track the user being replied to
 
-  // Admin UUID (to identify messages from the admin)
-  const adminUid = "mDzZh62EFydOFZeOZm0oVP5ciso2"; // Replace with actual admin UID
-
-  // Set up an observer on the Auth object to get the current user
   useEffect(() => {
-    const auth = getAuth();
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setAuthUser(user);
-    });
-
-    // Clean up the subscription on unmount
-    return () => unsubscribe();
-  }, []);
-
-  // Fetch messages from Firestore
-  useEffect(() => {
-    if (!authUser) return;
+    if (authUserLoading || !authUser) return;
 
     const fetchMessages = async () => {
       try {
-        const q = query(
-          collection(firestore, "UserMessages"),
-          where("orderReference", "==", "order_reference") // Replace with actual order reference
-        );
+        const q = query(collection(firestore, "UserMessages"));
         const querySnapshot = await getDocs(q);
-        const messagesList = querySnapshot.docs.map((doc) => ({
+        const allMessages = querySnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         })) as Message[];
-        setMessages(messagesList);
+
+        // Group messages by userId
+        const groupedMessages = allMessages.reduce((acc, msg) => {
+          if (!acc[msg.userId]) acc[msg.userId] = [];
+          acc[msg.userId].push(msg);
+          return acc;
+        }, {} as Record<string, Message[]>);
+
+        // Create summaries for each user
+        const summaries = Object.entries(groupedMessages).map(([userId, messages]) => {
+          const latestMessage = messages[messages.length - 1];
+          return {
+            userId,
+            latestMessage: latestMessage.message,
+            latestTimestamp: latestMessage.timestamp.seconds,
+          };
+        });
+
+        setMessages(allMessages);
+        setUserSummaries(summaries);
       } catch (error) {
         console.error("Error fetching messages:", error);
       } finally {
@@ -58,44 +67,41 @@ const AdminInbox = () => {
     };
 
     fetchMessages();
-  }, [authUser]);
+  }, [authUser, authUserLoading]);
 
-  // Send a message to Firestore
+  const handleUserSelect = (userId: string) => {
+    setSelectedUserId(userId);
+  };
+
   const sendMessage = async () => {
-    if (newMessage.trim() === "" || !authUser || !replyToUserId) return;
-
-    const messageWithUserName = `From ${authUser.displayName || "Anonymous"}: ${newMessage}`;
+    if (newMessage.trim() === "" || !authUser || !selectedUserId) return;
 
     try {
-      // Send the message to Firestore with the userId to reply to the specific user
       await addDoc(collection(firestore, "UserMessages"), {
-        message: messageWithUserName,
-        userId: replyToUserId, // Message is sent to the user being replied to
+        message: newMessage,
+        userId: selectedUserId,
         timestamp: serverTimestamp(),
         orderReference: "order_reference", // Replace with actual order reference
       });
 
-      // Immediately update the UI with the new message
       setMessages((prevMessages) => [
         ...prevMessages,
         {
-          id: "temp-id", // Use a temporary ID for UI update
-          message: messageWithUserName,
+          id: "temp-id",
+          message: newMessage,
           userId: authUser.uid,
-          timestamp: { seconds: Math.floor(Date.now() / 1000) }, // Use current time
+          timestamp: { seconds: Math.floor(Date.now() / 1000) },
           orderReference: "order_reference", // Replace with actual order reference
         },
       ]);
-      setNewMessage(""); // Reset input after sending
-      setReplyToUserId(null); // Clear the user being replied to
+      setNewMessage("");
     } catch (error) {
       console.error("Error sending message:", error);
     }
   };
 
-  // Handle replying to a specific user
-  const handleReply = (userId: string) => {
-    setReplyToUserId(userId);
+  const fetchChatMessages = () => {
+    return messages.filter((msg) => msg.userId === selectedUserId);
   };
 
   return (
@@ -103,95 +109,105 @@ const AdminInbox = () => {
       <AdminLayout>
         <div className="inbox-container">
           <h1>Admin Inbox</h1>
-          <div className="chat-box">
+          <div className="user-list">
             {loading ? (
               <p>Loading messages...</p>
             ) : (
-              <div className="messages-list">
-                {messages.map((msg) => (
-                  <div
-                    key={msg.id}
-                    className={`message ${msg.userId === adminUid ? "admin-message" : "user-message"}`}
-                  >
-                    <p>{msg.message}</p>
-                    <span>{new Date(msg.timestamp.seconds * 1000).toLocaleString()}</span>
-                    {msg.userId !== authUser?.uid && (
-                      <button onClick={() => handleReply(msg.userId)}>Reply</button> // Set the userId to reply to
-                    )}
-                  </div>
-                ))}
-              </div>
+              userSummaries.map((summary) => (
+                <div
+                  key={summary.userId}
+                  className="user-summary"
+                  onClick={() => handleUserSelect(summary.userId)}
+                >
+                  <h3>User {summary.userId}</h3>
+                  <p>{summary.latestMessage}</p>
+                  <span>{new Date(summary.latestTimestamp * 1000).toLocaleString()}</span>
+                </div>
+              ))
             )}
           </div>
+        </div>
 
-          <div className="send-message">
+        {selectedUserId && (
+          <div className="chat-container">
+            <h1>Chat with User {selectedUserId}</h1>
+            <div className="messages">
+              {fetchChatMessages().map((msg) => (
+                <div
+                  key={msg.id}
+                  className={`message ${msg.userId === authUser?.uid ? "admin-message" : "user-message"}`}
+                >
+                  <p>{msg.message}</p>
+                  <span>{new Date(msg.timestamp.seconds * 1000).toLocaleString()}</span>
+                </div>
+              ))}
+            </div>
             <textarea
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
               placeholder="Type your message here..."
             ></textarea>
-            <button onClick={sendMessage} disabled={!newMessage.trim() || !replyToUserId}>
-              Send Reply
-            </button>
+            <button onClick={sendMessage}>Send</button>
           </div>
-        </div>
+        )}
 
         <style>{`
           .inbox-container {
             padding: 20px;
           }
-          .chat-box {
-            border: 1px solid #ddd;
-            padding: 10px;
-            max-height: 400px;
-            overflow-y: scroll;
-            background-color: #333;
-          }
-          .messages-list {
+          .user-list {
             display: flex;
             flex-direction: column;
             gap: 10px;
           }
+          .user-summary {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: #f9f9f9;
+          }
+          .user-summary:hover {
+            background-color: #e0e0e0;
+          }
+          .chat-container {
+            padding: 20px;
+          }
+          .messages {
+            max-height: 400px;
+            overflow-y: scroll;
+            background-color: #f4f4f4;
+            padding: 10px;
+            border: 1px solid #ddd;
+            white-space: pre-wrap; /* Ensure line breaks in messages are respected */
+          }
           .message {
             padding: 10px;
+            margin-bottom: 10px;
             border-radius: 5px;
-            color: white;
           }
           .user-message {
             background-color: #4caf50;
-            align-self: flex-end;
+            color: white;
+            text-align: right;
           }
           .admin-message {
             background-color: #007bff;
             color: white;
-            align-self: flex-start;
-          }
-          .send-message {
-            margin-top: 20px;
-            display: flex;
-            flex-direction: column;
           }
           textarea {
             width: 100%;
-            height: 100px;
             padding: 10px;
-            margin-bottom: 10px;
-            border: 1px solid #ccc;
+            margin-top: 10px;
             border-radius: 5px;
-            resize: none;
-            background-color: #444;
-            color: white;
           }
           button {
+            margin-top: 10px;
             padding: 10px 20px;
             background-color: #007bff;
             color: white;
             border: none;
             border-radius: 5px;
-            cursor: pointer;
-          }
-          button:disabled {
-            background-color: #ccc;
           }
         `}</style>
       </AdminLayout>

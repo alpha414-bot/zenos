@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import { collection, query, where, getDocs, addDoc, serverTimestamp } from "firebase/firestore";
-import { getAuth, onAuthStateChanged, User } from "firebase/auth";
+import { useAuthUser } from "@/Services/Hooks"; // Import the hook to get the current user
 import { firestore } from "@/firebase-config"; // Corrected import for firestore
 import UserLayout from "@/Layouts/UserLayout";
 import PageMeta from "@/Layouts/PageMeta";
-import { useLocation } from "react-router-dom";
 
 interface Message {
   id: string;
@@ -15,54 +14,40 @@ interface Message {
 }
 
 const Inbox = () => {
-  const [authUser, setAuthUser] = useState<User | null>(null);
+  const { data: currentUser } = useAuthUser(); // Use the hook to get current user data
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState<string>("");
+
   const [loading, setLoading] = useState<boolean>(true);
-  const [initialOrderData, setInitialOrderData] = useState<{
-    reference: string;
-    amount: number;
-    carts: any[];
-  } | null>(null);
 
-  const location = useLocation();
-
-  // Admin UID constant (use this to identify admin messages)
-  const adminUid = "mDzZh62EFydOFZeOZm0oVP5ciso2";
-
-  // Set up an observer on the Auth object to get the current user
-  useEffect(() => {
-    const auth = getAuth();
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setAuthUser(user);
-    });
-
-    // Clean up the subscription on unmount
-    return () => unsubscribe();
-  }, []);
-
-  // Fetch initial order data from the state if available
-  useEffect(() => {
-    if (location.state) {
-      setInitialOrderData(location.state);
-    }
-  }, [location]);
+  const adminUserId = "mDzZh62EFydOFZeOZm0oVP5ciso2"; // Admin user ID
 
   // Fetch messages from Firestore
   useEffect(() => {
-    if (!authUser) return;
+    if (!currentUser) return;
 
     const fetchMessages = async () => {
       try {
+        // Query for messages where userId is the current user's ID or it's an admin message
         const q = query(
           collection(firestore, "UserMessages"),
-          where("orderReference", "==", initialOrderData?.reference || "") // Fetch messages based on the orderReference
+          where("orderReference", "==", "order_reference") // Replace with actual order reference
         );
+
         const querySnapshot = await getDocs(q);
-        const messagesList = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        })) as Message[];
+        const messagesList = querySnapshot.docs
+          .map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }))
+          .filter(
+            (msg) =>
+              (msg as Message).userId === currentUser.uid || (msg as Message).userId === adminUserId // Admin or user messages
+          ) as Message[];
+
+        // Sort messages by timestamp (newest first)
+        messagesList.sort((a, b) => b.timestamp.seconds - a.timestamp.seconds);
+
         setMessages(messagesList);
       } catch (error) {
         console.error("Error fetching messages:", error);
@@ -71,24 +56,25 @@ const Inbox = () => {
       }
     };
 
-    if (initialOrderData?.reference) {
-      fetchMessages();
-    }
-  }, [authUser, initialOrderData]);
+    fetchMessages();
+  }, [currentUser]);
 
   // Send a message to Firestore
   const sendMessage = async () => {
-    if (newMessage.trim() === "" || !authUser) return;
+    if (newMessage.trim() === "" || !currentUser) return;
 
-    const messageWithUserName = `From ${authUser.displayName || "Anonymous"}: ${newMessage}`;
+    // Fallback to "Anonymous" if the displayName is not set
+    const displayName = currentUser.displayName || "Anonymous";
+    const messageWithUserName = `From ${displayName}: ${newMessage}`;
 
     try {
+      console.log(currentUser.uid)
       // Send the message to Firestore
       await addDoc(collection(firestore, "UserMessages"), {
         message: messageWithUserName,
-        userId: authUser.uid,
+        userId: currentUser.uid, // Always use the authenticated user's UID
         timestamp: serverTimestamp(),
-        orderReference: initialOrderData?.reference || "", // Use the order reference
+        orderReference: "order_reference", // Replace with actual order reference
       });
 
       // Immediately update the UI with the new message
@@ -97,9 +83,9 @@ const Inbox = () => {
         {
           id: "temp-id", // Use a temporary ID or omit it if it's not needed for UI updates
           message: messageWithUserName,
-          userId: authUser.uid,
+          userId: currentUser.uid,
           timestamp: { seconds: Math.floor(Date.now() / 1000) }, // Use current time
-          orderReference: initialOrderData?.reference || "", // Use the order reference
+          orderReference: "order_reference", // Replace with actual order reference
         },
       ]);
       setNewMessage(""); // Reset input after sending
@@ -107,30 +93,6 @@ const Inbox = () => {
       console.error("Error sending message:", error);
     }
   };
-
-  // Send initial order data message to the admin if order data is available
-  useEffect(() => {
-    if (initialOrderData && messages.length === 0) {
-      const initialMessage = `New order placed! Reference: ${initialOrderData.reference}, Amount: ${initialOrderData.amount}, Cart Items: ${JSON.stringify(initialOrderData.carts)}`;
-
-      // Send the initial message to the admin (message from user to admin)
-      const sendInitialMessage = async () => {
-        try {
-          await addDoc(collection(firestore, "UserMessages"), {
-            message: initialMessage,
-            userId: adminUid, // Admin's UID
-            timestamp: serverTimestamp(),
-            orderReference: initialOrderData.reference, // Order reference
-          });
-          setMessages([{ id: "temp-id", message: initialMessage, userId: adminUid, timestamp: { seconds: Math.floor(Date.now() / 1000) }, orderReference: initialOrderData.reference }]);
-        } catch (error) {
-          console.error("Error sending initial order message:", error);
-        }
-      };
-
-      sendInitialMessage();
-    }
-  }, [initialOrderData, messages]);
 
   return (
     <PageMeta title="User - My Inbox" description="View, Manage and place your order">
@@ -145,7 +107,7 @@ const Inbox = () => {
                 {messages.map((msg) => (
                   <div
                     key={msg.id}
-                    className={`message ${msg.userId === authUser?.uid ? "user-message" : "admin-message"}`}
+                    className={`message ${msg.userId === currentUser?.uid ? "user-message" : "admin-message"}`}
                   >
                     <p>{msg.message}</p>
                     <span>{new Date(msg.timestamp.seconds * 1000).toLocaleString()}</span>

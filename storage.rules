@@ -1,12 +1,23 @@
-rules_version = '2';
-
-// Craft rules based on data in your Firestore database
-// allow write: if firestore.get(
-//    /databases/(default)/documents/users/$(request.auth.uid)).data.isAdmin;
-service firebase.storage {
-  match /b/{bucket}/o {
-    match /{allPaths=**} {
-      allow read, write: if true;
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // UserMessages document rule
+    match /UserMessages/{chatId} {
+      // Allow read/write if the user is authenticated and owns the chat or is an admin
+      allow read, write: if request.auth != null && (
+        request.auth.uid == resource.data.sender_uid ||
+        request.auth.uid == resource.data.recipient_uid ||
+        request.auth.uid == 'Y4P4ECBLLWRbk7VZUqkpqqixE7H2'  // Add the admin UID here
+      );
+      
+      // Messages subcollection rule
+      match /Messages/{messageId} {
+        // Allow read/write if the user is authenticated and owns the chat or is an admin
+        allow read, write: if request.auth != null && (
+          request.auth.uid == resource.data.sender_uid ||
+          request.auth.uid == resource.data.recipient_uid ||
+          request.auth.uid == 'Y4P4ECBLLWRbk7VZUqkpqqixE7H2'  // Add the admin UID here
+        );
+      }
     }
   }
 }

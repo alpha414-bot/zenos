@@ -1,217 +1,172 @@
-import { useEffect, useState } from "react";
-import { collection, query, where, getDocs, addDoc, serverTimestamp } from "firebase/firestore";
-import { useAuthUser } from "@/Services/Hooks"; // Custom hook for fetching auth user
+import { useState, useEffect } from "react";
+import { queryToFetchAllChats, queryToFetchChatMessages, queryToSendChatMessage } from "@/Services/Queries/ChatQuery";
+import { auth } from "@/firebase-config";
+import UserLayout from "@/Layouts/UserLayout";
 import AdminLayout from "@/Layouts/AdminLayout";
-import { firestore } from "@/firebase-config";
-import PageMeta from "@/Layouts/PageMeta";
+import { notify } from "@/notify";
+import { Timestamp } from "firebase/firestore";
 
 interface Message {
-  id: string;
-  message: string;
-  userId: string;
-  timestamp: { seconds: number };
-  orderReference: string;
+  text: string;
+  sender_uid: string;
+  recipient_uid: string;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+  id?: string;
 }
 
-interface UserSummary {
-  userId: string;
-  latestMessage: string;
-  latestTimestamp: number;
+interface ChatMetaListInterface {
+  id: string;
+  has_messages: boolean;
+  text: string;
+  unread: boolean;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+  members: string[];
+  sent_by_uid?: string;
 }
 
 const AdminInbox = () => {
-  const { data: authUser, isLoading: authUserLoading } = useAuthUser(); // Use custom hook for auth user
+  const [chats, setChats] = useState<ChatMetaListInterface[]>([]);
+  const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [userSummaries, setUserSummaries] = useState<UserSummary[]>([]);
-  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [newMessage, setNewMessage] = useState<string>("");
 
-  const [loading, setLoading] = useState<boolean>(true);
+  const user = auth.currentUser; // Assuming the user is authenticated
+  const admin_uid = "Y4P4ECBLLWRbk7VZUqkpqqixE7H2"; // Replace with actual admin UID
 
   useEffect(() => {
-    if (authUserLoading || !authUser) return;
-
-    const fetchMessages = async () => {
+    const fetchChats = async () => {
       try {
-        const q = query(collection(firestore, "UserMessages"));
-        const querySnapshot = await getDocs(q);
-        const allMessages = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        })) as Message[];
-
-        // Group messages by userId
-        const groupedMessages = allMessages.reduce((acc, msg) => {
-          if (!acc[msg.userId]) acc[msg.userId] = [];
-          acc[msg.userId].push(msg);
-          return acc;
-        }, {} as Record<string, Message[]>);
-
-        // Create summaries for each user
-        const summaries = Object.entries(groupedMessages).map(([userId, messages]) => {
-          const latestMessage = messages[messages.length - 1];
-          return {
-            userId,
-            latestMessage: latestMessage.message,
-            latestTimestamp: latestMessage.timestamp.seconds,
-          };
-        });
-
-        setMessages(allMessages);
-        setUserSummaries(summaries);
+        const chatData = await queryToFetchAllChats(admin_uid);
+        console.log("Fetched chats:", chatData.data); // Log chats fetched
+        setChats(chatData.data);
       } catch (error) {
-        console.error("Error fetching messages:", error);
-      } finally {
-        setLoading(false);
+        console.error("Error fetching chats:", error);
+        notify.error({ text: "Unable to fetch chats" });
       }
     };
 
-    fetchMessages();
-  }, [authUser, authUserLoading]);
+    if (admin_uid) {
+      fetchChats();
+    }
+  }, [admin_uid]);
 
-  const handleUserSelect = (userId: string) => {
-    setSelectedUserId(userId);
-  };
+  useEffect(() => {
+    if (selectedChatId) {
+      console.log("Selected Chat ID:", selectedChatId);  // Log selected chat ID
 
-  const sendMessage = async () => {
-    if (newMessage.trim() === "" || !authUser || !selectedUserId) return;
+      const fetchMessages = async () => {
+        try {
+          console.log("Starting to fetch chat messages for chat id:", selectedChatId);
+          await queryToFetchChatMessages(
+            (data: { data: Message[]; chat_id: string }) => {
+              console.log("Fetched messages for chat:", selectedChatId, data.data);  // Log fetched messages and chat ID
+              setMessages(data.data);
+            },
+            selectedChatId,
+            user
+          );
+        } catch (error) {
+          console.error("Error fetching messages:", error);
+          notify.error({ text: "Unable to fetch chat messages" });
+        }
+      };
+
+      fetchMessages();
+    }
+  }, [selectedChatId, user]);
+
+  const handleSendMessage = async () => {
+    if (newMessage.trim() === "" || !selectedChatId) return;
 
     try {
-      await addDoc(collection(firestore, "UserMessages"), {
-        message: newMessage,
-        userId: selectedUserId,
-        timestamp: serverTimestamp(),
-        orderReference: "order_reference", // Replace with actual order reference
-      });
-
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        {
-          id: "temp-id",
-          message: newMessage,
-          userId: authUser.uid,
-          timestamp: { seconds: Math.floor(Date.now() / 1000) },
-          orderReference: "order_reference", // Replace with actual order reference
-        },
-      ]);
+      await queryToSendChatMessage(
+        { text: newMessage, sender_uid: user?.uid || "", recipient_uid: admin_uid },
+        selectedChatId
+      );
       setNewMessage("");
     } catch (error) {
       console.error("Error sending message:", error);
+      notify.error({ text: "There was an issue sending your message" });
     }
   };
 
-  const fetchChatMessages = () => {
-    return messages.filter((msg) => msg.userId === selectedUserId);
-  };
-
   return (
-    <PageMeta title="Admin - Inbox" description="Manage and view user messages">
-      <AdminLayout>
-        <div className="inbox-container">
-          <h1>Admin Inbox</h1>
-          <div className="user-list">
-            {loading ? (
-              <p>Loading messages...</p>
-            ) : (
-              userSummaries.map((summary) => (
-                <div
-                  key={summary.userId}
-                  className="user-summary"
-                  onClick={() => handleUserSelect(summary.userId)}
-                >
-                  <h3>User {summary.userId}</h3>
-                  <p>{summary.latestMessage}</p>
-                  <span>{new Date(summary.latestTimestamp * 1000).toLocaleString()}</span>
+    <AdminLayout>
+      <div className="container mx-auto p-4">
+        <h1 className="text-2xl font-semibold mb-4">Admin Inbox</h1>
+
+        <div className="bg-gray-100 p-4 rounded-md shadow-md mb-4">
+          <h2 className="text-lg font-medium mb-2">Chats</h2>
+          {chats.length > 0 ? (
+            chats.map((chat) => (
+              <div
+                key={chat.id}
+                className="p-3 border-b cursor-pointer"
+                onClick={() => {
+                  console.log("Selected chat id: ", chat.id);  // Log selected chat ID
+                  setSelectedChatId(chat.id);
+                }}
+              >
+                <div className="flex justify-between">
+                  <span className="font-semibold">{chat.text}</span>
+                  <span>{chat.unread ? "Unread" : "Read"}</span>
                 </div>
-              ))
-            )}
-          </div>
+              </div>
+            ))
+          ) : (
+            <p className="text-gray-500">No chats available.</p>
+          )}
         </div>
 
-        {selectedUserId && (
-          <div className="chat-container">
-            <h1>Chat with User {selectedUserId}</h1>
-            <div className="messages">
-              {fetchChatMessages().map((msg) => (
-                <div
-                  key={msg.id}
-                  className={`message ${msg.userId === authUser?.uid ? "admin-message" : "user-message"}`}
-                >
-                  <p>{msg.message}</p>
-                  <span>{new Date(msg.timestamp.seconds * 1000).toLocaleString()}</span>
-                </div>
-              ))}
+        {selectedChatId && (
+          <div>
+            <h2 className="text-lg font-medium mb-4">Messages</h2>
+            <div className="bg-gray-100 p-4 rounded-md shadow-md max-h-[60vh] overflow-y-auto mb-4">
+              {messages.length > 0 ? (
+                messages.map((msg, index) => (
+                  <div
+                    key={index}
+                    className={`flex mb-2 ${
+                      msg.sender_uid === user?.uid ? "justify-end" : "justify-start"
+                    }`}
+                  >
+                    <div
+                      className={`p-3 rounded-lg max-w-[75%] ${
+                        msg.sender_uid === user?.uid
+                          ? "bg-blue-500 text-white"
+                          : "bg-gray-300 text-black"
+                      }`}
+                    >
+                      {msg.text}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-500">No messages yet. Start the conversation!</p>
+              )}
             </div>
-            <textarea
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              placeholder="Type your message here..."
-            ></textarea>
-            <button onClick={sendMessage}>Send</button>
+
+            <div className="flex space-x-2">
+              <input
+                type="text"
+                className="flex-1 p-2 border border-gray-300 rounded-md"
+                placeholder="Type your message"
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+              />
+              <button
+                className="px-4 py-2 bg-blue-500 text-white rounded-md"
+                onClick={handleSendMessage}
+              >
+                Send Message
+              </button>
+            </div>
           </div>
         )}
-
-        <style>{`
-          .inbox-container {
-            padding: 20px;
-          }
-          .user-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-          }
-          .user-summary {
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            cursor: pointer;
-            background-color: #f9f9f9;
-          }
-          .user-summary:hover {
-            background-color: #e0e0e0;
-          }
-          .chat-container {
-            padding: 20px;
-          }
-          .messages {
-            max-height: 400px;
-            overflow-y: scroll;
-            background-color: #f4f4f4;
-            padding: 10px;
-            border: 1px solid #ddd;
-            white-space: pre-wrap; /* Ensure line breaks in messages are respected */
-          }
-          .message {
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 5px;
-          }
-          .user-message {
-            background-color: #4caf50;
-            color: white;
-            text-align: right;
-          }
-          .admin-message {
-            background-color: #007bff;
-            color: white;
-          }
-          textarea {
-            width: 100%;
-            padding: 10px;
-            margin-top: 10px;
-            border-radius: 5px;
-          }
-          button {
-            margin-top: 10px;
-            padding: 10px 20px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-          }
-        `}</style>
-      </AdminLayout>
-    </PageMeta>
+      </div>
+    </AdminLayout>
   );
 };
 

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { queryToCreateChat, queryToFetchChatMessages, queryToSendChatMessage } from "@/Services/Queries/ChatQuery";
 import { auth } from "@/firebase-config";
+import UserLayout from "@/Layouts/UserLayout";
 import { notify } from "@/notify";
 import { Timestamp } from "firebase/firestore";
 
@@ -33,7 +34,7 @@ interface ChatData {
   sent_by_uid?: string;
 }
 
-const admin_uid = "admin_uid_placeholder"; // Replace with actual admin UID
+const admin_uid = "Y4P4ECBLLWRbk7VZUqkpqqixE7H2"; // Replace with actual admin UID
 
 const Inbox = () => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -42,13 +43,12 @@ const Inbox = () => {
   const [loading, setLoading] = useState<boolean>(true);
 
   const user = auth.currentUser as AuthUserType;
-  const { uid } = user;
+  const { uid } = user || {};
 
   useEffect(() => {
     const fetchChat = async () => {
       try {
-        // Assert the type of chatData as ChatData
-        const chatData = await queryToCreateChat(admin_uid, user) as ChatData;
+        const chatData = (await queryToCreateChat(admin_uid, user)) as ChatData;
         setChatId(chatData.id);
       } catch (error) {
         console.error("Error during chat creation:", error);
@@ -68,7 +68,7 @@ const Inbox = () => {
     const fetchMessages = async () => {
       try {
         await queryToFetchChatMessages((data: { data: Message[] }) => {
-          setMessages(data.data); // This is where you set the messages
+          setMessages(data.data);
         }, admin_uid, user);
       } catch (error) {
         console.error("Error fetching messages:", error);
@@ -89,7 +89,7 @@ const Inbox = () => {
         { text: newMessage, sender_uid: uid, recipient_uid: admin_uid },
         chatId!
       );
-      setNewMessage(""); // Clear input after sending
+      setNewMessage("");
     } catch (error) {
       notify.error({ text: "There was an issue sending your message" });
     }
@@ -98,6 +98,7 @@ const Inbox = () => {
   if (loading) return <div>Loading...</div>;
 
   return (
+    <UserLayout>
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-semibold mb-4">Chat with Admin</h1>
 
@@ -142,6 +143,7 @@ const Inbox = () => {
         </button>
       </div>
     </div>
+    </UserLayout>
   );
 };
 

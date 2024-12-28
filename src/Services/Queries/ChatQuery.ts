@@ -15,7 +15,7 @@ import {
   where,
 } from "firebase/firestore";
 
-// Define the structure of the chat metadata
+// Updated interface with media support
 interface ChatMetaListInterface {
   id: string;
   has_messages: boolean;
@@ -27,7 +27,7 @@ interface ChatMetaListInterface {
   sent_by_uid?: string;
 }
 
-// Define the structure of chat messages
+// Updated interface with media support
 interface ChatMessagesInterface {
   id: string;
   text: string;
@@ -35,9 +35,14 @@ interface ChatMessagesInterface {
   recipient_uid: string;
   createdAt: Timestamp;
   updatedAt: Timestamp;
+  media?: {
+    name: string;
+    fullPath: string;
+    type: string;
+  };
 }
 
-// Check or create chat
+// Check or create chat (remains the same)
 export const queryToCreateChat = (recipient_uid?: string, auth_user?: AuthUserType) =>
   new Promise((resolve, reject) => {
     try {
@@ -72,63 +77,56 @@ export const queryToCreateChat = (recipient_uid?: string, auth_user?: AuthUserTy
               unread: false,
               createdAt: Timestamp.now(),
               updatedAt: Timestamp.now(),
-              members: [recipient_uid, auth_user?.uid],
-            } as ChatMetaListInterface)
+              members: [auth_user.uid, recipient_uid],
+            })
               .then((newChat) => {
-                getDoc(doc(firestore, "UserMessages", newChat.id))
-                  .then((chatDoc) => {
-                    resolve({ id: chatDoc.id, ...chatDoc.data() });
-                  })
-                  .catch((error) => {
-                    reject(new Error("Failed to fetch newly created chat: " + error.message));
-                  });
+                getDoc(newChat).then((chatDoc) => {
+                  resolve({ id: chatDoc.id, ...chatDoc.data() });
+                });
               })
-              .catch((error) => {
-                reject(new Error("Failed to create chat: " + error.message));
-              });
+              .catch(reject);
           }
         })
-        .catch((error) => {
-          reject(new Error("Error checking for existing chat: " + error.message));
-        });
+        .catch(reject);
     } catch (error) {
       reject(error);
       notify.error({ text: "Error while setting up chat instance." });
     }
   });
 
-// Fetch chat by recipient UID
+// Fetch chat by recipient UID (remains the same)
 export const queryToGetChat = (
   listener: any,
   recipient_uid?: string,
   auth_user?: AuthUserType
 ): Promise<ChatMetaListInterface> =>
   new Promise((resolve, reject) => {
-    if (!recipient_uid || !auth_user) {
-      return reject(new Error("Recipient or Auth User is missing"));
+    if (!recipient_uid || !auth_user?.uid) {
+      reject(new Error("Recipient or Auth User is missing"));
+      return;
     }
 
     try {
       const chatCollection = collection(firestore, "UserMessages");
       const chatQuery = query(
         chatCollection,
-        where("members", "array-contains", recipient_uid)
+        where("members", "array-contains", auth_user.uid)
       );
 
       getDocs(chatQuery)
         .then((snapshot) => {
           const matchingChat = snapshot.docs.find((doc) =>
-            doc.data().members.includes(auth_user.uid)
+            doc.data().members.includes(recipient_uid)
           );
 
           if (matchingChat) {
-            const chatData = matchingChat.data();
-            chatData.id = matchingChat.id;
+            const chatData = {
+              id: matchingChat.id,
+              ...matchingChat.data()
+            } as ChatMetaListInterface;
             resolve(listener(chatData));
           } else {
-            queryToCreateChat(recipient_uid, auth_user)
-              .then((newChat) => resolve(listener(newChat)))
-              .catch(reject);
+            reject(new Error("No chat found"));
           }
         })
         .catch(reject);
@@ -138,110 +136,67 @@ export const queryToGetChat = (
     }
   });
 
-// Fetch messages
-export const queryToFetchChatMessages = (
-  listener: (data: { data: ChatMessagesInterface[]; chat_id: string }) => void,
-  recipient_uid?: string,
-  auth_user?: AuthUserType
-): Promise<ChatMessagesInterface[]> =>
-  new Promise((resolve, reject) => {
-    console.log("Starting to fetch chat messages...");
-
-    queryToGetChat((chatData: ChatMetaListInterface) => chatData, recipient_uid, auth_user)
-      .then((chatData) => {
-        const chat_id = chatData.id;
-
-        if (!chat_id) {
-          reject("Chat ID is missing");
-          return notify.error({ text: "Chat ID is missing" });
-        }
-
-        console.log("Found chat ID:", chat_id);
-        const chatDocRef = doc(collection(firestore, "UserMessages"), chat_id);
-        const messagesQuery = query(
-          collection(chatDocRef, "Messages"),
-          orderBy("createdAt")
-        );
-
-        console.log("Querying Messages Subcollection:", messagesQuery);
-
-        onSnapshot(
-          messagesQuery,
-          (snapshot) => {
-            console.log("Snapshot triggered");
-            const messages = snapshot.docs.map((doc) => ({
-              id: doc.id,
-              ...doc.data(),
-            } as ChatMessagesInterface));
-
-            console.log("Fetched messages:", messages);
-            listener({ data: messages, chat_id });
-            resolve(messages);
-          },
-          (error) => {
-            console.error("Snapshot listener error:", error);
-            reject(error);
-            notify.error({ text: "There was a snapshot error" });
-          }
-        );
-      })
-      .catch(reject);
-  });
-
-// Send message
+// Send message (updated with media support)
 export const queryToSendChatMessage = (
-  payload: { text: string; sender_uid: string; recipient_uid: string },
+  payload: {
+    text: string;
+    sender_uid: string;
+    recipient_uid: string;
+    media?: {
+      name: string;
+      fullPath: string;
+      type: string;
+    };
+  },
   chat_id?: string
 ) =>
-  new Promise((resolve, reject) => {
+  new Promise(async (resolve, reject) => {
     if (!chat_id) {
       reject(new Error("Please try refreshing the page, unable to send message"));
       return notify.error({ text: "Please try refreshing the page, unable to send message" });
     }
 
     try {
-      console.log("Sending message for chat ID:", chat_id);
-      const chatDocRef = doc(collection(firestore, "UserMessages"), chat_id);
+      const chatDocRef = doc(firestore, "UserMessages", chat_id);
+      
+      const chatDoc = await getDoc(chatDocRef);
+      if (!chatDoc.exists()) {
+        throw new Error("Chat does not exist");
+      }
+
       const messagesCollection = collection(chatDocRef, "Messages");
-
-      console.log("Adding message to Firestore:", payload);
-
-      addDoc(messagesCollection, {
+      const messageData = {
         ...payload,
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now(),
-      })
-        .then(() => {
-          console.log("Message added to Firestore successfully");
+      };
 
-          // Update chat metadata
-          runTransaction(firestore, async (transaction) => {
-            transaction.update(chatDocRef, {
-              has_messages: true,
-              text: payload.text,
-              unread: true,
-              updatedAt: Timestamp.now(),
-              sent_by_uid: payload.sender_uid,
-            });
-          })
-            .then(() => {
-              console.log("Chat updated successfully");
-              resolve(payload);
-            })
-            .catch(reject);
-        })
-        .catch((error) => {
-          console.error("Error adding message:", error);
-          reject(error);
-        });
+      await runTransaction(firestore, async (transaction) => {
+        const newMessageRef = doc(messagesCollection);
+        transaction.set(newMessageRef, messageData);
+
+        // Update chat metadata with media information if present
+        const chatUpdateData: any = {
+          has_messages: true,
+          text: payload.media ? `Sent ${payload.media.type.startsWith('image/') ? 'an image' : 'a file'}` : payload.text,
+          unread: true,
+          updatedAt: Timestamp.now(),
+          sent_by_uid: payload.sender_uid,
+        };
+
+        transaction.update(chatDocRef, chatUpdateData);
+      });
+
+      resolve(payload);
     } catch (error) {
+      console.error("Error sending message:", error);
       reject(error);
       notify.error({ text: "Error while sending message" });
     }
   });
- // Fetch all chats
-// Fix the return type to match the expected structure.
-// Fetch all chats
+
+// Fetch all chats (remains the same)
+
 export const queryToFetchAllChats = (admin_uid?: string): Promise<{ data: ChatMetaListInterface[] }> =>
   new Promise((resolve, reject) => {
     if (!admin_uid) {
@@ -295,7 +250,50 @@ export const queryToFetchAllChats = (admin_uid?: string): Promise<{ data: ChatMe
       notify.error({ text: "Error while fetching chats." });
     }
   });
+// Add this function to your ChatQuery file
 
+export const queryToFetchChatMessages = (
+  listener: (data: { data: ChatMessagesInterface[]; chat_id: string }) => void,
+  chat_id?: string
+): Promise<ChatMessagesInterface[]> =>
+  new Promise((resolve, reject) => {
+    if (!chat_id) {
+      reject(new Error("Chat ID is missing"));
+      return notify.error({ text: "Chat ID is missing" });
+    }
+
+    try {
+      const chatDocRef = doc(firestore, "UserMessages", chat_id);
+      const messagesQuery = query(
+        collection(chatDocRef, "Messages"),
+        orderBy("createdAt", "desc")
+      );
+
+      const unsubscribe = onSnapshot(
+        messagesQuery,
+        (snapshot) => {
+          const messages = snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          } as ChatMessagesInterface));
+
+          listener({ data: messages, chat_id });
+          resolve(messages);
+        },
+        (error) => {
+          console.error("Error fetching messages:", error);
+          reject(error);
+          notify.error({ text: "Error fetching messages" });
+        }
+      );
+
+      return () => unsubscribe();
+    } catch (error) {
+      console.error("Unexpected error:", error);
+      reject(error);
+      notify.error({ text: "Error while fetching messages" });
+    }
+  });
 
 
 

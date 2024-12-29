@@ -105,7 +105,7 @@ function Navbar() {
             )) || (
               <li>
                 <NavLink
-                  to="/login"
+                  to="/auth"
                   className={({ isActive }) =>
                     `tracking-wide ${
                       isActive
@@ -227,7 +227,7 @@ function Navbar() {
             )) || (
               <li>
                 <Link
-                  to="/login"
+                  to="/auth"
                   className="underline underline-offset-4 tracking-wide decoration-dotted hover:text-gray-500 font-medium"
                 >
                   Sign In/Sign Up

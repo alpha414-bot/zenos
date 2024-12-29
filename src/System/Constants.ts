@@ -1,3 +1,8 @@
+export const Config = {
+  phone: "09036279887",
+  email: "info@zenos.com.ng",
+  address: "651 N North Adekunle. St, Lagos",
+};
 export const ZenosCategory = [
   { key: "oraimo", value: "Oraimo" },
   { key: "new-age", value: "New Age" },

@@ -54,7 +54,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
       // middle is for authenticated user, user must be not be anonymous and must be logged in
       if (middlewares && middlewares.includes("auth")) {
         if (!currentUser?.isAnonymous && !currentUser?.uid) {
-          return navigate("/login", { replace: true });
+          return navigate("/auth", { replace: true });
         }
       }
       // user is authenticated and user is not anonymous

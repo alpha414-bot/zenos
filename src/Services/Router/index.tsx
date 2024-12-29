@@ -61,7 +61,7 @@ const RootRouter: RouteObject[] = [
   },
   // login
   {
-    path: "/login",
+    path: "/auth",
     element: (
       <ProtectedRoute middlewares={["guest"]}>
         <AuthPage />

@@ -1,8 +1,10 @@
 import Anime from "@/Components/Anime";
 import Button from "@/Components/Button";
+import ButtonAsLink from "@/Components/ButtonAsLink";
 import Filter from "@/Components/Filter";
 import Input from "@/Components/Input";
 import ProductList from "@/Components/ProductList";
+import SliderArrow from "@/Components/SliderArrow";
 import Spinner from "@/Components/Spinner";
 import Title from "@/Components/Title";
 import MainLayout from "@/Layouts/MainLayout";
@@ -29,12 +31,8 @@ const Home = () => {
         title="Gadget Ecommerce"
         description="The ecommerce with the latest in laptops, mobile and gadgets"
       >
-        <div className="space-y-0">
-          <div
-            className={classNames("relative items-stretch", {
-              "min-h-[25rem] md:min-h-screen": true,
-            })}
-          >
+        <div className="space-y-7">
+          <div className="grid grid-cols-1 items-stretch gap-x-14 py-8 px-2 md:py-8 md:px-12 md:grid-cols-[69%_auto]">
             <Slider
               {...{
                 fade: true,
@@ -47,58 +45,178 @@ const Home = () => {
                 // infinite: false,
                 swipe: true,
                 dots: true,
-              }}
-              className=""
-            >
-              <div
-                className={classNames("py-40 h-full relative space-y-6", {
-                  "min-h-[25rem] md:min-h-screen": true,
-                })}
-                data-main
-              >
-                <div className="flex flex-col items-start">
-                  <div className="px-6 py-6 inline-block mx-auto rounded-t-3xl bg-gray-400/40 md:px-4">
-                    <p className="text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-zenos-100/65 via-zenos-300/80 to-zenos-500 md:text-6xl lg:text-9xl">
-                      Grooming
-                    </p>
-                  </div>
-                  <div className="px-6 py-6 inline-block mx-auto rounded-3xl bg-gray-400/40 md:px-4">
-                    <p className="text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-zenos-500 via-zenos-300/80 to-zenos-100/65 md:text-6xl lg:text-9xl">
-                      Ultimate . Series
-                    </p>
-                  </div>
-                </div>
-                <p className="text-lg font-semibold text-center tracking-wide md:text-xl">
-                  Power Up Your Life: The Latest in Mobile; Accessories and
-                  Gadgets
-                </p>
-                {/* Animation */}
-                <div className="bg-white absolute inset-0 bottom-0 -z-10 w-full flex items-end">
-                  <Anime
-                    height={25}
-                    typeOfCanva="globe"
-                    className="w-full h-[40rem] md:h-[40rem]"
+                dotsClass: "absolute bottom-2 w-full block !px-6 !py-4",
+                nextArrow: (
+                  <SliderArrow
+                    type="next"
+                    arrowClassName="!right-2 md:!right-4 animate-slideright bg-zenos-600 p-1.5 !rounded-full !shadow-none md:!hidden group-hover:!block"
+                    iconClassName="!w-6 !h-6"
+                    // iconClassName="!w-8 !h-8 md:!w-6 md:!h-6"
                   />
-                </div>
-              </div>
-              <div
-                className={classNames("relative h-full bg-red-500", {
-                  "min-h-[25rem] md:min-h-screen": true,
-                })}
-              >
+                ),
+                prevArrow: (
+                  <SliderArrow
+                    type="prev"
+                    arrowClassName="!left-2 md:!left-4 animate-slideleft bg-zenos-600 p-1.5 !rounded-full !shadow-none md:!hidden group-hover:!block"
+                    iconClassName="!w-6 !h-6"
+                  />
+                ),
+                customPaging: () => <></>,
+                appendDots: (dots) => (
+                  <div>
+                    <ul className="custom-slick-dot">{dots}</ul>
+                  </div>
+                ),
+              }}
+              className="group"
+            >
+              {new Array(4).fill(0).map((_item, index) => (
                 <div
-                  className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
-                  style={{
-                    backgroundImage: `url("/assets/images/BannerD.png")`,
-                  }}
-                ></div>
-              </div>
+                  key={index}
+                  className={classNames("relative w-full !h-auto md:!h-[75vh]")}
+                >
+                  <h2 className="absolute z-10 text-4xl py-2 px-4">
+                    {index + 1}
+                  </h2>
+                  <img
+                    src="/assets/images/BannerB.png"
+                    alt="1st Slider image"
+                    className="!block w-full rounded-lg md:!hidden"
+                  />
+                  <div
+                    className="!hidden w-full h-full bg-no-repeat bg-center bg-cover rounded-lg md:rounded-3xl md:!block"
+                    style={{
+                      backgroundImage: `url('/assets/images/BannerB.png')`,
+                    }}
+                  ></div>
+                </div>
+              ))}
             </Slider>
+            <div className="font-roboto grid md:grid-rows-2 gap-8 py-6 px-2">
+              {/* Oraimo Flyer */}
+              {[
+                {
+                  placeholder: "oraimo-flyer.jpg",
+                  title: "Oraimo",
+                  link: "oraimo",
+                },
+                {
+                  placeholder: "newage-flyer.jpg",
+                  title: "New Age",
+                  link: "newage",
+                },
+              ].map((item, index) => (
+                <div
+                  key={index}
+                  className="h-auto relative bg-gray-800 rounded-lg gap-8 overflow-hidden md:h-full md:rounded-3xl"
+                >
+                  <div className="relative z-10 w-full inset-0 py-4 px-8 bg-gray-800/75 flex flex-col items-center text-center justify-start gap-y-3 md:py-2 md:justify-center md:h-full">
+                    <h2 className="text-2xl font-bold text-gray-200 underline underline-offset-4 decoration-dotted md:text-4xl md:leading-[3rem]">
+                      Shop for <br className="hidden md:block" />
+                      {item.title} Gadgets
+                    </h2>
+                    <ButtonAsLink
+                      to="/shop/oraimo"
+                      className="whitespace-nowrap !m-0"
+                    >
+                      Shop Now
+                    </ButtonAsLink>
+                  </div>
+                  <div
+                    className="absolute inset-0 z-0 w-full h-full bg-red-500 bg-cover bg-top bg-no-repeat"
+                    style={{
+                      backgroundImage: `url("/assets/images/${item.placeholder}")`,
+                    }}
+                  ></div>
+                </div>
+              ))}
+            </div>
           </div>
+          {/* Quick About Us */}
+          {/* <div className="border border-gray-700 mx-2 px-6 py-6 rounded-lg grid grid-cols- gap-y-6 divide-gray-700 md:grid-cols-5 md:py-4 md:divide-x-2 md:mx-12"> */}
+          <Slider
+            {...{
+              slidesToShow: 5,
+              autoplay: true,
+              autoplaySpeed: 1500,
+              infinite: false,
+              arrows: false,
+              dots: false,
+              responsive: [
+                {
+                  breakpoint: 600,
+                  settings: {
+                    slidesToShow: 1,
+                    slidesToScroll: 1,
+                  },
+                },
+              ],
+            }}
+            className="quick-us px-5"
+          >
+            {[
+              {
+                icon: "fa-solid fa-headset",
+                title: "24/7 Support",
+                subtitle: "Support every time",
+              },
+              {
+                icon: "fa-solid fa-credit-card",
+                title: "Accept Payment",
+                subtitle: "Verve, Bank Transfer",
+              },
+              {
+                icon: "fa-solid fa-shield",
+                title: "Secure Payment",
+                subtitle: "100% Secured",
+              },
+              {
+                icon: "fa-solid fa-truck",
+                title: "Free Shipping",
+                subtitle: "Across Nigeria",
+              },
+              {
+                icon: "fa-solid fa-calendar",
+                title: "30 days return",
+                subtitle: "Get 30 days guarantee",
+              },
+            ].map((item, index) => {
+              return (
+                <div key={index}>
+                  <div
+                    className={classNames(
+                      "w-full px-6 !flex flex-nowrap !flex-row items-center justify-center gap-4 group"
+                    )}
+                  >
+                    <i
+                      className={classNames(
+                        "fa-2x text-zenos-500 group-hover:text-zenos-700",
+                        item.icon
+                      )}
+                    ></i>
+                    <div className="space-y-1">
+                      <p className="font-sans whitespace-nowrap text-xl leading-none font-semibold uppercase">
+                        {item.title}
+                      </p>
+                      <p className="text-sm leading-5 ">{item.subtitle}</p>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </Slider>
+          {/* </div> */}
           <div className="py-10 px-3 md:px-10 space-y-10">
             <div id="shop">
-              <Title>Best Selling Products</Title>
-              <div className="mt-6 grid grid-cols-1 sm:grid-cols-[1fr_2fr] xl:grid-cols-[1fr_3fr] gap-10">
+              <div className="">
+                <Title>Best Selling Products</Title>
+                <p className="text-sm font-semibold py-1 px-2">
+                  Products with a lot of sale this month and last. Browse
+                  through and enjoy.
+                </p>
+                <hr className="mt-3 border-gray-300" />
+              </div>
+              <div className="mt-6 py-8 grid grid-cols-1 sm:grid-cols-[1fr_2fr] xl:grid-cols-[1fr_3fr] gap-10">
                 <div className="grow">
                   <Filter products={data} />
                 </div>
@@ -119,7 +237,9 @@ const Home = () => {
                         </>
                       )) || (
                         <div className="no-container-products">
-                          <p className="no-product-data">No Product found! Start listing Product</p>
+                          <p className="no-product-data">
+                            No Product found! Start listing Product
+                          </p>
                         </div>
                       )))}
                 </div>

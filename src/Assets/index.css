@@ -7,12 +7,28 @@
   .firebase-emulator-warning {
     @apply !fixed !left-auto !right-4 !bottom-2 !rounded-full !w-12 !h-12 !text-white !bg-white !text-opacity-0 !bg-no-repeat !bg-contain !bg-center bg-[url('https://firebase.google.com/static/images/brand-guidelines/logo-logomark.png')] !shadow-sm !shadow-gray-200;
   }
+  /* Slick */
+  .custom-slick-dot {
+    @apply flex !items-center justify-end gap-x-3 !px-4 w-full !py-2;
+  }
+  .custom-slick-dot li {
+    @apply !w-2 !h-2 bg-zenos-600/55 !inline-block !p-0 !m-0 rounded-full !transition-all !delay-100 !duration-300 !ease-in-out;
+  }
+  .custom-slick-dot li.slick-active {
+    @apply !w-10 !h-2 bg-zenos-600 !inline-block !p-0 !m-0 rounded-full;
+  }
+  .quick-us .slick-track {
+    @apply !divide-x-0 md:!divide-x-2 !divide-gray-700;
+  }
+  .quick-us .slick-list {
+    @apply !border !border-gray-700 !py-5 mx-2 !rounded-2xl md:!py-4;
+  }
   /* Rich Text Editor */
   .rich-editor h1 {
-    @apply text-3xl font-semibold;
+    @apply text-3xl font-semibold underline underline-offset-4 !important;
   }
   .rich-editor h2 {
-    @apply text-2xl font-medium !important;
+    @apply text-xl font-medium !important;
   }
   .rich-editor ol {
     @apply list-decimal pl-4 !important;

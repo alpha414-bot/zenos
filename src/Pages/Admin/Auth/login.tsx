@@ -43,6 +43,7 @@ const AdminLogin = () => {
                 name="email"
                 type="email"
                 placeholder="Email address"
+                isFocused
               />
             </div>
             <div>

@@ -16,7 +16,7 @@ import {
   updateDoc,
   where,
 } from "firebase/firestore";
-import { deleteObject, ref } from "firebase/storage";
+import { ref } from "firebase/storage";
 import { backend_url } from "../../../package.json";
 
 /**
@@ -189,26 +189,28 @@ export const queryToUploadFiles = (
 export const queryToDeleteFiles = (path: string) =>
   new Promise((resolve, reject) => {
     try {
-      const FileRef = ref(storage, path);
       // delete from firestore collection first, and then proceed to deleting from storage
       const MediaCollection = collection(firestore, "Media");
+      console.log("path is", path)
       const QueryForFile = query(
         MediaCollection,
-        where("media.fullPath", "==", path),
+        where("media.name", "==", path),
         limit(1)
       );
       getDocs(QueryForFile).then((snapFile) => {
         if (!snapFile.empty) {
           const MediaFile = snapFile.docs[0];
+          console.log("media file is", MediaFile.data());
+          return true;
           deleteDoc(MediaFile.ref)
             .then(() => {
-              // if media docs was deleted from firestore successfully, then there is no point as to if it was deleted in the bucket
-              deleteObject(FileRef).then((resp) => {
-                resolve(resp);
-                notify.success({
-                  text: "File has been deleted successfully.",
-                });
-              });
+              // Now delete from backend server
+              // deleteObject(FileRef).then((resp) => {
+              //   resolve(resp);
+              //   notify.success({
+              //     text: "File has been deleted successfully.",
+              //   });
+              // });
             })
             .catch((err) => {
               console.log(

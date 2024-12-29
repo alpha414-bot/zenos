@@ -1,4 +1,5 @@
 import flowbite from "flowbite-react/tailwind";
+import defaultTheme from "tailwindcss/defaultTheme";
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
@@ -11,6 +12,16 @@ module.exports = {
   ],
   darkMode: "selector",
   theme: {
+    fontFamily: {
+      poppins: ["Poppins", "system-ui"],
+      roboto: [
+        "Roboto Flex",
+        "sans-serif",
+        "system-ui",
+        ...defaultTheme.fontFamily.sans,
+      ],
+      ...defaultTheme.fontFamily,
+    },
     extend: {
       colors: {
         glass: "rgba(255, 255, 255, 0.12)",

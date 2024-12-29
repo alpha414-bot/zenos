@@ -58,10 +58,10 @@ const AdminRouter: RouteObject[] = [
                 onClick={() => {
                   queryToRegisterUser(
                     {
-                      email: "bumiapartnerslimited@gmail.com",
+                      email: "admin@gmail.com",
                       first_name: "Admin",
                       last_name: "Admin",
-                      password: "$Zenos000",
+                      password: "password",
                       phone: "8149651464",
                       username: "@admin",
                     },

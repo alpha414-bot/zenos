@@ -1,4 +1,5 @@
 import { isUrl } from "@/System/function";
+import classNames from "classnames";
 import _ from "lodash";
 import React, { PropsWithChildren, Ref, useMemo } from "react";
 import {
@@ -28,11 +29,12 @@ const Icon = React.forwardRef(
     { className, ...props }: PropsWithChildren<BaseProps>,
     ref: Ref<HTMLSpanElement>
   ) => (
-    <span
-      {...props}
-      ref={ref}
-      className={`material-symbols-outlined ${className} text-xl align-text-bottom`}
-    />
+    <>
+      <span
+        ref={ref}
+        className={classNames(`text-xl align-text-bottom`, className)}
+      />
+    </>
   )
 );
 
@@ -244,7 +246,7 @@ export const LinkButton = ({ icon }: { icon: any }) => {
         }
       }}
     >
-      <Icon>{icon}</Icon>
+      <Icon className={icon} />
     </Button>
   );
 };
@@ -259,7 +261,7 @@ export const MarkButton = ({ format, icon }: { format: any; icon: any }) => {
         toggleMark(editor, format);
       }}
     >
-      <Icon>{icon}</Icon>
+      <Icon className={icon} />
     </Button>
   );
 };
@@ -278,7 +280,7 @@ export const BlockButton = ({ format, icon }: { format: any; icon: any }) => {
         toggleBlock(editor, format);
       }}
     >
-      <Icon>{icon}</Icon>
+      <Icon className={icon} />
     </Button>
   );
 };

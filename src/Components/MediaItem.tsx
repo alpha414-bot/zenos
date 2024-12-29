@@ -28,7 +28,7 @@ const MediaItem: React.FC<{
   clearSelect,
 }) => {
   const type = _.split(item?.media?.mimetype, "/")[0];
-  const { data: src } = useMediaFile(item?.media?.name, "w800", type);
+  const { data: src } = useMediaFile(item?.media?.name, "w1280", type);
   const { media, createdAt, updatedAt } = item;
   const createdAtDate = moment(fm(createdAt));
   const updateAtDate = moment(fm(updatedAt));
@@ -186,7 +186,7 @@ const MediaItem: React.FC<{
             {type == "image" && (
               <img
                 src={`${src}`}
-                className="w-full h-full object-contain"
+                className="w-full min-h-32 h-full object-contain"
                 alt={media?.name}
               />
             )}

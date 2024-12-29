@@ -3,12 +3,22 @@ import AdminLayout from '@/Layouts/AdminLayout';
 import { queryToFetchAllChats, queryToFetchChatMessages, queryToSendChatMessage } from '@/Services/Queries/ChatQuery';
 import { queryToUploadFiles } from '@/Services/Queries/MediaQuery';
 import { notify } from '@/notify';
-import { Timestamp } from 'firebase/firestore';
+import { Timestamp, collection, getDocs, query, where } from 'firebase/firestore';
 import EmojiPicker, { EmojiClickData } from 'emoji-picker-react';
 import { FaSmile, FaPaperclip } from 'react-icons/fa';
 import { backend_url } from "../../../package.json";
+import { firestore } from '@/firebase-config';
+import Media from "@/Components/Media";
+import { useForm, Control } from "react-hook-form";
 
-// Define interfaces for type safety
+interface UserData {
+  displayName: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  uid: string;
+}
+
 interface ChatMessage {
   id: string;
   text: string;
@@ -32,33 +42,64 @@ interface Chat {
   updatedAt: Timestamp;
   members: string[];
   sent_by_uid?: string;
+  userData?: UserData;
+}
+
+interface ChatFormData {
+  message: string;
+  attachments: any[];
 }
 
 const AdminInbox: React.FC = () => {
-  // State declarations
+  const { control, handleSubmit, reset, watch } = useForm<ChatFormData>({
+    defaultValues: {
+      message: '',
+      attachments: []
+    }
+  });
+
   const [chats, setChats] = useState<Chat[]>([]);
   const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [uploading, setUploading] = useState(false);
 
-  // Refs
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messageListRef = useRef<HTMLDivElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Constants
-  const adminUid = "Y4P4ECBLLWRbk7VZUqkpqqixE7H2"; // Your admin UID
+  const adminUid = "Y4P4ECBLLWRbk7VZUqkpqqixE7H2";
+  const attachments = watch('attachments');
 
-  // Fetch all chats on component mount
+  // Fetch user data for a chat
+  const fetchUserData = async (chat: Chat): Promise<Chat> => {
+    const recipientUid = chat.members.find(id => id !== adminUid);
+    if (!recipientUid) return chat;
+
+    try {
+      const usersCollection = collection(firestore, "Users");
+      const q = query(usersCollection, where("uid", "==", recipientUid));
+      const userSnapshot = await getDocs(q);
+
+      if (!userSnapshot.empty) {
+        const userData = userSnapshot.docs[0].data() as UserData;
+        return { ...chat, userData };
+      }
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    }
+    return chat;
+  };
+
   useEffect(() => {
     const fetchChats = async () => {
       try {
         setLoading(true);
         const result = await queryToFetchAllChats(adminUid);
-        setChats(result.data);
+        const chatsWithUserData = await Promise.all(
+          result.data.map(fetchUserData)
+        );
+        setChats(chatsWithUserData);
       } catch (error) {
         console.error('Error fetching chats:', error);
         notify.error({ text: 'Failed to load chats' });
@@ -70,14 +111,12 @@ const AdminInbox: React.FC = () => {
     fetchChats();
   }, [adminUid]);
 
-  // Scroll to bottom when new messages arrive
   useEffect(() => {
     if (messageListRef.current) {
       messageListRef.current.scrollTop = messageListRef.current.scrollHeight;
     }
   }, [messages]);
 
-  // Set up message listener when chat is selected
   useEffect(() => {
     if (!selectedChatId) return;
 
@@ -94,14 +133,20 @@ const AdminInbox: React.FC = () => {
 
   const handleChatSelect = (chatId: string) => {
     setSelectedChatId(chatId);
-    setMessages([]); // Clear previous messages
-    messageListRef.current?.scrollTo(0, 0); // Reset scroll position
+    setMessages([]);
+    messageListRef.current?.scrollTo(0, 0);
+    reset({ message: '', attachments: [] });
   };
 
-  const handleSendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!selectedChatId || !newMessage.trim()) return;
+  const onEmojiClick = (emojiData: EmojiClickData) => {
+    const currentMessage = watch('message');
+    reset({ ...watch(), message: currentMessage + emojiData.emoji });
+    setShowEmojiPicker(false);
+  };
+  // ... continuing from Part 1
+
+  const onSubmit = async (data: ChatFormData) => {
+    if (!selectedChatId || (!data.message.trim() && !data.attachments?.length)) return;
 
     const selectedChat = chats.find(chat => chat.id === selectedChatId);
     if (!selectedChat) return;
@@ -113,74 +158,44 @@ const AdminInbox: React.FC = () => {
     }
 
     try {
-      const payload = {
-        text: newMessage.trim(),
-        sender_uid: adminUid,
-        recipient_uid: recipientUid,
-      };
-
-      await queryToSendChatMessage(payload, selectedChatId);
-      setNewMessage(''); // Clear input only after successful send
-    } catch (error) {
-      console.error('Error sending message:', error);
-      notify.error({ text: 'Failed to send message' });
-    }
-  };
-
-  const onEmojiClick = (emojiData: EmojiClickData) => {
-    setNewMessage(prev => prev + emojiData.emoji);
-    setShowEmojiPicker(false);
-  };
-
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (!files || !selectedChatId) return;
-
-    try {
       setUploading(true);
-      
-      const uploadResult = await queryToUploadFiles(
-        Array.from(files),
-        '/chat_uploads',
-        true
-      );
 
-      if (uploadResult) {
-        const selectedChat = chats.find(chat => chat.id === selectedChatId);
-        if (!selectedChat) return;
-
-        const recipientUid = selectedChat.members.find(id => id !== adminUid);
-        if (!recipientUid) {
-          notify.error({ text: 'Cannot find recipient' });
-          return;
-        }
-
-        // For each uploaded file, send a message
-        for (const file of Array.from(files)) {
+      // Handle attachments first
+      if (data.attachments?.length) {
+        for (const file of data.attachments) {
           const payload = {
             text: file.name,
             sender_uid: adminUid,
             recipient_uid: recipientUid,
             media: {
               name: file.name,
-              fullPath: `chat_uploads/${file.name}`,
+              fullPath: file.path,
               type: file.type
             }
           };
 
           await queryToSendChatMessage(payload, selectedChatId);
         }
-
-        notify.success({ text: 'File(s) uploaded successfully' });
       }
+
+      // Handle text message
+      if (data.message.trim()) {
+        const payload = {
+          text: data.message.trim(),
+          sender_uid: adminUid,
+          recipient_uid: recipientUid,
+        };
+
+        await queryToSendChatMessage(payload, selectedChatId);
+      }
+
+      // Reset form after successful send
+      reset({ message: '', attachments: [] });
     } catch (error) {
-      console.error('Error uploading file:', error);
-      notify.error({ text: 'Failed to upload file' });
+      console.error('Error sending message:', error);
+      notify.error({ text: 'Failed to send message' });
     } finally {
       setUploading(false);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
     }
   };
 
@@ -211,7 +226,7 @@ const AdminInbox: React.FC = () => {
           href={getMediaUrl(msg.media.fullPath)}
           target="_blank" 
           rel="noopener noreferrer"
-          className="flex items-center space-x-2 text-blue-500 hover:text-blue-600"
+          className="flex items-center space-x-2 text-orange-500 hover:text-orange-600"
         >
           <FaPaperclip />
           <span>{msg.media.name}</span>
@@ -223,45 +238,45 @@ const AdminInbox: React.FC = () => {
 
   return (
     <AdminLayout>
-      <div className="flex h-[calc(100vh-64px)]">
+      <div className="flex h-[calc(100vh-64px)] bg-gray-900">
         {/* Chat List Sidebar */}
-        <div className="w-1/4 border-r border-gray-200 bg-white overflow-y-auto">
-          <div className="p-4 border-b border-gray-200">
-            <h2 className="text-xl font-semibold text-gray-900">Conversations</h2>
+        <div className="w-1/4 border-r border-gray-700 bg-gray-800 overflow-y-auto">
+          <div className="p-4 border-b border-gray-700">
+            <h2 className="text-xl font-semibold text-white">Conversations</h2>
           </div>
           
           {loading ? (
-            <div className="p-4 text-center text-gray-700">Loading chats...</div>
+            <div className="p-4 text-center text-gray-400">Loading chats...</div>
           ) : (
-            <div className="divide-y divide-gray-200">
+            <div className="divide-y divide-gray-700">
               {chats.length === 0 ? (
-                <div className="p-4 text-center text-gray-700">No conversations yet</div>
+                <div className="p-4 text-center text-gray-400">No conversations yet</div>
               ) : (
                 chats.map((chat) => (
                   <div
                     key={chat.id}
                     onClick={() => handleChatSelect(chat.id)}
-                    className={`p-4 cursor-pointer hover:bg-gray-100 transition-colors ${
-                      selectedChatId === chat.id ? 'bg-gray-100' : ''
+                    className={`p-4 cursor-pointer hover:bg-gray-700 transition-colors ${
+                      selectedChatId === chat.id ? 'bg-gray-700' : ''
                     }`}
                   >
                     <div className="flex items-center space-x-3">
                       <div className="flex-shrink-0">
-                        <div className="w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center">
-                          <span className="text-lg text-white">
-                            {chat.text[0]?.toUpperCase() || '?'}
+                        <div className="w-12 h-12 rounded-full bg-orange-500 flex items-center justify-center">
+                          <span className="text-lg text-gray-900">
+                            {chat.userData?.first_name?.[0]?.toUpperCase() || '?'}
                           </span>
                         </div>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900 truncate">
-                          {chat.text}
+                        <p className="text-sm font-medium text-white truncate">
+                          {chat.userData ? `${chat.userData.first_name} ${chat.userData.last_name}` : 'Unknown User'}
                         </p>
-                        <p className="text-sm text-gray-700">
+                        <p className="text-sm text-gray-400">
                           {formatTimestamp(chat.updatedAt)}
                         </p>
                         {chat.unread && chat.sent_by_uid !== adminUid && (
-                          <span className="inline-block bg-blue-500 rounded-full w-2 h-2 ml-2"></span>
+                          <span className="inline-block bg-orange-500 rounded-full w-2 h-2 ml-2"></span>
                         )}
                       </div>
                     </div>
@@ -273,7 +288,7 @@ const AdminInbox: React.FC = () => {
         </div>
 
         {/* Chat Window */}
-        <div className="flex-1 flex flex-col bg-gray-50">
+        <div className="flex-1 flex flex-col bg-gray-900">
           {selectedChatId ? (
             <>
               {/* Messages Container */}
@@ -292,15 +307,15 @@ const AdminInbox: React.FC = () => {
                       <div
                         className={`max-w-[70%] rounded-lg p-3 ${
                           msg.sender_uid === adminUid
-                            ? 'bg-gray-700 text-white'
-                            : 'bg-white text-gray-900'
+                            ? 'bg-orange-500 text-gray-900'
+                            : 'bg-gray-800 text-white'
                         }`}
                       >
                         {renderMessageContent(msg)}
                         <p className={`text-xs mt-1 ${
                           msg.sender_uid === adminUid
-                            ? 'text-gray-300'
-                            : 'text-gray-700'
+                            ? 'text-gray-800'
+                            : 'text-gray-400'
                         }`}>
                           {formatTimestamp(msg.createdAt)}
                         </p>
@@ -311,58 +326,54 @@ const AdminInbox: React.FC = () => {
                 <div ref={messagesEndRef} />
               </div>
 
-              {/* Message Input */}
-              <div className="border-t border-gray-200 p-4 bg-white">
-                <form onSubmit={handleSendMessage} className="flex space-x-4">
-                  <div className="flex-1 flex items-center space-x-2 relative">
-                    <button
-                      type="button"
-                      onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                      className="text-gray-500 hover:text-gray-700"
-                    >
-                      <FaSmile className="w-5 h-5" />
-                    </button>
-                    
-                    <input
-                      type="text"
-                      value={newMessage}
-                      onChange={(e) => setNewMessage(e.target.value)}
-                      placeholder="Type your message..."
-                      className="flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:border-gray-500 text-gray-900 placeholder-gray-600"
-                    />
-                    
-                    <label className="cursor-pointer text-gray-500 hover:text-gray-700">
-                      <FaPaperclip className="w-5 h-5" />
+              {/* Message Input with Media Component */}
+              <div className="border-t border-gray-700 p-4 bg-gray-800">
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                  <Media
+                    name="attachments"
+                    control={control as Control}
+                    multiSelect={true}
+                    placeholder="Drop files here or click to upload"
+                    align="row"
+                  />
+                  
+                  <div className="flex space-x-4">
+                    <div className="flex-1 flex items-center space-x-2 relative">
+                      <button
+                        type="button"
+                        onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                        className="text-gray-400 hover:text-orange-500"
+                      >
+                        <FaSmile className="w-5 h-5" />
+                      </button>
+                      
                       <input
-                        type="file"
-                        ref={fileInputRef}
-                        onChange={handleFileUpload}
-                        className="hidden"
-                        multiple
-                        accept="image/*,.pdf,.doc,.docx,.xls,.xlsx"
+                        {...control.register('message')}
+                        placeholder="Type your message..."
+                        className="flex-1 rounded-lg bg-gray-700 border border-gray-600 px-4 py-2 focus:outline-none focus:border-orange-500 text-white placeholder-gray-400"
                       />
-                    </label>
 
-                    {showEmojiPicker && (
-                      <div className="absolute bottom-full mb-2 z-50">
-                        <EmojiPicker onEmojiClick={onEmojiClick} />
-                      </div>
-                    )}
+                      {showEmojiPicker && (
+                        <div className="absolute bottom-full mb-2 z-50">
+                          <EmojiPicker onEmojiClick={onEmojiClick} />
+                        </div>
+                      )}
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={!watch('message')?.trim() && !attachments?.length || uploading}
+                      className="bg-orange-500 text-gray-900 px-6 py-2 rounded-lg hover:bg-orange-600 transition-colors disabled:bg-gray-600 disabled:text-gray-400"
+                    >
+                      {uploading ? 'Sending...' : 'Send'}
+                    </button>
                   </div>
-
-                  <button
-                    type="submit"
-                    disabled={!newMessage.trim() || uploading}
-                    className="bg-gray-700 text-white px-6 py-2 rounded-lg hover:bg-gray-800 transition-colors disabled:bg-gray-400"
-                  >
-                    {uploading ? 'Uploading...' : 'Send'}
-                  </button>
                 </form>
               </div>
             </>
           ) : (
             <div className="flex-1 flex items-center justify-center">
-              <p className="text-gray-700 text-lg font-medium">
+              <p className="text-gray-400 text-lg font-medium">
                 Select a conversation to start chatting
               </p>
             </div>

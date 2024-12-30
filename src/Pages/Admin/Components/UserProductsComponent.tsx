@@ -3,9 +3,9 @@ import ButtonAsLink from "@/Components/ButtonAsLink";
 import Image from "@/Components/Image";
 import Input from "@/Components/Input";
 import Media from "@/Components/Media";
-import { getAuth } from "firebase/auth";
 import RichEditor from "@/Components/RichEditor";
 import SelectDropdown from "@/Components/SelectDropdown";
+import { getAuth } from "firebase/auth";
 import Table from "@/Components/Table";
 import VariantsType from "@/Components/VariantsType";
 import { useProductsData } from "@/Services/Hooks";
@@ -340,7 +340,8 @@ const ProductsAction = ({ values }: { values: ProductItemType }) => {
                 />
               </svg>
               <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
-                Are you sure you want to delete this product?
+                Are you sure you want to delete this product? {values?.id}
+                -delete-popup
               </h3>
               <button
                 data-modal-hide={`${values?.id}-delete-product-modal`}
@@ -447,25 +448,40 @@ const SelectProductAction = ({ id, status }: { id: string; status?: any }) => {
   );
 };
 
-const AdminProductsComponent = () => {
-  const { data: products } = useProductsData(undefined, true);
+const UserProductsComponent = () => {
+  const auth = getAuth();
+  const currentUser = auth.currentUser;
+
+  if (!currentUser) {
+    console.error("No user is signed in.");
+    return <div>No user signed in</div>; // You can handle it appropriately
+  }
+
+  const userUuid = currentUser.uid;
+
+  // Fetch products
+  let { data: products = [] } = useProductsData<ProductItemType[]>(undefined, true);
+
+  // Reassign products to filtered products based on the user's UUID
+  if (Array.isArray(products)) {
+    products = products.filter((product) => product.createdBy === userUuid);
+  }
+
   const { control, handleSubmit, reset, watch } = useForm({ mode: "all" });
+
+  
   const columns = useMemo<ColumnDef<ProductItemType>[]>(
     () => [
       {
         header: "Status",
-        accessorFn: (row) => row,
+        accessorFn: (row) => row.status,
         cell: (info) => (
-          <>
-            <SelectProductAction
-              id={(info.getValue() as any).id}
-              status={(info.getValue() as any).status}
-            />
-          </>
+          <span>{info.getValue() as any}</span>
         ),
         footer: (props) => props.column.id,
         enableSorting: false,
       },
+
       {
         accessorKey: "image",
         cell: (info) => (
@@ -473,14 +489,12 @@ const AdminProductsComponent = () => {
             {/* <div className="flex items-center gap-1 flex-wrap"> */}
             <div className="grid grid-cols-2 md:grid-cols-3 gap-1 min-w-60">
               {(info.getValue() as any[]).map((item, index) => (
-                <>
-                  <Image
-                    key={index}
-                    src={item}
-                    className="w-full max-w-full max-h-full bg-zenos-200 rounded-sm overflow-hidden"
-                    width={120}
-                  />
-                </>
+                <Image
+                  key={index}
+                  src={item}
+                  className="w-full max-w-full max-h-full bg-zenos-200 rounded-sm overflow-hidden"
+                  width={120}
+                />
               ))}
             </div>
           </>
@@ -528,20 +542,13 @@ const AdminProductsComponent = () => {
         ),
         footer: (props) => props.column.id,
       },
-      {
-        header: "Action",
-        accessorFn: (row) => row,
-        cell: (info) => {
-          return <ProductsAction values={info.getValue() as any} />;
-        },
-        footer: (props) => props.column.id,
-        enableSorting: false,
-      },
+  
     ],
     []
   );
   const [addProductModal, setAddProductModal] = useState<Modal>();
   const [variants, setVariants] = useState([{}]);
+ 
   const submitProductsForm = (data: any) => {
     const auth = getAuth();
   const currentUser = auth.currentUser;
@@ -566,8 +573,8 @@ const AdminProductsComponent = () => {
           ...data,
           ...{
             image: image,
-            status: "active",
-            createdBy: userUuid, // Assign the user UUID to the "createdBy" field
+            status: "archived",
+            createdBy: userUuid,  
             description: data.description?.replace(/\n/g, "\\n"),
           },
         })
@@ -805,4 +812,4 @@ const AdminProductsComponent = () => {
     </section>
   );
 };
-export default AdminProductsComponent;
+export default UserProductsComponent;

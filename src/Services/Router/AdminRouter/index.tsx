@@ -2,6 +2,7 @@
 import AdminDashoard from "@/Pages/Admin/Dashboard";
 import ErrorPage from "@/Pages/ErrorPage";
 import Inbox from "@/Pages/Inbox";
+import AdminInbox from "@/Pages/Admin/AdminInbox";
 import { queryToRegisterUser } from "@/Services/Queries/AuthQuery";
 import { Button } from "flowbite-react";
 import { Navigate, Outlet, RouteObject } from "react-router-dom";
@@ -25,7 +26,7 @@ const AdminRouter: RouteObject[] = [
       },
       {
         path: "inbox",
-        element: <Inbox />,
+        element: <AdminInbox />,
       },
     ],
   },

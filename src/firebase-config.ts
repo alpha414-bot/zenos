@@ -1,9 +1,7 @@
-// Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { connectAuthEmulator, getAuth } from "firebase/auth";
 import { connectFirestoreEmulator, getFirestore } from "firebase/firestore";
 import { connectStorageEmulator, getStorage } from "firebase/storage";
-
 const firebaseConfig = {
   apiKey: "AIzaSyCIdRVESOrRuy-MkOawsemsZqcYw5TvQSQ",
   authDomain: "vint-ecommerce.firebaseapp.com",
@@ -14,6 +12,11 @@ const firebaseConfig = {
   appId: "1:875924243691:web:39c861280476191c30eaae",
   measurementId: "G-GW51SXRFJ3",
 };
+
+// Initialize Firebase
+
+
+
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);

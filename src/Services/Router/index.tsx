@@ -4,6 +4,7 @@ import ForgotPassword from "@/Pages/Auth/ForgotPassword";
 import Checkout from "@/Pages/Checkout";
 import ErrorPage from "@/Pages/ErrorPage";
 import Home from "@/Pages/Home";
+import AddProduct from "@/Pages/AddProduct";
 import Inbox from "@/Pages/Inbox";
 import Product from "@/Pages/Product";
 import Carts from "@/Pages/Subpages/Carts";
@@ -11,6 +12,7 @@ import Orders from "@/Pages/Subpages/Orders";
 import { Outlet, RouteObject, createBrowserRouter } from "react-router-dom";
 import AdminRouter from "./AdminRouter";
 import { ProtectedRoute, withScrollToTop } from "./utils";
+import AdminProductsComponent from "@/Pages/Admin/Components/AdminProductsComponent";
 
 const RootRouter: RouteObject[] = [
   {
@@ -51,6 +53,10 @@ const RootRouter: RouteObject[] = [
       {
         path: "carts",
         element: <Carts />,
+      },
+      {
+        path: "products",
+        element: <AddProduct/>,
       },
       // inbox
       {

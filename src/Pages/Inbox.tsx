@@ -500,4 +500,4 @@ Order Date: ${new Date().toLocaleString()}
   );
 };
 
-export default Inbox;git add .
+export default Inbox;

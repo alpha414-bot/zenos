@@ -18,7 +18,7 @@ interface MediaMetaDataInterface {
 
 interface MediaItemInterface {
   id?: string;
-  user_uid?: string;
+  useruid?: string;
   media: MediaMetaDataInterface;
   createdAt: Timestamp;
   reuploadAttempt?: number;

@@ -1,4 +1,4 @@
-import { auth, firestore, storage } from "@/firebase-config";
+import { auth, firestore } from "@/firebase-config";
 import { notify } from "@/notify";
 import { createSlug, isURL } from "@/System/function";
 import { MediaItemInterface, MediaMetaDataInterface } from "@/Types/Media";
@@ -16,7 +16,6 @@ import {
   updateDoc,
   where,
 } from "firebase/firestore";
-import { ref } from "firebase/storage";
 import { backend_url } from "../../../package.json";
 
 /**
@@ -31,8 +30,8 @@ import { backend_url } from "../../../package.json";
 export const queryToGetAssetFile = (
   path: any,
   listener: any,
-  width?: string,
-  type?: string
+  width: string = "1280",
+  type: string = "images"
 ): Promise<string | object> =>
   new Promise((resolve, reject) => {
     try {
@@ -41,7 +40,11 @@ export const queryToGetAssetFile = (
         return path;
       } else if (!!path) {
         return resolve(
-          listener(`${backend_url}/media/cdn/${type}s/${width}/${path}`)
+          listener(
+            `${backend_url}/media/cdn/${type}/${
+              isNaN(Number(width)) ? width : `w${width}`
+            }/${path}`
+          )
         );
       }
     } catch (error) {
@@ -191,7 +194,7 @@ export const queryToDeleteFiles = (path: string) =>
     try {
       // delete from firestore collection first, and then proceed to deleting from storage
       const MediaCollection = collection(firestore, "Media");
-      console.log("path is", path)
+      console.log("path is", path);
       const QueryForFile = query(
         MediaCollection,
         where("media.name", "==", path),
@@ -199,18 +202,29 @@ export const queryToDeleteFiles = (path: string) =>
       );
       getDocs(QueryForFile).then((snapFile) => {
         if (!snapFile.empty) {
-          const MediaFile = snapFile.docs[0];
-          console.log("media file is", MediaFile.data());
-          return true;
-          deleteDoc(MediaFile.ref)
+          const MediaFileRef = snapFile.docs[0].ref;
+          const { media } = snapFile.docs[0].data() as MediaItemInterface;
+          // Now delete from backend server
+          console.log("media file is", media);
+          deleteDoc(MediaFileRef)
             .then(() => {
-              // Now delete from backend server
-              // deleteObject(FileRef).then((resp) => {
-              //   resolve(resp);
-              //   notify.success({
-              //     text: "File has been deleted successfully.",
-              //   });
-              // });
+              const headers = new Headers();
+              headers.append("Content-Type", "application/json");
+              fetch(`${backend_url}/media/delete?`, {
+                method: "DELETE",
+                body: JSON.stringify({
+                  filename: media.name,
+                  directory: media.directory,
+                }),
+                headers,
+                redirect: "follow",
+              }).then(async (resp) => {
+                console.log("delete request", await resp.json());
+                resolve(resp.json());
+                notify.success({
+                  text: "File has been deleted successfully.",
+                });
+              });
             })
             .catch((err) => {
               console.log(
@@ -237,7 +251,7 @@ export const queryToDeleteFiles = (path: string) =>
  * @param user_uid the id of the authenticated user
  * @returns promise return MediaItemInterface[]
  */
-export const queryAppMedia = (
+export const queryUserMedias = (
   listener: any,
   user_uid?: string
 ): Promise<MediaItemInterface[]> =>

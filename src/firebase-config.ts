@@ -21,8 +21,8 @@ const auth = getAuth(app);
 const firestore = getFirestore(app);
 const storage = getStorage(app);
 
-const IP = "192.168.0.135";
-// const IP = "127.0.0.1";
+// const IP = "192.168.0.135";
+const IP = "127.0.0.1";
 connectAuthEmulator(auth, `http://${IP}:9099`);
 connectFirestoreEmulator(firestore, IP, 8080);
 connectStorageEmulator(storage, IP, 9199);

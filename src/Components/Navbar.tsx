@@ -19,7 +19,7 @@ function Navbar() {
         currentUser?.uid &&
         !currentUser?.isAnonymous &&
         !currentUser?.emailVerified && (
-          <div className="bg-gray-900 px-6 py-3 relative z-50 text-center space-x-2">
+          <div className="mynavbar bg-gray-900 px-6 py-3 relative z-50 text-center space-x-2">
             {(currentUser?.admin && (
               <>
                 <span className="text-base font-medium">
@@ -49,7 +49,7 @@ function Navbar() {
             )}
           </div>
         )}
-      <nav className="sticky top-0 z-50 flex items-center justify-between bg-gray-950 shadow-md w-full shadow-gray-900/50 px-4 py-3.5 md:px-10 md:py-3">
+      <nav className="mynavbar sticky top-0 z-50 flex items-center justify-between bg-gray-950 shadow-md w-full shadow-gray-900/50 px-4 py-3.5 md:px-10 md:py-3">
         <Link to="/">
           <img
             src="/assets/images/zenos.svg"

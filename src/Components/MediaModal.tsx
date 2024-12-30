@@ -38,7 +38,8 @@ const MediaModal = () => {
       setTimeout(() => {
         queryToUploadFiles(
           acceptedFiles,
-          `/uploads/${auth.currentUser?.uid || "app"}`
+          `/uploads/${auth.currentUser?.uid || "app"}`,
+          true
         ).finally(() => {
           return setIsImageUploading(false);
         });

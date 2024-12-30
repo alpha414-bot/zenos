@@ -7,7 +7,7 @@ import { onAuthStateChanged, signInAnonymously } from "firebase/auth";
 import { useCallback, useEffect } from "react";
 import { useQuery, useQueryClient } from "react-query";
 import { queryToGetUserData } from "../Queries/AuthQuery";
-import { queryAppMedia, queryToGetAssetFile } from "../Queries/MediaQuery";
+import { queryUserMedias, queryToGetAssetFile } from "../Queries/MediaQuery";
 import { getOrders } from "../Queries/OrderQuery";
 import {
   getCartProducts,
@@ -221,7 +221,7 @@ export const useUserMedia = () => {
   return useQuery({
     queryKey,
     queryFn: (): Promise<MediaItemInterface[]> =>
-      queryAppMedia(snapshotListener, AuthUser?.uid),
+      queryUserMedias(snapshotListener, AuthUser?.uid),
     enabled: !!(AuthUserIsFetched && AuthUser?.uid),
   });
 };

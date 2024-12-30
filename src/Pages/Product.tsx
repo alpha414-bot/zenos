@@ -1,15 +1,16 @@
 import Button from "@/Components/Button";
+import Image from "@/Components/Image";
 import ProductList from "@/Components/ProductList";
 import MainLayout from "@/Layouts/MainLayout";
 import PageMeta from "@/Layouts/PageMeta";
-import {
-  useMediaFile,
-  useProductsData,
-  useSimilarProductsData,
-} from "@/Services/Hooks";
+import { useProductsData, useSimilarProductsData } from "@/Services/Hooks";
 import { addToCartQuery } from "@/Services/Queries/CartQuery";
+import { queryToGetAssetFile } from "@/Services/Queries/MediaQuery";
 import { price } from "@/System/function";
+import classNames from "classnames";
+import FsLightbox from "fslightbox-react";
 import _ from "lodash";
+import { useEffect, useMemo, useState } from "react";
 import ImageGallery from "react-image-gallery";
 import "react-image-gallery/styles/css/image-gallery.css";
 import { Link, useParams } from "react-router-dom";
@@ -17,13 +18,45 @@ import { Link, useParams } from "react-router-dom";
 const Product = () => {
   // trigger view products
   const { product_id } = useParams();
+  const [toggler, setToggler] = useState<boolean>(false);
+  const [visible, setVisible] = useState(false);
+  const [lightboxImage, setLightboxImage] = useState<
+    { path: string; url: string }[]
+  >([]);
   const { data: product } = useProductsData(product_id) as {
     data: ProductItemType;
   };
   const { data: SimilarProducts } = useSimilarProductsData(product) as {
     data: ProductItemType[];
   };
-  const { data: image } = useMediaFile(product.image);
+  const images = useMemo(() => {
+    return _.map(product.image, (value) => {
+      return value;
+    });
+  }, [product.image]);
+  // Lightbox Images
+  useEffect(() => {
+    const imagePromises = _.map(product.image, async (value) => {
+      const url = await queryToGetAssetFile(value, (data: any) => data);
+      return { path: value, url: url };
+    });
+    Promise.all(imagePromises).then((d: any) => setLightboxImage(d));
+  }, [product.image]);
+
+  useEffect(() => {
+    const element = document.querySelectorAll(".mynavbar");
+    if (element) {
+      if (visible) {
+        element.forEach((el) => {
+          el.classList.remove("z-50");
+        });
+      } else {
+        element.forEach((el) => {
+          el.classList.add("z-50");
+        });
+      }
+    }
+  }, [visible]);
   return (
     <MainLayout>
       <PageMeta
@@ -32,14 +65,15 @@ const Product = () => {
         )}`}
         description={`Zenos product ${product?.name}, ${product?.description}`}
       >
+        <br />
         <div className="px-1.5 py-10 space-y-5 md:px-4">
-          <div className="flex flex-col items-start justify-between gap-x-12 gap-y-32  px-2 lg:flex-row lg:px-6">
+          <div className="flex flex-col items-start justify-between gap-x-12 gap-y-32  px-2 lg:flex-row  lg:px-6">
             <div className="w-full lg:w-3/4">
               {/* Products Image and Metadata */}
               <div className="grid grid-cols-1 gap-x-8 gap-y-2 md:grid-cols-2">
                 <div className="">
                   <ImageGallery
-                    items={_.map(image, (value, key) => ({
+                    items={_.map(images, (value, key) => ({
                       key,
                       original: value,
                       thumbnail: value,
@@ -48,6 +82,31 @@ const Product = () => {
                         "bg-zenos-400/20 rounded-xl overflow-hidden",
                       thumbnailClass: "border foc",
                     }))}
+                    renderItem={({ original }) => (
+                      <Image
+                        onClick={() => {
+                          setToggler(!toggler);
+                        }}
+                        src={original}
+                        className="w-full object-contain"
+                      />
+                    )}
+                    renderThumbInner={({
+                      thumbnail,
+                      thumbnailAlt,
+                      thumbnailClass,
+                    }) =>
+                      thumbnail && (
+                        <Image
+                          src={thumbnail}
+                          className={classNames(
+                            "w-full object-contain",
+                            thumbnailClass
+                          )}
+                          alt={thumbnailAlt}
+                        />
+                      )
+                    }
                     showFullscreenButton={false}
                     useBrowserFullscreen={false}
                     renderRightNav={(onClick, disabled) => (
@@ -55,7 +114,7 @@ const Product = () => {
                         type="button"
                         onClick={onClick}
                         disabled={disabled}
-                        className="absolute top-2/4 right-2 z-20 bg-zenos-500/60 rounded-lg inline !w-auto !p-0 disabled:hidden"
+                        className="absolute top-2/4 right-2 z-20 bg-zenos-500/60 hover:bg-zenos-600 rounded-lg inline !w-auto !p-0 disabled:hidden"
                       >
                         <svg
                           className="w-12 h-12 text-white"
@@ -81,7 +140,7 @@ const Product = () => {
                         type="button"
                         onClick={onClick}
                         disabled={disabled}
-                        className="absolute top-2/4 left-2 z-20 bg-zenos-500/60 rounded-lg inline !w-auto !p-0 disabled:hidden"
+                        className="absolute top-2/4 left-2 z-20 bg-zenos-500/60 hover:bg-zenos-600 rounded-lg inline !w-auto !p-0 disabled:hidden"
                       >
                         <svg
                           className="w-12 h-12 text-white"
@@ -105,28 +164,6 @@ const Product = () => {
                   />
                 </div>
                 <div className="">
-                  <div className="w-full inline-flex justify-end">
-                    {/* Favourite */}
-                    <button>
-                      <svg
-                        className="w-8 h-8 text-white"
-                        aria-hidden="true"
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="24"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          stroke="currentColor"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M12.01 6.001C6.5 1 1 8 5.782 13.001L12.011 20l6.23-7C23 8 17.5 1 12.01 6.002Z"
-                        />
-                      </svg>
-                    </button>
-                  </div>
                   {/* name */}
                   <p className="text-6xl font-extrabold leading-[4.5rem]">
                     {product.name}
@@ -359,6 +396,17 @@ const Product = () => {
             </div>
           </div>
         </div>
+
+        {lightboxImage.length > 0 && (
+          <div className="relative z-50">
+            <FsLightbox
+              toggler={!!toggler}
+              onOpen={() => setVisible(true)}
+              onClose={() => setVisible(false)}
+              sources={_.map(lightboxImage, "url")}
+            />
+          </div>
+        )}
       </PageMeta>
     </MainLayout>
   );

@@ -18,7 +18,7 @@ const Image: FC<ImagePropsInterface> = ({
   w,
   ...props
 }) => {
-  const { data: image, isLoading } = useMediaFile(src, w, "image");
+  const { data: image, isLoading } = useMediaFile(src, w, "images");
   return (
     (isLoading && (
       <div

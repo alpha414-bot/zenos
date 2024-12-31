@@ -31,7 +31,7 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
     const [placeholderTextInput, setPlaceholderTextInput] = useState<
       string | undefined
     >(placeholder);
-    const input = !!ref ? ref : useRef<HTMLTextAreaElement>(null);
+    const input = ref ? ref : useRef<HTMLTextAreaElement>(null);
 
     useEffect(() => {
       if (isFocused && input?.current) {

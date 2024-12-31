@@ -28,7 +28,7 @@ const OutsideClick: React.FC<OutsideClickInterface> = ({
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
       document.addEventListener("keydown", (e) => {
-        let key = e.key;
+        const key = e.key;
         if (
           key === "Enter" ||
           key === "Tab" ||

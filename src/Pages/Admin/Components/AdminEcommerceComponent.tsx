@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { FaShoppingCart, FaUsers, FaDollarSign, FaBox } from 'react-icons/fa';
+import  { useState, useEffect } from 'react';
+import { FaShoppingCart, FaBox } from 'react-icons/fa';
 import { getProductData } from '@/Services/Queries/ProductQuery';
-import { collection, query, getDocs } from 'firebase/firestore';
+import { collection,  getDocs } from 'firebase/firestore';
 import { firestore } from '@/firebase-config';
 
 interface ProductData {

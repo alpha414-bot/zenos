@@ -38,7 +38,7 @@ export const queryToGetAssetFile = (
       if (isURL(path)) {
         resolve(path);
         return path;
-      } else if (!!path) {
+      } else if (path) {
         return resolve(
           listener(
             `${backend_url}/media/cdn/${type}/${

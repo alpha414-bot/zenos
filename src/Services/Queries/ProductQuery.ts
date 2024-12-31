@@ -109,7 +109,7 @@ export const getSimilarProductData = (
     try {
       const ProductCollection = collection(firestore, "Products");
       // return all the products in the ProductCollection with pagination
-      let productQuery = query(
+      const productQuery = query(
         ProductCollection,
         where("name", "!=", product?.name || "non"),
         where("category", "==", product?.category || "non"),

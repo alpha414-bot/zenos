@@ -90,7 +90,7 @@ function Navbar() {
             {(currentUser?.uid && !currentUser.isAnonymous && (
               <li>
                 <NavLink
-                  to={!!currentUser.admin ? "/admin/dashboard" : "/user/carts"}
+                  to={currentUser.admin ? "/admin/dashboard" : "/user/carts"}
                   className={({ isActive }) =>
                     `tracking-wide ${
                       isActive
@@ -218,7 +218,7 @@ function Navbar() {
             {(currentUser?.uid && !currentUser.isAnonymous && (
               <li>
                 <Link
-                  to={!!currentUser.admin ? "/admin/dashboard" : "/user/carts"}
+                  to={currentUser.admin ? "/admin/dashboard" : "/user/carts"}
                   className="underline underline-offset-4 tracking-wide decoration-dotted hover:text-gray-500 font-medium"
                 >
                   My account

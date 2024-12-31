@@ -24,7 +24,7 @@ const Carts = () => {
               <ProductList
                 type="carts_listing"
                 products={data.map((item) => {
-                  let data = {
+                  const data = {
                     ...{
                       cartQuantity: item.quantity,
                       discount: item.discount,

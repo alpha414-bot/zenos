@@ -12,7 +12,7 @@ import Orders from "@/Pages/Subpages/Orders";
 import { Outlet, RouteObject, createBrowserRouter } from "react-router-dom";
 import AdminRouter from "./AdminRouter";
 import { ProtectedRoute, withScrollToTop } from "./utils";
-import AdminProductsComponent from "@/Pages/Admin/Components/AdminProductsComponent";
+
 
 const RootRouter: RouteObject[] = [
   {

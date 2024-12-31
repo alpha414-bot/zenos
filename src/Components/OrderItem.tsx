@@ -76,7 +76,7 @@ const OrderItem = ({ order }: { order: OrderDataInterface }) => {
             <ProductList
               type="order_listing"
               products={order.products.map((item) => {
-                let data = {
+                const data = {
                   ...{
                     cartQuantity: item.quantity,
                     discount: item.discount,

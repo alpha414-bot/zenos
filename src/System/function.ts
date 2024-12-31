@@ -46,7 +46,7 @@ export const price = (
   minimumFractionDigits: number = 2,
   maximumFractionDigits: number = 2
 ): string => {
-  let format = new Intl.NumberFormat("en-NG", {
+  const format = new Intl.NumberFormat("en-NG", {
     style: style,
     currency: "NGN",
     minimumFractionDigits: minimumFractionDigits,
@@ -69,7 +69,7 @@ export const priceInPerct = (
   percentage: number,
   operation: "-" | "+"
 ) => {
-  let percentagePrice = (percentage / 100) * value;
+  const percentagePrice = (percentage / 100) * value;
   switch (operation) {
     case "+":
       return (value + percentagePrice).toFixed(2);
@@ -771,7 +771,7 @@ export const __serialize = (Node: any) => {
       return `<p${style}>${children}</p>`;
     case "link":
       let url: any = escapeHtml(stripHtml(Node.url));
-      let children_url = escapeHtml(stripHtml(children));
+      const children_url = escapeHtml(stripHtml(children));
       if (isUrl(children_url)) {
         url = children_url;
       }

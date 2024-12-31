@@ -1,4 +1,4 @@
-import { auth, firestore } from "@/firebase-config";
+import { firestore } from "@/firebase-config";
 import { notify } from "@/notify";
 import { AuthUserType } from "@/Types/Auth";
 import {
@@ -14,6 +14,18 @@ import {
   orderBy,
   where,
 } from "firebase/firestore";
+// interface SendMessageParams {
+//   text: string;
+//   sender_uid: string;
+//   recipient_uid: string;
+//   media?: {
+//     name: string;
+//     fullPath: string;
+//     type: string;
+//   };
+//   isSystemMessage?: boolean;
+//   isAutoReply?: boolean;
+// }
 
 // Updated interface with media support
 interface ChatMetaListInterface {

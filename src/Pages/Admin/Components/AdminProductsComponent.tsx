@@ -32,7 +32,7 @@ const ProductsAction = ({ values }: { values: ProductItemType }) => {
   const [editProductModal, setEditProductModal] = useState<Modal>();
   const updateProductSubmission = (data?: any) => {
     if (data.image && data.image.length > 0) {
-      let image = _.flatMap(data.image, (item) =>
+      const image = _.flatMap(data.image, (item) =>
         item?.media?.fullPath ? item?.media?.fullPath : item
       );
       data.image = image;
@@ -555,7 +555,7 @@ const AdminProductsComponent = () => {
   const userUuid = currentUser.uid;
 
   // Process images
-  let image = _.flatMap(data.image, (item) => item.media.fullPath);
+  const image = _.flatMap(data.image, (item) => item.media.fullPath);
 
   // Add document to Firestore
   addCollectionDoc(

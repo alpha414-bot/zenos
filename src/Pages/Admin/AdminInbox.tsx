@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import { queryToFetchAllChats, queryToFetchChatMessages, queryToSendChatMessage } from '@/Services/Queries/ChatQuery';
-import { queryToUploadFiles } from '@/Services/Queries/MediaQuery';
 import { notify } from '@/notify';
 import { Timestamp, collection, getDocs, query, where } from 'firebase/firestore';
 import EmojiPicker, { EmojiClickData } from 'emoji-picker-react';
@@ -9,7 +8,7 @@ import { FaSmile, FaPaperclip } from 'react-icons/fa';
 import { backend_url } from "../../../package.json";
 import { firestore } from '@/firebase-config';
 import Media from "@/Components/Media";
-import { useForm, Control } from "react-hook-form";
+import { useForm, Control, FieldValues } from "react-hook-form";
 
 interface UserData {
   displayName: string;
@@ -119,22 +118,40 @@ const AdminInbox: React.FC = () => {
 
   useEffect(() => {
     if (!selectedChatId) return;
-
-    const unsubscribe = queryToFetchChatMessages((data) => {
-      setMessages(data.data);
-    }, selectedChatId);
-
+  
+    let unsubscribe: (() => void) | null = null;
+  
+    const setupMessageListener = () => {
+      try {
+        // The queryToFetchChatMessages should return a cleanup function
+        const cleanup = queryToFetchChatMessages((data: { data: ChatMessage[] }) => {
+          setMessages(data.data);
+        }, selectedChatId);
+  
+        if (typeof cleanup === 'function') {
+          unsubscribe = cleanup;
+        }
+      } catch (error) {
+        console.error('Error setting up message listener:', error);
+      }
+    };
+  
+    setupMessageListener();
+  
+    // Cleanup function
     return () => {
-      if (typeof unsubscribe === 'function') {
+      if (unsubscribe && typeof unsubscribe === 'function') {
         unsubscribe();
       }
     };
   }, [selectedChatId]);
 
-  const handleChatSelect = (chatId: string) => {
+  const handleChatSelect = (chatId: string): void => {
     setSelectedChatId(chatId);
     setMessages([]);
-    messageListRef.current?.scrollTo(0, 0);
+    if (messageListRef.current) {
+      messageListRef.current.scrollTo(0, 0);
+    }
     reset({ message: '', attachments: [] });
   };
 
@@ -329,14 +346,13 @@ const AdminInbox: React.FC = () => {
               {/* Message Input with Media Component */}
               <div className="border-t border-gray-700 p-4 bg-gray-800">
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                  <Media
-                    name="attachments"
-                    control={control as Control}
-                    multiSelect={true}
-                    placeholder="Drop files here or click to upload"
-                    align="row"
-                  />
-                  
+                <Media
+  name="attachments"
+  control={control as unknown as Control<FieldValues>} // Fix the Control type
+  multiSelect={true}
+  placeholder="Drop files here or click to upload"
+  align="row"
+/>              
                   <div className="flex space-x-4">
                     <div className="flex-1 flex items-center space-x-2 relative">
                       <button

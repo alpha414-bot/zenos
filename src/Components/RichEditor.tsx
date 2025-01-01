@@ -39,7 +39,7 @@ const RichEditor: React.FC<RichEditorInterface> = ({
     []
   );
   const initialValue = useMemo(
-    () => defaultValue || "<p>Hllo</p>",
+    () => defaultValue || "<p></p><p></p>",
     [defaultValue]
   );
   return (
@@ -73,26 +73,26 @@ const RichEditor: React.FC<RichEditorInterface> = ({
                 }}
               >
                 <Toolbar>
-                  <MarkButton format="bold" icon="format_bold" />
-                  <MarkButton format="italic" icon="format_italic" />
-                  <MarkButton format="underline" icon="format_underlined" />
-                  <MarkButton format="code" icon="code" />
-                  <LinkButton icon="link" />
-                  <BlockButton format="heading-one" icon="looks_one" />
-                  <BlockButton format="heading-two" icon="looks_two" />
-                  <BlockButton format="block-quote" icon="format_quote" />
+                  <MarkButton format="bold" icon="fa-solid fa-bold" />
+                  <MarkButton format="italic" icon="fa-solid fa-italic" />
+                  <MarkButton format="underline" icon="fa-solid fa-underline" />
+                  <MarkButton format="code" icon="fa-solid fa-code" />
+                  <LinkButton icon="fa-solid fa-link" />
+                  <BlockButton format="heading-one" icon="fa-solid fa-1" />
+                  <BlockButton format="heading-two" icon="fa-solid fa-2" />
+                  <BlockButton format="block-quote" icon="fa-solid fa-quote-left" />
                   <BlockButton
                     format="numbered-list"
-                    icon="format_list_numbered"
+                    icon="fa-solid fa-list-ol"
                   />
                   <BlockButton
                     format="bulleted-list"
-                    icon="format_list_bulleted"
+                    icon="fa-solid fa-list"
                   />
-                  <BlockButton format="left" icon="format_align_left" />
-                  <BlockButton format="center" icon="format_align_center" />
-                  <BlockButton format="right" icon="format_align_right" />
-                  <BlockButton format="justify" icon="format_align_justify" />
+                  <BlockButton format="left" icon="fa-solid fa-align-left" />
+                  <BlockButton format="center" icon="fa-solid fa-align-center" />
+                  <BlockButton format="right" icon="fa-solid fa-align-right" />
+                  <BlockButton format="justify" icon="fa-solid fa-align-justify" />
                 </Toolbar>
                 <Editable
                   onBlur={onBlur}

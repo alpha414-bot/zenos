@@ -19,7 +19,7 @@ function Navbar() {
         currentUser?.uid &&
         !currentUser?.isAnonymous &&
         !currentUser?.emailVerified && (
-          <div className="bg-gray-900 px-6 py-3 relative z-50 text-center space-x-2">
+          <div className="mynavbar bg-gray-900 px-6 py-3 relative z-50 text-center space-x-2">
             {(currentUser?.admin && (
               <>
                 <span className="text-base font-medium">
@@ -49,7 +49,7 @@ function Navbar() {
             )}
           </div>
         )}
-      <nav className="sticky top-0 z-50 flex items-center justify-between bg-gray-950 shadow-md w-full shadow-gray-900/50 px-4 py-3.5 md:px-10 md:py-3">
+      <nav className="mynavbar sticky top-0 z-50 flex items-center justify-between bg-gray-950 shadow-md w-full shadow-gray-900/50 px-4 py-3.5 md:px-10 md:py-3">
         <Link to="/">
           <img
             src="/assets/images/zenos.svg"
@@ -90,7 +90,7 @@ function Navbar() {
             {(currentUser?.uid && !currentUser.isAnonymous && (
               <li>
                 <NavLink
-                  to={!!currentUser.admin ? "/admin/dashboard" : "/user/carts"}
+                  to={currentUser.admin ? "/admin/dashboard" : "/user/carts"}
                   className={({ isActive }) =>
                     `tracking-wide ${
                       isActive
@@ -105,7 +105,7 @@ function Navbar() {
             )) || (
               <li>
                 <NavLink
-                  to="/login"
+                  to="/auth"
                   className={({ isActive }) =>
                     `tracking-wide ${
                       isActive
@@ -218,7 +218,7 @@ function Navbar() {
             {(currentUser?.uid && !currentUser.isAnonymous && (
               <li>
                 <Link
-                  to={!!currentUser.admin ? "/admin/dashboard" : "/user/carts"}
+                  to={currentUser.admin ? "/admin/dashboard" : "/user/carts"}
                   className="underline underline-offset-4 tracking-wide decoration-dotted hover:text-gray-500 font-medium"
                 >
                   My account
@@ -227,7 +227,7 @@ function Navbar() {
             )) || (
               <li>
                 <Link
-                  to="/login"
+                  to="/auth"
                   className="underline underline-offset-4 tracking-wide decoration-dotted hover:text-gray-500 font-medium"
                 >
                   Sign In/Sign Up

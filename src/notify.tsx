@@ -28,7 +28,7 @@ export const ToastWrapper = ({
       </p>
       <p
         className={classNames(
-          "text-base font-normal bg-clip-text text-transparent bg-gradient-to-r",
+          "text-base font-semibold bg-clip-text text-transparent bg-gradient-to-r",
           {
             "from-green-500 via-green-400 to-green-50 decoration-white":
               toastProps?.type == "success",

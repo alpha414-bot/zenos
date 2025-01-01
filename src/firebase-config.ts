@@ -31,4 +31,3 @@ const storage = getStorage(app);
 // connectStorageEmulator(storage, IP, 9199);
 
 export { app, auth, firestore, storage };
-

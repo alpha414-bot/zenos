@@ -32,7 +32,7 @@ const ProductsAction = ({ values }: { values: ProductItemType }) => {
   const [editProductModal, setEditProductModal] = useState<Modal>();
   const updateProductSubmission = (data?: any) => {
     if (data.image && data.image.length > 0) {
-      let image = _.flatMap(data.image, (item) =>
+      const image = _.flatMap(data.image, (item) =>
         item?.media?.fullPath ? item?.media?.fullPath : item
       );
       data.image = image;
@@ -340,8 +340,7 @@ const ProductsAction = ({ values }: { values: ProductItemType }) => {
                 />
               </svg>
               <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
-                Are you sure you want to delete this product? {values?.id}
-                -delete-popup
+                Are you sure you want to delete this product?
               </h3>
               <button
                 data-modal-hide={`${values?.id}-delete-product-modal`}
@@ -474,12 +473,14 @@ const AdminProductsComponent = () => {
             {/* <div className="flex items-center gap-1 flex-wrap"> */}
             <div className="grid grid-cols-2 md:grid-cols-3 gap-1 min-w-60">
               {(info.getValue() as any[]).map((item, index) => (
-                <Image
-                  key={index}
-                  src={item}
-                  className="w-full max-w-full max-h-full bg-zenos-200 rounded-sm overflow-hidden"
-                  width={120}
-                />
+                <>
+                  <Image
+                    key={index}
+                    src={item}
+                    className="w-full max-w-full max-h-full bg-zenos-200 rounded-sm overflow-hidden"
+                    width={120}
+                  />
+                </>
               ))}
             </div>
           </>
@@ -554,7 +555,7 @@ const AdminProductsComponent = () => {
   const userUuid = currentUser.uid;
 
   // Process images
-  let image = _.flatMap(data.image, (item) => item.media.fullPath);
+  const image = _.flatMap(data.image, (item) => item.media.fullPath);
 
   // Add document to Firestore
   addCollectionDoc(

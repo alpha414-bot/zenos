@@ -4,11 +4,9 @@
   "development": true,
   "version": "1.0.0",
   "type": "module",
-  "PaySecretKey": "sk_test_1434e5dbc7e87043ff8661f66dcb5f2da85f1f4d",
-  "PayPublicKey": "pk_test_c39acfcb77401d556afda0db1342f9ff951346e9",
-  "backend_url": "http://localhost:8095",
+  "backend_url": "http://127.0.0.1:8095",
   "scripts": {
-    "firebase:emulators": "firebase emulators:start --import=data --export-on-exit=data",
+    "firebase:emulators": "firebase emulators:start --import=firebase-data --export-on-exit=firebase-data",
     "dev": "vite",
     "build": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
@@ -29,6 +27,7 @@
     "firebase": "^10.12.2",
     "flowbite": "^2.5.2",
     "flowbite-react": "^0.10.2",
+    "fslightbox-react": "^1.7.6",
     "is-hotkey": "^0.2.0",
     "locomotive-scroll": "^5.0.0-beta.21",
     "lodash": "^4.17.21",
@@ -64,6 +63,7 @@
     "vanta": "^0.5.24"
   },
   "devDependencies": {
+    "@types/fslightbox-react": "^1.7.8",
     "@types/lodash": "^4.17.4",
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.22",

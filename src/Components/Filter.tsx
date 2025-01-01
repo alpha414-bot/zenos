@@ -24,7 +24,7 @@ const Filter = ({
   >("");
   const [mixer, setMixer] = useState<any>();
   useEffect(() => {
-    var $containerEl = document.querySelector(".mixitup-product-wrapper");
+    const $containerEl = document.querySelector(".mixitup-product-wrapper");
     if ($containerEl) {
       mixitup.use(mixitupmultifilter);
       mixitup.use(mixitupPagination);

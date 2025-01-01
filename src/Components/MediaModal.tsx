@@ -38,7 +38,8 @@ const MediaModal = () => {
       setTimeout(() => {
         queryToUploadFiles(
           acceptedFiles,
-          `/uploads/${auth.currentUser?.uid || "app"}`
+          `/uploads/${auth.currentUser?.uid || "app"}`,
+          true
         ).finally(() => {
           return setIsImageUploading(false);
         });
@@ -46,11 +47,11 @@ const MediaModal = () => {
     }
     return acceptedFiles;
   }, []);
-  let extensions: MimesType = {};
+  const extensions: MimesType = {};
 
   if (mediaType) {
     for (const mime of mediaType) {
-      let extensionsForMimeType = MIME_TYPE[mime + "/*"] as ExtensionType[];
+      const extensionsForMimeType = MIME_TYPE[mime + "/*"] as ExtensionType[];
       extensions[mime + "/*"] = extensionsForMimeType ?? [];
     }
   }
@@ -67,7 +68,7 @@ const MediaModal = () => {
             ? event.dataTransfer.files
             : event.target.files;
           if (fileList.length > 0) {
-            for (var i = 0; i < fileList.length; i++) {
+            for (let i = 0; i < fileList.length; i++) {
               const file = fileList.item(i);
 
               Object.defineProperty(file, "myProp", {

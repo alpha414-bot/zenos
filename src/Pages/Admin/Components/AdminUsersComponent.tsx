@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import { collection, onSnapshot } from 'firebase/firestore';
 import { FaUsers, FaUserCheck, FaUserClock } from 'react-icons/fa';
 import { firestore } from '@/firebase-config';
-import { collection, query, getDocs, onSnapshot, Timestamp } from 'firebase/firestore';
+
 
 interface UserData {
   admin: boolean;

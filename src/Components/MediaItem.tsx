@@ -1,4 +1,3 @@
-import { useMediaFile } from "@/Services/Hooks";
 import { queryToDeleteFiles } from "@/Services/Queries/MediaQuery";
 import { fm, shorten } from "@/System/function";
 import { MediaItemInterface, ModalInterface } from "@/Types/Media";
@@ -7,6 +6,7 @@ import { initFlowbite } from "flowbite";
 import _ from "lodash";
 import moment from "moment";
 import { useEffect } from "react";
+import Image from "./Image";
 
 const MediaItem: React.FC<{
   item: MediaItemInterface;
@@ -28,13 +28,12 @@ const MediaItem: React.FC<{
   clearSelect,
 }) => {
   const type = _.split(item?.media?.mimetype, "/")[0];
-  const { data: src } = useMediaFile(item?.media?.name, "w800", type);
   const { media, createdAt, updatedAt } = item;
   const createdAtDate = moment(fm(createdAt));
   const updateAtDate = moment(fm(updatedAt));
   useEffect(() => {
     initFlowbite();
-  }, [src, item]);
+  }, [item]);
   const MediaOnChange = (data: any) => {
     // if not multiselect, choose a file and continue
     if (!multiSelect) {
@@ -112,6 +111,31 @@ const MediaItem: React.FC<{
           </svg>
         </button>
       )}
+      {showThumbnail && multiSelect && (
+        <button
+          type="button"
+          className={classNames(
+            "absolute top-1 right-1 z-20 rounded-md bg-zenos-500 p-0.5 cursorpointer shadow-md"
+          )}
+          onClick={() => clearSelect(item)}
+        >
+          <svg
+            className="w-6 h-6 text-white"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              fillRule="evenodd"
+              d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm5.757-1a1 1 0 1 0 0 2h8.486a1 1 0 1 0 0-2H7.757Z"
+              clipRule="evenodd"
+            />
+          </svg>
+        </button>
+      )}
       {showThumbnail && !multiSelect && (
         <button
           type="button"
@@ -147,75 +171,48 @@ const MediaItem: React.FC<{
       <button
         type="button"
         // data-modal-hide="mediaModal"
-        className={`border-0 relative w-full ${
-          showThumbnail ? "h-full" : "h-auto"
-        } rounded-md bg-center group ${
-          !src
-            ? "flex flex-col gap-1 items-center justify-center cursor-not-allowed px-3"
-            : "flex items-stretch justify-center cursor-pointer"
-        }`}
+        className={classNames(
+          `border-0 relative w-full rounded-md bg-center group flex items-stretch justify-center cursor-pointer`,
+          {
+            "h-full": showThumbnail,
+            "h-auto": !showThumbnail,
+          }
+        )}
         onClick={() => {
-          if (src && !showThumbnail) {
-            return MediaOnChange({ ...item, ...{ src: src } });
+          if (!showThumbnail) {
+            return MediaOnChange(item);
           }
         }}
       >
-        {(!src && (
-          <>
-            <svg
-              className="w-full h-full text-gray-100"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              fill="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                fillRule="evenodd"
-                d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm11-4a1 1 0 1 0-2 0v5a1 1 0 1 0 2 0V8Zm-1 7a1 1 0 1 0 0 2h.01a1 1 0 1 0 0-2H12Z"
-                clipRule="evenodd"
-              />
-            </svg>
-            <span className="mb-2 -mt-2 font-semibold text-gray-100 text-sm text-center">
-              !! {_.upperFirst(type)} not found !!
-            </span>
-          </>
-        )) || (
-          <>
-            {type == "image" && (
-              <img
-                src={`${src}`}
-                className="w-full h-full object-contain"
-                alt={media?.name}
-              />
-            )}
-            {type != "image" && type != "video" && (
-              <>
-                <svg
-                  className="w-full min-w-44 h-full min-h-44 text-white"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width={24}
-                  height={24}
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M9 2.221V7H4.221a2 2 0 0 1 .365-.5L8.5 2.586A2 2 0 0 1 9 2.22ZM11 2v5a2 2 0 0 1-2 2H4v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2h-7Z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </>
-            )}
-            {type == "video" && (
-              <video>
-                <source src={src} />
-              </video>
-            )}
-          </>
-        )}
+        <>
+          {type == "image" && (
+            <Image
+              src={item.media.name}
+              className="w-full min-h-32 h-full object-contain"
+              alt={media?.name}
+            />
+          )}
+          {type != "image" && type != "video" && (
+            <>
+              <svg
+                className="w-full min-w-44 h-full min-h-44 text-white"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                width={24}
+                height={24}
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M9 2.221V7H4.221a2 2 0 0 1 .365-.5L8.5 2.586A2 2 0 0 1 9 2.22ZM11 2v5a2 2 0 0 1-2 2H4v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2h-7Z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </>
+          )}
+          {type == "video" && <video>{item.media.name}</video>}
+        </>
         <div className="hidden absolute inset-0 bg-gray-800 bg-opacity-40 transition-all ease-in-out delay-100 duration-200 group-hover:block">
           <div className="absolute text-[0.6rem] text-left pt-2 pb-1 leading-3 px-1 z-50 bottom-0 w-full bg-gray-200 text-gray-800 bg-opacity-90 font-medium">
             {(!showThumbnail && (

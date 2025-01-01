@@ -1,4 +1,5 @@
 import { isUrl } from "@/System/function";
+import classNames from "classnames";
 import _ from "lodash";
 import React, { PropsWithChildren, Ref, useMemo } from "react";
 import {
@@ -16,13 +17,17 @@ export const HOTKEYS: any = {
   "mod+u": "underline",
   "mod+`": "code",
 };
+
 const LIST_TYPES = ["numbered-list", "bulleted-list"];
 const TEXT_ALIGN_TYPES = ["left", "center", "right", "justify"];
+
 interface BaseProps {
   className: string;
   [key: string]: unknown;
 }
+
 type LinkElement = { type: "link"; url: string; children: Descendant[] };
+
 const Icon = React.forwardRef(
   (
     { className, ...props }: PropsWithChildren<BaseProps>,
@@ -31,7 +36,7 @@ const Icon = React.forwardRef(
     <span
       {...props}
       ref={ref}
-      className={`material-symbols-outlined ${className} text-xl align-text-bottom`}
+      className={classNames(`text-xl align-text-bottom`, className)}
     />
   )
 );
@@ -115,7 +120,7 @@ const toggleBlock = (editor: any, format: any) => {
       !TEXT_ALIGN_TYPES.includes(format),
     split: true,
   });
-  //   let newProperties: Partial<SlateElement>;
+
   let newProperties: any;
   if (TEXT_ALIGN_TYPES.includes(format)) {
     newProperties = {
@@ -135,10 +140,7 @@ const toggleBlock = (editor: any, format: any) => {
 };
 
 export const Toolbar = React.forwardRef(
-  (
-    { className, ...props }: PropsWithChildren<BaseProps>,
-    ref: Ref<HTMLDivElement>
-  ) => (
+  ({ className, ...props }: PropsWithChildren<BaseProps>, ref: Ref<HTMLDivElement>) => (
     <div
       {...props}
       data-test-id="menu"
@@ -235,7 +237,6 @@ export const LinkButton = ({ icon }: { icon: any }) => {
       onMouseDown={(event: any) => {
         if (!isLinkActive(editor)) {
           event.preventDefault();
-          window.prompt;
           const url = window.prompt("Enter the URL of the link:");
           if (!url) return;
           insertLink(editor, url);
@@ -244,7 +245,7 @@ export const LinkButton = ({ icon }: { icon: any }) => {
         }
       }}
     >
-      <Icon>{icon}</Icon>
+      <Icon className={icon} />
     </Button>
   );
 };
@@ -259,7 +260,7 @@ export const MarkButton = ({ format, icon }: { format: any; icon: any }) => {
         toggleMark(editor, format);
       }}
     >
-      <Icon>{icon}</Icon>
+      <Icon className={icon} />
     </Button>
   );
 };
@@ -278,7 +279,7 @@ export const BlockButton = ({ format, icon }: { format: any; icon: any }) => {
         toggleBlock(editor, format);
       }}
     >
-      <Icon>{icon}</Icon>
+      <Icon className={icon} />
     </Button>
   );
 };
@@ -306,6 +307,7 @@ const LinkComponent = React.forwardRef(
       }
       return "about:blank";
     }, [element.url]);
+
     return (
       <a
         ref={ref}
@@ -326,13 +328,11 @@ export const Element = React.forwardRef(
       attributes,
       children,
       element,
-    }: PropsWithChildren<
-      {
-        attributes: any;
-        children: React.ReactNode;
-        element: any;
-      } & BaseProps
-    >,
+    }: PropsWithChildren<{
+      attributes: any;
+      children: React.ReactNode;
+      element: any;
+    }>,
     ref: React.Ref<any>
   ) => {
     const style = { textAlign: element.align };
@@ -340,7 +340,7 @@ export const Element = React.forwardRef(
       case "link":
         return (
           <LinkComponent
-            {...attributes}
+            attributes={attributes}
             ref={ref}
             children={children}
             element={element}

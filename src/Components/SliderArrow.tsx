@@ -4,11 +4,10 @@ export default function SliderArrow(props: {
   type: "next" | "prev";
   className?: string;
   arrowClassName?: string;
+  iconClassName?: string;
   onClick?: any;
 }) {
-  let { type, arrowClassName, className, onClick } = props;
-  // console.log(className);
-  // className = className.replace(/\bslick\S*/g, "").trim();
+  const { type, arrowClassName, className, onClick, iconClassName } = props;
   return (
     <div
       className={classNames(
@@ -25,7 +24,7 @@ export default function SliderArrow(props: {
     >
       {(type == "prev" && (
         <svg
-          className="w-5 h-5 text-white"
+          className={classNames("w-5 h-5 text-white", iconClassName)}
           aria-hidden="true"
           xmlns="http://www.w3.org/2000/svg"
           width="24"
@@ -37,13 +36,13 @@ export default function SliderArrow(props: {
             stroke="currentColor"
             strokeLinecap="round"
             strokeLinejoin="round"
-            strokeWidth="2"
+            strokeWidth="2.5"
             d="m15 19-7-7 7-7"
           />
         </svg>
       )) || (
         <svg
-          className="w-5 h-5 text-white"
+          className={classNames("w-5 h-5 text-white", iconClassName)}
           aria-hidden="true"
           xmlns="http://www.w3.org/2000/svg"
           width="24"
@@ -55,7 +54,7 @@ export default function SliderArrow(props: {
             stroke="currentColor"
             strokeLinecap="round"
             strokeLinejoin="round"
-            strokeWidth="2"
+            strokeWidth="2.5"
             d="m9 5 7 7-7 7"
           />
         </svg>

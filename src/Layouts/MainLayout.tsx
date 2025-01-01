@@ -1,3 +1,4 @@
+import Cookie from "@/Components/Cookie";
 import Footer from "@/Components/Footer";
 import MediaModal from "@/Components/MediaModal";
 import Navbar from "@/Components/Navbar";
@@ -15,6 +16,7 @@ const MainLayout: React.FC<{
   }, []);
   return (
     <>
+      <Cookie />
       {showLoadingBar && (
         <LoadingBar
           height={3}

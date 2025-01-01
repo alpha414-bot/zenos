@@ -1,48 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
 import AdminLayout from '@/Layouts/AdminLayout';
-import { queryToFetchAllChats, queryToFetchChatMessages, queryToSendChatMessage } from '@/Services/Queries/ChatQuery';
 import { notify } from '@/notify';
-import { Timestamp, collection, getDocs, query, where } from 'firebase/firestore';
+import { Timestamp } from 'firebase/firestore';
 import EmojiPicker, { EmojiClickData } from 'emoji-picker-react';
 import { FaSmile, FaPaperclip } from 'react-icons/fa';
 import { backend_url } from "../../../package.json";
-import { firestore } from '@/firebase-config';
 import Media from "@/Components/Media";
 import { useForm, Control, FieldValues } from "react-hook-form";
-
-interface UserData {
-  displayName: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  uid: string;
-}
-
-interface ChatMessage {
-  id: string;
-  text: string;
-  sender_uid: string;
-  recipient_uid: string;
-  createdAt: Timestamp;
-  updatedAt: Timestamp;
-  media?: {
-    name: string;
-    fullPath: string;
-    type: string;
-  };
-}
-
-interface Chat {
-  id: string;
-  text: string;
-  has_messages: boolean;
-  unread: boolean;
-  createdAt: Timestamp;
-  updatedAt: Timestamp;
-  members: string[];
-  sent_by_uid?: string;
-  userData?: UserData;
-}
+import { useAdminChat } from '@/Services/Hooks/useAdminChat';
 
 interface ChatFormData {
   message: string;
@@ -57,58 +22,23 @@ const AdminInbox: React.FC = () => {
     }
   });
 
-  const [chats, setChats] = useState<Chat[]>([]);
-  const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [loading, setLoading] = useState(true);
+  const adminUid = "Y4P4ECBLLWRbk7VZUqkpqqixE7H2";
+  
+  const {
+    chats,
+    messages,
+    loading,
+    selectedChatId,
+    setSelectedChatId,
+    sendMessage,
+  } = useAdminChat(adminUid);
+
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [uploading, setUploading] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messageListRef = useRef<HTMLDivElement>(null);
-
-  const adminUid = "Y4P4ECBLLWRbk7VZUqkpqqixE7H2";
   const attachments = watch('attachments');
-
-  // Fetch user data for a chat
-  const fetchUserData = async (chat: Chat): Promise<Chat> => {
-    const recipientUid = chat.members.find(id => id !== adminUid);
-    if (!recipientUid) return chat;
-
-    try {
-      const usersCollection = collection(firestore, "Users");
-      const q = query(usersCollection, where("uid", "==", recipientUid));
-      const userSnapshot = await getDocs(q);
-
-      if (!userSnapshot.empty) {
-        const userData = userSnapshot.docs[0].data() as UserData;
-        return { ...chat, userData };
-      }
-    } catch (error) {
-      console.error('Error fetching user data:', error);
-    }
-    return chat;
-  };
-
-  useEffect(() => {
-    const fetchChats = async () => {
-      try {
-        setLoading(true);
-        const result = await queryToFetchAllChats(adminUid);
-        const chatsWithUserData = await Promise.all(
-          result.data.map(fetchUserData)
-        );
-        setChats(chatsWithUserData);
-      } catch (error) {
-        console.error('Error fetching chats:', error);
-        notify.error({ text: 'Failed to load chats' });
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchChats();
-  }, [adminUid]);
 
   useEffect(() => {
     if (messageListRef.current) {
@@ -116,43 +46,12 @@ const AdminInbox: React.FC = () => {
     }
   }, [messages]);
 
-  useEffect(() => {
-    if (!selectedChatId) return;
-  
-    let unsubscribe: (() => void) | null = null;
-  
-    const setupMessageListener = () => {
-      try {
-        // The queryToFetchChatMessages should return a cleanup function
-        const cleanup = queryToFetchChatMessages((data: { data: ChatMessage[] }) => {
-          setMessages(data.data);
-        }, selectedChatId);
-  
-        if (typeof cleanup === 'function') {
-          unsubscribe = cleanup;
-        }
-      } catch (error) {
-        console.error('Error setting up message listener:', error);
-      }
-    };
-  
-    setupMessageListener();
-  
-    // Cleanup function
-    return () => {
-      if (unsubscribe && typeof unsubscribe === 'function') {
-        unsubscribe();
-      }
-    };
-  }, [selectedChatId]);
-
   const handleChatSelect = (chatId: string): void => {
     setSelectedChatId(chatId);
-    setMessages([]);
+    reset({ message: '', attachments: [] });
     if (messageListRef.current) {
       messageListRef.current.scrollTo(0, 0);
     }
-    reset({ message: '', attachments: [] });
   };
 
   const onEmojiClick = (emojiData: EmojiClickData) => {
@@ -160,7 +59,6 @@ const AdminInbox: React.FC = () => {
     reset({ ...watch(), message: currentMessage + emojiData.emoji });
     setShowEmojiPicker(false);
   };
-  // ... continuing from Part 1
 
   const onSubmit = async (data: ChatFormData) => {
     if (!selectedChatId || (!data.message.trim() && !data.attachments?.length)) return;
@@ -180,30 +78,19 @@ const AdminInbox: React.FC = () => {
       // Handle attachments first
       if (data.attachments?.length) {
         for (const file of data.attachments) {
-          const payload = {
-            text: file.name,
-            sender_uid: adminUid,
-            recipient_uid: recipientUid,
+          await sendMessage(file.name, recipientUid, {
             media: {
               name: file.name,
               fullPath: file.path,
               type: file.type
             }
-          };
-
-          await queryToSendChatMessage(payload, selectedChatId);
+          });
         }
       }
 
       // Handle text message
       if (data.message.trim()) {
-        const payload = {
-          text: data.message.trim(),
-          sender_uid: adminUid,
-          recipient_uid: recipientUid,
-        };
-
-        await queryToSendChatMessage(payload, selectedChatId);
+        await sendMessage(data.message.trim(), recipientUid);
       }
 
       // Reset form after successful send
@@ -224,7 +111,7 @@ const AdminInbox: React.FC = () => {
     return `${backend_url}/media/cdn/images/original/${path}`;
   };
 
-  const renderMessageContent = (msg: ChatMessage) => {
+  const renderMessageContent = (msg: any) => {
     if (msg.media) {
       if (msg.media.type.startsWith('image/')) {
         return (
@@ -252,7 +139,6 @@ const AdminInbox: React.FC = () => {
     }
     return <p className="text-sm font-medium break-words">{msg.text}</p>;
   };
-
   return (
     <AdminLayout>
       <div className="flex h-[calc(100vh-64px)] bg-gray-900">
@@ -346,13 +232,13 @@ const AdminInbox: React.FC = () => {
               {/* Message Input with Media Component */}
               <div className="border-t border-gray-700 p-4 bg-gray-800">
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                <Media
-  name="attachments"
-  control={control as unknown as Control<FieldValues>} // Fix the Control type
-  multiSelect={true}
-  placeholder="Drop files here or click to upload"
-  align="row"
-/>              
+                  <Media
+                    name="attachments"
+                    control={control as unknown as Control<FieldValues>}
+                    multiSelect={true}
+                    placeholder="Drop files here or click to upload"
+                    align="row"
+                  />
                   <div className="flex space-x-4">
                     <div className="flex-1 flex items-center space-x-2 relative">
                       <button
@@ -378,7 +264,7 @@ const AdminInbox: React.FC = () => {
 
                     <button
                       type="submit"
-                      disabled={!watch('message')?.trim() && !attachments?.length || uploading}
+                      disabled={(!watch('message')?.trim() && !attachments?.length) || uploading}
                       className="bg-orange-500 text-gray-900 px-6 py-2 rounded-lg hover:bg-orange-600 transition-colors disabled:bg-gray-600 disabled:text-gray-400"
                     >
                       {uploading ? 'Sending...' : 'Send'}

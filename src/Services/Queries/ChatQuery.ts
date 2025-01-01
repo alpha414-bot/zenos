@@ -1,3 +1,4 @@
+
 import { firestore } from "@/firebase-config";
 import { notify } from "@/notify";
 import { AuthUserType } from "@/Types/Auth";
@@ -13,6 +14,7 @@ import {
   query,
   orderBy,
   where,
+  setDoc
 } from "firebase/firestore";
 // interface SendMessageParams {
 //   text: string;
@@ -109,45 +111,96 @@ export const queryToCreateChat = (recipient_uid?: string, auth_user?: AuthUserTy
 // Fetch chat by recipient UID (remains the same)
 export const queryToGetChat = (
   listener: any,
-  recipient_uid?: string,
-  auth_user?: AuthUserType
+  auth_uid?: string,
+  recipient?: AuthUserType
 ): Promise<ChatMetaListInterface> =>
-  new Promise((resolve, reject) => {
-    if (!recipient_uid || !auth_user?.uid) {
+  new Promise(async (resolve, reject) => {
+    if (!auth_uid || !recipient?.uid) {
       reject(new Error("Recipient or Auth User is missing"));
       return;
     }
 
+    const debugLog = (message: string) => {
+      console.log(`[${new Date().toISOString()}] QueryToGetChat: ${message}`);
+    };
+
     try {
+      debugLog(`Starting chat query for auth_uid: ${auth_uid}, recipient: ${recipient.uid}`);
+
       const chatCollection = collection(firestore, "UserMessages");
-      const chatQuery = query(
+      
+      // First, try to find an existing chat
+      debugLog('Querying for existing chat');
+      const existingChatQuery = query(
         chatCollection,
-        where("members", "array-contains", auth_user.uid)
+        where("members", "array-contains", auth_uid)
       );
 
-      getDocs(chatQuery)
-        .then((snapshot) => {
-          const matchingChat = snapshot.docs.find((doc) =>
-            doc.data().members.includes(recipient_uid)
-          );
+      const chatSnapshot = await getDocs(existingChatQuery);
+      debugLog(`Found ${chatSnapshot.size} potential chats`);
 
-          if (matchingChat) {
-            const chatData = {
-              id: matchingChat.id,
-              ...matchingChat.data()
-            } as ChatMetaListInterface;
-            resolve(listener(chatData));
-          } else {
-            reject(new Error("No chat found"));
-          }
-        })
-        .catch(reject);
+      // Find chat with both members
+      const existingChat = chatSnapshot.docs.find(doc => {
+        const members = doc.data().members;
+        return members.includes(recipient.uid);
+      });
+
+      if (existingChat) {
+        debugLog(`Found existing chat with ID: ${existingChat.id}`);
+        const chatData = {
+          id: existingChat.id,
+          ...existingChat.data()
+        } as ChatMetaListInterface;
+        return resolve(listener(chatData));
+      }
+
+      debugLog('No existing chat found, creating new chat');
+
+      // Generate a deterministic chat ID based on sorted user IDs
+      const sortedMembers = [auth_uid, recipient.uid].sort();
+      const deterministicChatId = `chat_${sortedMembers.join('_')}`;
+      debugLog(`Generated deterministic chat ID: ${deterministicChatId}`);
+
+      // Check if the deterministic ID already exists
+      const deterministicChatRef = doc(chatCollection, deterministicChatId);
+      const deterministicChatDoc = await getDoc(deterministicChatRef);
+
+      if (deterministicChatDoc.exists()) {
+        debugLog(`Found chat with deterministic ID: ${deterministicChatId}`);
+        const chatData = {
+          id: deterministicChatId,
+          ...deterministicChatDoc.data()
+        } as ChatMetaListInterface;
+        return resolve(listener(chatData));
+      }
+
+      debugLog('Creating new chat with deterministic ID');
+      const newChatData = {
+        has_messages: false,
+        text: "Start conversation",
+        unread: false,
+        createdAt: Timestamp.now(),
+        updatedAt: Timestamp.now(),
+        members: [auth_uid, recipient.uid]
+      };
+
+      // Use set with merge to handle potential race conditions
+      await setDoc(deterministicChatRef, newChatData, { merge: true });
+      debugLog(`Created new chat with ID: ${deterministicChatId}`);
+
+      const chatData = {
+        id: deterministicChatId,
+        ...newChatData
+      } as ChatMetaListInterface;
+
+      resolve(listener(chatData));
     } catch (error) {
+      debugLog(`Error: ${error}`);
+      console.error("Error in queryToGetChat:", error);
       reject(error);
       notify.error({ text: "Error connecting to server. [UNABLE_TO_QUERY_CHAT]" });
     }
   });
-
 // Send message (updated with media support)
 export const queryToSendChatMessage = (
   payload: {

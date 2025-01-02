@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { FaShoppingCart, FaUsers, FaDollarSign, FaBox } from 'react-icons/fa';
-import { getProductData } from '@/Services/Queries/ProductQuery';
-import { collection, query, getDocs } from 'firebase/firestore';
-import { firestore } from '@/firebase-config';
+import { firestore } from "@/firebase-config";
+import { getProductData } from "@/Services/Queries/ProductQuery";
+import { collection, getDocs } from "firebase/firestore";
+import { useEffect, useState } from "react";
+import { FaBox, FaShoppingCart } from "react-icons/fa";
 
 interface ProductData {
   id: string;
@@ -20,37 +20,46 @@ const AdminEcommerceComponent = () => {
     totalProducts: 0,
     activeProducts: 0,
     totalOrders: 0,
-    totalValue: 0
+    totalValue: 0,
   });
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
         // Fetch products
-        await getProductData((data: ProductData[]) => {
-          console.log('Fetched products:', data);
-          
-          // Calculate product stats
-          const activeProducts = data.filter(p => p.status === 'active').length;
-          const totalValue = data.reduce((sum, product) => sum + (product.price * product.stock), 0);
-          
-          // Fetch orders
-          const ordersCollection = collection(firestore, "Orders");
-          getDocs(ordersCollection).then((orderSnapshot) => {
-            const totalOrders = orderSnapshot.size;
-            
-            setStats({
-              totalProducts: data.length,
-              activeProducts,
-              totalOrders,
-              totalValue
+        await getProductData(
+          (data: ProductData[]) => {
+            console.log("Fetched products:", data);
+
+            // Calculate product stats
+            const activeProducts = data.filter(
+              (p) => p.status === "active"
+            ).length;
+            const totalValue = data.reduce(
+              (sum, product) => sum + product.price * product.stock,
+              0
+            );
+
+            // Fetch orders
+            const ordersCollection = collection(firestore, "Orders");
+            getDocs(ordersCollection).then((orderSnapshot) => {
+              const totalOrders = orderSnapshot.size;
+
+              setStats({
+                totalProducts: data.length,
+                activeProducts,
+                totalOrders,
+                totalValue,
+              });
+
+              setLoading(false);
             });
-            
-            setLoading(false);
-          });
-        }, null, true);
+          },
+          null,
+          true
+        );
       } catch (error) {
-        console.error('Error fetching stats:', error);
+        console.error("Error fetching stats:", error);
         setLoading(false);
       }
     };
@@ -59,7 +68,12 @@ const AdminEcommerceComponent = () => {
   }, []);
 
   return (
-    <section data-scroll data-scroll-speed=".05" id="AdminEcommerceSection" className="bg-gray-900 p-6 rounded-lg">
+    <section
+      data-scroll
+      data-scroll-speed=".05"
+      id="AdminEcommerceSection"
+      className="bg-gray-900 p-6 rounded-lg"
+    >
       <div className="pb-2 border-b-2 border-orange-500 mb-4">
         <h4 className="text-3xl font-bold text-white">Ecommerce Overview</h4>
       </div>
@@ -67,7 +81,10 @@ const AdminEcommerceComponent = () => {
       {loading ? (
         <div className="grid grid-cols-4 gap-4 mb-6">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="bg-gray-800 p-4 rounded-lg shadow animate-pulse">
+            <div
+              key={i}
+              className="bg-gray-800 p-4 rounded-lg shadow animate-pulse"
+            >
               <div className="h-16 bg-gray-700 rounded"></div>
             </div>
           ))}
@@ -80,7 +97,9 @@ const AdminEcommerceComponent = () => {
                 <FaBox className="text-gray-900 text-xl" />
               </div>
               <div className="ml-4">
-                <p className="text-gray-400 text-sm font-medium">Total Products</p>
+                <p className="text-gray-400 text-sm font-medium">
+                  Total Products
+                </p>
                 <h3 className="text-2xl font-bold text-white">
                   {stats.totalProducts.toLocaleString()}
                 </h3>
@@ -111,12 +130,17 @@ const AdminEcommerceComponent = () => {
                 <FaBox className="text-gray-900 text-xl" />
               </div>
               <div className="ml-4">
-                <p className="text-gray-400 text-sm font-medium">Active Products</p>
+                <p className="text-gray-400 text-sm font-medium">
+                  Active Products
+                </p>
                 <h3 className="text-2xl font-bold text-white">
                   {stats.activeProducts.toLocaleString()}
                 </h3>
                 <p className="text-xs text-gray-500">
-                  {((stats.activeProducts / stats.totalProducts) * 100).toFixed(1)}% of total
+                  {((stats.activeProducts / stats.totalProducts) * 100).toFixed(
+                    1
+                  )}
+                  % of total
                 </p>
               </div>
             </div>
@@ -128,13 +152,13 @@ const AdminEcommerceComponent = () => {
                 <FaShoppingCart className="text-gray-900 text-xl" />
               </div>
               <div className="ml-4">
-                <p className="text-gray-400 text-sm font-medium">Total Orders</p>
+                <p className="text-gray-400 text-sm font-medium">
+                  Total Orders
+                </p>
                 <h3 className="text-2xl font-bold text-white">
                   {stats.totalOrders.toLocaleString()}
                 </h3>
-                <p className="text-xs text-gray-500">
-                  All time orders
-                </p>
+                <p className="text-xs text-gray-500">All time orders</p>
               </div>
             </div>
           </div>

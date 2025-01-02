@@ -13,7 +13,7 @@ const Filter = ({
   products,
   paginateLimit = 12,
 }: {
-  products: any;
+  products: ProductItemType[];
   paginateLimit?: number;
 }) => {
   const [categoryType, setCategoryType] = useState<
@@ -24,10 +24,21 @@ const Filter = ({
   >("");
   const [mixer, setMixer] = useState<any>();
   useEffect(() => {
+    function getParam(param: string) {
+      var url = window.location.href
+        .slice(window.location.href.indexOf("?") + 1)
+        .split("&");
+      for (var i = 0; i < url.length; i++) {
+        var params = url[i].split("=");
+        if (params[0] == param) return params[1];
+      }
+      return false;
+    }
+    const filter = getParam("filter");
     var $containerEl = document.querySelector(".mixitup-product-wrapper");
+    mixitup.use(mixitupmultifilter);
+    mixitup.use(mixitupPagination);
     if ($containerEl) {
-      mixitup.use(mixitupmultifilter);
-      mixitup.use(mixitupPagination);
       setMixer(
         mixitup($containerEl, {
           multifilter: {
@@ -35,10 +46,15 @@ const Filter = ({
           },
           pagination: {
             limit: paginateLimit, // 12
+            maintainActivePage: true,
+            hidePageListIfSinglePage: true,
           },
-          // load: {
-          //   filter: "",
-          // },
+          load: {
+            filter:
+              filter == "all" || !filter
+                ? null
+                : `.product-category-${getParam("filter")}`,
+          },
           animation: {
             // effects: "fade rotateZ(-180deg)" /* fade scale */,
             duration: 700 /* 600 */,
@@ -59,6 +75,10 @@ const Filter = ({
         })
       );
     }
+    return () => {
+      // mixer?.paginate(paginateLimit);
+      mixer?.destroy();
+    };
   }, [products, paginateLimit]);
   return (
     <div>
@@ -226,7 +246,10 @@ const Filter = ({
           </div>
         </div>
       </form>
-      <img src="/assets/images/BannerF.png" className="mt-4 w-full rounded-lg" />
+      <img
+        src="/assets/images/BannerF.png"
+        className="mt-4 w-full rounded-lg"
+      />
     </div>
   );
 };

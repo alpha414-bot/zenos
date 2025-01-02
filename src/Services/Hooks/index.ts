@@ -7,12 +7,13 @@ import { onAuthStateChanged, signInAnonymously } from "firebase/auth";
 import { useCallback, useEffect } from "react";
 import { useQuery, useQueryClient } from "react-query";
 import { queryToGetUserData } from "../Queries/AuthQuery";
-import { queryUserMedias, queryToGetAssetFile } from "../Queries/MediaQuery";
+import { queryToGetAssetFile, queryUserMedias } from "../Queries/MediaQuery";
 import { getOrders } from "../Queries/OrderQuery";
 import {
   getCartProducts,
   getProductData,
   getSimilarProductData,
+  getUkUsedProductData,
 } from "../Queries/ProductQuery";
 
 export const useAuthUser = () => {
@@ -54,9 +55,27 @@ export const useAuthUser = () => {
   );
 };
 
+export const useUkUsedProductData = <T>() => {
+  const queryClient = useQueryClient();
+  // listener to subscribe to firestore snappshot
+  const snapshotListener = useCallback((data: any) => {
+    queryClient.setQueryData(keys.product_data("uk-used"), data);
+    return data;
+  }, []);
+  return useQuery(
+    keys.product_data("uk-used"),
+    (): Promise<T> => getUkUsedProductData(snapshotListener),
+    {
+      keepPreviousData: true,
+      placeholderData: [] as any
+    }
+  );
+};
+
 export const useProductsData = <T>(
   product_id?: any,
-  admin: boolean = false
+  admin: boolean = false,
+  for_public: boolean = true,
 ) => {
   const queryClient = useQueryClient();
   // listener to subscribe to firestore snappshot
@@ -66,7 +85,7 @@ export const useProductsData = <T>(
   }, []);
   return useQuery(
     keys.product_data(product_id, admin),
-    (): Promise<T> => getProductData(snapshotListener, product_id, admin),
+    (): Promise<T> => getProductData(snapshotListener, product_id, admin, for_public),
     {
       keepPreviousData: true,
       placeholderData: !!product_id ? [] : ({} as T),

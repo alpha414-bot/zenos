@@ -4,9 +4,22 @@
 
 @layer {
   /* Firebase Emulator */
-  .firebase-emulator-warning {
-    @apply !fixed !left-auto !right-4 !bottom-2 !rounded-full !w-12 !h-12 !text-white !bg-white !text-opacity-0 !bg-no-repeat !bg-contain !bg-center bg-[url('https://firebase.google.com/static/images/brand-guidelines/logo-logomark.png')] !shadow-sm !shadow-gray-200;
+  @keyframes glowing-border {
+    0%,
+    100% {
+      @apply border-zenos-500;
+      box-shadow: 0 0 10px red;
+    }
+    50% {
+      @apply border-blue-500;
+      box-shadow: 0 0 10px blue;
+    }
   }
+  .firebase-emulator-warning {
+    animation: glowing-border 2s infinite;
+    @apply !fixed !left-auto !right-4 !top-2 !rounded-full !border-4 !w-8 !h-8 !text-white !bg-white !text-opacity-0 !bg-no-repeat !bg-contain !bg-center bg-[url('https://firebase.google.com/static/images/brand-guidelines/logo-logomark.png')] !shadow-sm !shadow-gray-200;
+  }
+
   /* Slick */
   .custom-slick-dot {
     @apply flex !items-center justify-end gap-x-3 !px-4 w-full !py-2;
@@ -67,12 +80,12 @@
   .mixitup-product-wrapper.mixitup-container-failed > .product-placeholder {
     @apply !hidden;
   }
-  .mixitup-product-wrapper.mixitup-container-failed > p.no-product-data,
-  .no-container-products > p.no-product-data {
-    @apply !block text-center font-bold grid-cols-3 text-lg tracking-tight underline underline-offset-2 decoration-dotted;
+  .mixitup-product-wrapper.mixitup-container-failed > .no-product-data,
+  .no-container-products > .no-product-data {
+    @apply !block text-center font-semibold grid-cols-3 text-xl tracking-tight underline underline-offset-2 decoration-dotted;
   }
   .mixitup-page-list {
-    @apply w-full !py-8 flex items-center justify-center gap-x-3;
+    @apply relative z-10 w-full !py-8 flex items-center justify-center gap-x-3;
   }
   .mixitup-page-list.mixitup-page-list-disabled {
     @apply !hidden;
@@ -81,12 +94,12 @@
   .mixitup-page-list > .mixitup-control:last-child {
     @apply !border-none !text-3xl;
   }
-  .mixitup-page-list > .mixitup-control {
-    @apply !border-2 !border-white !px-4 py-2 rounded !text-lg font-extrabold shadow shadow-gray-700 !transition-all !duration-150 !ease-in-out hover:!bg-gray-700 disabled:!bg-zinc-500 disabled:!text-gray-400 disabled:!cursor-not-allowed;
+  .mixitup-page-list > .mixitup-control-active {
+    @apply !bg-gray-500 !text-white !cursor-not-allowed hover:!bg-gray-500;
   }
-  /* .mixitup-page-list > .mixitup-control.mixitup-control-disabled {
-    @apply !cursor-not-allowed disabled:;
-  } */
+  .mixitup-page-list > .mixitup-control {
+    @apply !border-2 !border-white !px-4 py-2 rounded-md !text-lg font-extrabold shadow shadow-gray-700 !transition-all !duration-150 !ease-in-out hover:!bg-gray-500 disabled:!bg-zinc-500 disabled:!text-gray-400 disabled:!cursor-not-allowed;
+  }
   /* Glassmorphism */
   .glass-container {
     @apply relative;

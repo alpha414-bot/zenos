@@ -14,7 +14,7 @@ const ErrorPage: FC<ErrorPageInterface> = () => {
   return (
     <MainLayout no_footer>
       <PageMeta title={statusText} description={message}>
-        <div className="p-12 min-h-[50vh] flex items-center">
+        <div className="py-12 px-4 md:py-12 md:px-12 min-h-[50vh] flex items-start md:items-center">
           <div className="space-y-9">
             <h1 className="text-6xl font-extrabold">Whoops!</h1>
             <div className="row">

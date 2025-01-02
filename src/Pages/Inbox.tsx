@@ -1,18 +1,17 @@
-import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
-import UserLayout from "@/Layouts/UserLayout";
-import { useLocation } from 'react-router-dom';
-import { queryToCreateChat, queryToGetChat, queryToFetchChatMessages, queryToSendChatMessage } from '@/Services/Queries/ChatQuery';
-import { queryToUploadFiles } from '@/Services/Queries/MediaQuery';
-import { notify } from '@/notify';
-import { Timestamp } from 'firebase/firestore';
-import EmojiPicker, { EmojiClickData } from 'emoji-picker-react';
-import { FaSmile, FaPaperclip } from 'react-icons/fa';
-import { backend_url } from "../../package.json";
-import { auth } from '@/firebase-config';
 import Media from "@/Components/Media";
-import { Modal, InstanceOptions } from 'flowbite';
-import { useForm } from "react-hook-form";
+import UserLayout from "@/Layouts/UserLayout";
+import { queryToCreateChat, queryToFetchChatMessages, queryToGetChat, queryToSendChatMessage } from '@/Services/Queries/ChatQuery';
+import { auth } from '@/firebase-config';
+import { notify } from '@/notify';
+import EmojiPicker, { EmojiClickData } from 'emoji-picker-react';
+import { Timestamp } from 'firebase/firestore';
+import { InstanceOptions, Modal } from 'flowbite';
 import _ from 'lodash';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useForm } from "react-hook-form";
+import { FaPaperclip, FaSmile } from 'react-icons/fa';
+import { useLocation } from 'react-router-dom';
+import { backend_url } from "../../package.json";
 
 interface ChatMessage {
   id: string;

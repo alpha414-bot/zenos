@@ -1,11 +1,9 @@
 import Button from "@/Components/Button";
-import ButtonAsLink from "@/Components/ButtonAsLink";
 import Image from "@/Components/Image";
 import Input from "@/Components/Input";
 import Media from "@/Components/Media";
 import RichEditor from "@/Components/RichEditor";
 import SelectDropdown from "@/Components/SelectDropdown";
-import { getAuth } from "firebase/auth";
 import Table from "@/Components/Table";
 import VariantsType from "@/Components/VariantsType";
 import { useProductsData } from "@/Services/Hooks";
@@ -19,11 +17,12 @@ import {
 import { price } from "@/System/function";
 import { ColumnDef } from "@tanstack/react-table";
 import classNames from "classnames";
+import { getAuth } from "firebase/auth";
 import { Timestamp } from "firebase/firestore";
 import { InstanceOptions, Modal } from "flowbite";
 import _ from "lodash";
 import moment from "moment";
-import { useLayoutEffect, useMemo, useState } from "react";
+import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 
 // Components to handle product in the ecommerce website
@@ -33,7 +32,7 @@ const ProductsAction = ({ values }: { values: ProductItemType }) => {
   const updateProductSubmission = (data?: any) => {
     if (data.image && data.image.length > 0) {
       let image = _.flatMap(data.image, (item) =>
-        item?.media?.fullPath ? item?.media?.fullPath : item
+        item?.media?.name ? item?.media?.name : item
       );
       data.image = image;
     }
@@ -81,29 +80,6 @@ const ProductsAction = ({ values }: { values: ProductItemType }) => {
   return (
     <>
       <div className="flex items-center gap-2 flex-nowrap">
-        <ButtonAsLink
-          to={`/products/${values?.id}`}
-          target="_blank"
-          className="btn !bg-blue-500 !px-2 flex gap-0.5"
-          custom
-        >
-          <svg
-            className="w-6 h-6"
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            fill="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              fillRule="evenodd"
-              d="M4.998 7.78C6.729 6.345 9.198 5 12 5c2.802 0 5.27 1.345 7.002 2.78a12.713 12.713 0 0 1 2.096 2.183c.253.344.465.682.618.997.14.286.284.658.284 1.04s-.145.754-.284 1.04a6.6 6.6 0 0 1-.618.997 12.712 12.712 0 0 1-2.096 2.183C17.271 17.655 14.802 19 12 19c-2.802 0-5.27-1.345-7.002-2.78a12.712 12.712 0 0 1-2.096-2.183 6.6 6.6 0 0 1-.618-.997C2.144 12.754 2 12.382 2 12s.145-.754.284-1.04c.153-.315.365-.653.618-.997A12.714 12.714 0 0 1 4.998 7.78ZM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"
-              clipRule="evenodd"
-            />
-          </svg>
-          <span className=" sr-only">view</span>
-        </ButtonAsLink>
         <Button
           type="button"
           className="btn !bg-green-500 !px-2 !py-1 flex gap-0.5"
@@ -365,7 +341,13 @@ const ProductsAction = ({ values }: { values: ProductItemType }) => {
   );
 };
 
-const SelectProductAction = ({ id, status }: { id: string; status?: any }) => {
+export const SelectProductAction = ({
+  id,
+  status,
+}: {
+  id: string;
+  status?: any;
+}) => {
   const [productStatus, setProductStatus] = useState<string>(status);
   const [showProductStatusDropdown, setShowProductStatusDropdown] =
     useState<boolean>(false);
@@ -449,6 +431,7 @@ const SelectProductAction = ({ id, status }: { id: string; status?: any }) => {
 };
 
 const UserProductsComponent = () => {
+  const formRef = useRef<HTMLFormElement>(null);
   const auth = getAuth();
   const currentUser = auth.currentUser;
 
@@ -460,7 +443,11 @@ const UserProductsComponent = () => {
   const userUuid = currentUser.uid;
 
   // Fetch products
-  let { data: products = [] } = useProductsData<ProductItemType[]>(undefined, true);
+  let { data: products = [] } = useProductsData<ProductItemType[]>(
+    undefined,
+    false,
+    false
+  );
 
   // Reassign products to filtered products based on the user's UUID
   if (Array.isArray(products)) {
@@ -469,15 +456,12 @@ const UserProductsComponent = () => {
 
   const { control, handleSubmit, reset, watch } = useForm({ mode: "all" });
 
-  
   const columns = useMemo<ColumnDef<ProductItemType>[]>(
     () => [
       {
         header: "Status",
         accessorFn: (row) => row.status,
-        cell: (info) => (
-          <span>{info.getValue() as any}</span>
-        ),
+        cell: (info) => <span>{info.getValue() as any}</span>,
         footer: (props) => props.column.id,
         enableSorting: false,
       },
@@ -542,53 +526,62 @@ const UserProductsComponent = () => {
         ),
         footer: (props) => props.column.id,
       },
-  
+      {
+        header: "Action",
+        accessorFn: (row) => row,
+        cell: (info) => {
+          return <ProductsAction values={info.getValue() as any} />;
+        },
+        footer: (props) => props.column.id,
+        enableSorting: false,
+      },
     ],
     []
   );
   const [addProductModal, setAddProductModal] = useState<Modal>();
   const [variants, setVariants] = useState([{}]);
- 
+
   const submitProductsForm = (data: any) => {
     const auth = getAuth();
-  const currentUser = auth.currentUser;
+    const currentUser = auth.currentUser;
 
-  if (!currentUser) {
-    console.error("No user is signed in.");
-    return;
-  }
+    if (!currentUser) {
+      console.error("No user is signed in.");
+      return;
+    }
 
-  // Get the user's unique identifier (UUID)
-  const userUuid = currentUser.uid;
+    // Get the user's unique identifier (UUID)
+    const userUuid = currentUser.uid;
 
-  // Process images
-  let image = _.flatMap(data.image, (item) => item.media.fullPath);
+    // Process images
+    let image = _.flatMap(data.image, (item) => item.media.name);
 
-  // Add document to Firestore
-  addCollectionDoc(
-    "Products",
-    [
-      JSON.parse(
-        JSON.stringify({
-          ...data,
-          ...{
-            image: image,
-            status: "archived",
-            createdBy: userUuid,  
-            description: data.description?.replace(/\n/g, "\\n"),
-          },
-        })
-      ),
-    ],
-    `<span class="font-extrabold underline underline-offset-4 decoration-dotted decoration-green-500">${data.name}</span> added successfully.`
-  )
-    .then(() => {
-      addProductModal?.hide();
-    })
-    .finally(() => {
-      // Reset form or perform redirect
-      reset();
-    });
+    // Add document to Firestore
+    addCollectionDoc(
+      "Products",
+      [
+        JSON.parse(
+          JSON.stringify({
+            ...data,
+            ...{
+              image: image,
+              category: { key: "uk-used", value: "UK Used" },
+              status: "archived",
+              createdBy: userUuid,
+              description: data.description?.replace(/\n/g, "\\n"),
+            },
+          })
+        ),
+      ],
+      `<span class="font-extrabold underline underline-offset-4 decoration-dotted decoration-green-500">${data.name}</span> added successfully.`
+    )
+      .then(() => {
+        addProductModal?.hide();
+      })
+      .finally(() => {
+        // Reset form or perform redirect
+        reset();
+      });
   };
   useLayoutEffect(() => {
     const $targetEl: HTMLElement | null =
@@ -689,6 +682,7 @@ const UserProductsComponent = () => {
             </div>
             {/* Modal body */}
             <form
+              ref={formRef}
               className="px-4 py-4 space-y-5"
               //   className="relative bg-white rounded-lg shadow dark:bg-gray-700"
               onSubmit={handleSubmit(submitProductsForm)}
@@ -725,6 +719,8 @@ const UserProductsComponent = () => {
                     options={ZenosCategory}
                     control={control}
                     placeholder="Category"
+                    disableOptionKeys={["oraimo", "new-age"]}
+                    defaultOptionKey="uk-used"
                     containerClassName="z-30"
                     rules={{ required: "Category is required" }}
                   />

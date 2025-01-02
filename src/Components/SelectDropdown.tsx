@@ -244,11 +244,14 @@ const SelectDropdown = forwardRef<HTMLInputElement, SelectDropdownInterface>(
                               return (
                                 <div
                                   key={index}
-                                  className={`flex items-center gap-x-2 px-3 py-2 bg-gray-600 text-white hover:bg-gray-700 ${
-                                    disable
-                                      ? "cursor-not-allowed bg-zinc-200 opacity-70 text-opacity-20"
-                                      : "cursor-pointer"
-                                  }`}
+                                  className={classNames(
+                                    `flex items-center gap-x-2 px-3 py-2`,
+                                    {
+                                      "cursor-not-allowed bg-gray-500 text-gray-100 text opacity-70 text-opacity-20":
+                                        disable,
+                                      "cursor-pointer bg-gray-600 text-white hover:bg-gray-700": !disable,
+                                    }
+                                  )}
                                   onClick={() => {
                                     if (!disable) {
                                       // select is not disabled...

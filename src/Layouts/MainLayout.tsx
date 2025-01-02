@@ -1,6 +1,7 @@
 import Cookie from "@/Components/Cookie";
 import Footer from "@/Components/Footer";
 import MediaModal from "@/Components/MediaModal";
+import MobileFooterBar from "@/Components/MobileFooterBar";
 import Navbar from "@/Components/Navbar";
 import React, { useLayoutEffect, useState } from "react";
 import LoadingBar from "react-top-loading-bar";
@@ -25,13 +26,14 @@ const MainLayout: React.FC<{
           progress={100}
         />
       )}
-      <div>
+      <div className="pb-24 md:pb-0">
         {/* <div className="inline-flex flex-col justify-between w-full min-h-screen "> */}
         {!no_navbar && <Navbar />}
         <div id="page" className="relative z-40">
           <div id="wrapper">{children}</div>
         </div>
         {!no_footer && <Footer />}
+        <MobileFooterBar />
         <MediaModal />
       </div>
     </>

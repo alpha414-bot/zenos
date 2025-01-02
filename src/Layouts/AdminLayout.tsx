@@ -1,7 +1,7 @@
 import MediaModal from "@/Components/MediaModal";
 import Sidebar from "@/Components/Sidebar";
 import { FC, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import LoadingBar from "react-top-loading-bar";
 
 interface AdminLayoutInterface {
@@ -47,7 +47,17 @@ const AdminLayout: FC<AdminLayoutInterface> = ({ children }) => {
 
         <>
           <Sidebar type="admin" />
-          <div className="px-2 sm:px-4 sm:ml-64">{children}</div>
+          <div className="px-2 sm:px-4 sm:ml-64">
+            <div className="py-4 px-2 flex items-center justify-end">
+              <Link
+                to={"/"}
+                className="text-zenos-600 px-2 py-2 hover:bg-zenos-600 hover:text-white rounded-lg transition-all duration-300 ease-in-out"
+              >
+                <i className="fa-lg fa-solid fa-globe"></i>
+              </Link>
+            </div>
+            {children}
+          </div>
         </>
       </div>
       <MediaModal />

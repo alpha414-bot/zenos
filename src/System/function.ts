@@ -88,10 +88,11 @@ export const keys = {
     "auth_user_profile",
     auth_uid || "",
   ],
-  product_data: (product_id?: string, admin?: any) => [
+  product_data: (product_id?: string, admin?: any, extra: string = "") => [
     "product_data",
     product_id || "all",
     admin ? "admin" : "users",
+    extra,
   ],
   similar_product_data: (except_product_id?: string) => [
     "product_data",

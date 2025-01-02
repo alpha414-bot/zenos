@@ -25,10 +25,7 @@ interface BaseProps {
 }
 type LinkElement = { type: "link"; url: string; children: Descendant[] };
 const Icon = React.forwardRef(
-  (
-    { className, ...props }: PropsWithChildren<BaseProps>,
-    ref: Ref<HTMLSpanElement>
-  ) => (
+  ({ className }: PropsWithChildren<BaseProps>, ref: Ref<HTMLSpanElement>) => (
     <>
       <span
         ref={ref}

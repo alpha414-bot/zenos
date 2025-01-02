@@ -70,23 +70,28 @@ const Home = () => {
               }}
               className="group"
             >
-              {new Array(4).fill(0).map((_item, index) => (
+              {[
+                {
+                  image: "OraimoBannerB.jpg",
+                },
+                { image: "BannerB.png" },
+                {
+                  image: "BannerC.png",
+                },
+              ].map((item, index) => (
                 <div
                   key={index}
                   className={classNames("relative w-full !h-auto md:!h-[75vh]")}
                 >
-                  <h2 className="absolute z-10 text-4xl py-2 px-4">
-                    {index + 1}
-                  </h2>
                   <img
-                    src="/assets/images/BannerB.png"
+                    src={`/assets/images/${item.image}`}
                     alt="1st Slider image"
                     className="!block w-full rounded-lg md:!hidden"
                   />
                   <div
                     className="!hidden w-full h-full bg-no-repeat bg-center bg-cover rounded-lg md:rounded-3xl md:!block"
                     style={{
-                      backgroundImage: `url('/assets/images/BannerB.png')`,
+                      backgroundImage: `url('/assets/images/${item.image}')`,
                     }}
                   ></div>
                 </div>
@@ -138,8 +143,8 @@ const Home = () => {
             {...{
               slidesToShow: 5,
               autoplay: true,
-              autoplaySpeed: 1500,
-              infinite: false,
+              autoplaySpeed: 900,
+              infinite: true,
               arrows: false,
               dots: false,
               responsive: [
@@ -218,7 +223,7 @@ const Home = () => {
               </div>
               <div className="mt-6 py-8 grid grid-cols-1 sm:grid-cols-[1fr_2fr] xl:grid-cols-[1fr_3fr] gap-10">
                 <div className="grow">
-                  <Filter products={data} />
+                  <Filter products={data || []} paginateLimit={6} />
                 </div>
                 <div className="">
                   {isLoading ||
@@ -237,9 +242,7 @@ const Home = () => {
                         </>
                       )) || (
                         <div className="no-container-products">
-                          <p className="no-product-data">
-                            No Product found! Start listing Product
-                          </p>
+                          <p className="no-product-data">No Product found!</p>
                         </div>
                       )))}
                 </div>

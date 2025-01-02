@@ -1,7 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { FaUsers, FaUserCheck, FaUserClock } from 'react-icons/fa';
-import { firestore } from '@/firebase-config';
-import { collection, query, getDocs, onSnapshot, Timestamp } from 'firebase/firestore';
+import { firestore } from "@/firebase-config";
+import {
+  collection,
+  onSnapshot
+} from "firebase/firestore";
+import { useEffect, useState } from "react";
+import { FaUserCheck, FaUserClock, FaUsers } from "react-icons/fa";
 
 interface UserData {
   admin: boolean;
@@ -34,61 +37,69 @@ const AdminUsersComponent = () => {
   const [stats, setStats] = useState<UserStats>({
     totalUsers: 0,
     adminUsers: 0,
-    newUsers: 0
+    newUsers: 0,
   });
 
   useEffect(() => {
     const fetchUserStats = async () => {
       try {
         const usersCollection = collection(firestore, "Users"); // Changed to "Users"
-        
-        const unsubscribe = onSnapshot(usersCollection, (snapshot) => {
-          console.log('Snapshot received, document count:', snapshot.size);
-          
-          const users = snapshot.docs.map(doc => {
-            const data = doc.data() as UserData;
-            console.log('Processing user:', data); // Debug log
-            return {
-              ...data,
-              id: doc.id,
-              createdAtDate: data.createdAt ? new Date(data.createdAt.seconds * 1000) : null
-            };
-          });
 
-          // Get current date for new users calculation
-          const thirtyDaysAgo = new Date();
-          thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        const unsubscribe = onSnapshot(
+          usersCollection,
+          (snapshot) => {
+            console.log("Snapshot received, document count:", snapshot.size);
 
-          // Calculate stats
-          const totalUsers = users.length;
-          const adminUsers = users.filter(user => user.admin === true).length;
-          const newUsers = users.filter(user => {
-            if (!user.createdAtDate) return false;
-            return user.createdAtDate > thirtyDaysAgo;
-          }).length;
+            const users = snapshot.docs.map((doc) => {
+              const data = doc.data() as UserData;
+              console.log("Processing user:", data); // Debug log
+              return {
+                ...data,
+                id: doc.id,
+                createdAtDate: data.createdAt
+                  ? new Date(data.createdAt.seconds * 1000)
+                  : null,
+              };
+            });
 
-          console.log('Calculated stats:', {
-            totalUsers,
-            adminUsers,
-            newUsers,
-            users
-          });
+            // Get current date for new users calculation
+            const thirtyDaysAgo = new Date();
+            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-          setStats({
-            totalUsers,
-            adminUsers,
-            newUsers
-          });
+            // Calculate stats
+            const totalUsers = users.length;
+            const adminUsers = users.filter(
+              (user) => user.admin === true
+            ).length;
+            const newUsers = users.filter((user) => {
+              if (!user.createdAtDate) return false;
+              return user.createdAtDate > thirtyDaysAgo;
+            }).length;
 
-          setLoading(false);
-        }, (error) => {
-          console.error('Snapshot listener error:', error);
-          setLoading(false);
-        });
+            console.log("Calculated stats:", {
+              totalUsers,
+              adminUsers,
+              newUsers,
+              users,
+            });
+
+            setStats({
+              totalUsers,
+              adminUsers,
+              newUsers,
+            });
+
+            setLoading(false);
+          },
+          (error) => {
+            console.error("Snapshot listener error:", error);
+            setLoading(false);
+          }
+        );
 
         return () => unsubscribe();
       } catch (error) {
-        console.error('Error in fetchUserStats:', error);
+        console.error("Error in fetchUserStats:", error);
         setLoading(false);
       }
     };
@@ -97,7 +108,12 @@ const AdminUsersComponent = () => {
   }, []);
 
   return (
-    <section data-scroll data-scroll-speed=".1" id="AdminUsersSection" className="bg-gray-900 p-6 rounded-lg">
+    <section
+      data-scroll
+      data-scroll-speed=".1"
+      id="AdminUsersSection"
+      className="bg-gray-900 p-6 rounded-lg"
+    >
       <div className="pb-2 border-b-2 border-orange-500 mb-4">
         <h4 className="text-3xl font-bold text-white">Users Overview</h4>
       </div>
@@ -105,7 +121,10 @@ const AdminUsersComponent = () => {
       {loading ? (
         <div className="grid grid-cols-3 gap-4 mb-4">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="bg-gray-800 p-4 rounded-lg shadow animate-pulse">
+            <div
+              key={i}
+              className="bg-gray-800 p-4 rounded-lg shadow animate-pulse"
+            >
               <div className="h-16 bg-gray-700 rounded"></div>
             </div>
           ))}
@@ -139,7 +158,10 @@ const AdminUsersComponent = () => {
                   {stats.adminUsers.toLocaleString()}
                 </h3>
                 <p className="text-xs text-gray-500">
-                  {stats.totalUsers > 0 ? ((stats.adminUsers / stats.totalUsers) * 100).toFixed(1) : '0'}% of total
+                  {stats.totalUsers > 0
+                    ? ((stats.adminUsers / stats.totalUsers) * 100).toFixed(1)
+                    : "0"}
+                  % of total
                 </p>
               </div>
             </div>
@@ -152,12 +174,17 @@ const AdminUsersComponent = () => {
                 <FaUserClock className="text-gray-900 text-xl" />
               </div>
               <div className="ml-4">
-                <p className="text-gray-400 text-sm font-medium">New Users (30d)</p>
+                <p className="text-gray-400 text-sm font-medium">
+                  New Users (30d)
+                </p>
                 <h3 className="text-2xl font-bold text-white">
                   {stats.newUsers.toLocaleString()}
                 </h3>
                 <p className="text-xs text-gray-500">
-                  {stats.totalUsers > 0 ? ((stats.newUsers / stats.totalUsers) * 100).toFixed(1) : '0'}% of total
+                  {stats.totalUsers > 0
+                    ? ((stats.newUsers / stats.totalUsers) * 100).toFixed(1)
+                    : "0"}
+                  % of total
                 </p>
               </div>
             </div>

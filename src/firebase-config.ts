@@ -14,17 +14,12 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-
-
-
-
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const firestore = getFirestore(app);
 const storage = getStorage(app);
 
-// const IP = "192.168.0.135";
+// const IP = "192.168.0.5";
 const IP = "127.0.0.1";
 connectAuthEmulator(auth, `http://${IP}:9099`);
 connectFirestoreEmulator(firestore, IP, 8080);

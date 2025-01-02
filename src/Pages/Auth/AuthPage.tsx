@@ -22,7 +22,7 @@ const AuthPage = () => {
       mode: "all",
     });
   const onSignUpFormSubmit: SubmitHandler<UserSignUpFormInput> = (data) => {
-    queryToRegisterUser (data)
+    queryToRegisterUser(data)
     .then(() => {
       // Optionally, you can navigate to a different page after successful signup
       navigate("/"); // Redirect to home or dashboard

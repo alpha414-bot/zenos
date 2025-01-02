@@ -3,12 +3,11 @@ import ButtonAsLink from "@/Components/ButtonAsLink";
 import Image from "@/Components/Image";
 import Input from "@/Components/Input";
 import Media from "@/Components/Media";
-import { getAuth } from "firebase/auth";
 import RichEditor from "@/Components/RichEditor";
 import SelectDropdown from "@/Components/SelectDropdown";
 import Table from "@/Components/Table";
 import VariantsType from "@/Components/VariantsType";
-import { useProductsData } from "@/Services/Hooks";
+import { useProductsData, useUkUsedProductData } from "@/Services/Hooks";
 import { addCollectionDoc, updateCollectionDoc } from "@/Services/Queries";
 import { queryToDeleteProduct } from "@/Services/Queries/ProductQuery";
 import {
@@ -19,11 +18,12 @@ import {
 import { price } from "@/System/function";
 import { ColumnDef } from "@tanstack/react-table";
 import classNames from "classnames";
+import { getAuth } from "firebase/auth";
 import { Timestamp } from "firebase/firestore";
 import { InstanceOptions, Modal } from "flowbite";
 import _ from "lodash";
 import moment from "moment";
-import { useLayoutEffect, useMemo, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 
 // Components to handle product in the ecommerce website
@@ -33,7 +33,7 @@ const ProductsAction = ({ values }: { values: ProductItemType }) => {
   const updateProductSubmission = (data?: any) => {
     if (data.image && data.image.length > 0) {
       let image = _.flatMap(data.image, (item) =>
-        item?.media?.fullPath ? item?.media?.fullPath : item
+        item?.media?.name ? item?.media?.name : item
       );
       data.image = image;
     }
@@ -364,7 +364,15 @@ const ProductsAction = ({ values }: { values: ProductItemType }) => {
   );
 };
 
-const SelectProductAction = ({ id, status }: { id: string; status?: any }) => {
+const SelectProductAction = ({
+  id,
+  status,
+  include_archived,
+}: {
+  id: string;
+  status?: any;
+  include_archived?: boolean;
+}) => {
   const [productStatus, setProductStatus] = useState<string>(status);
   const [showProductStatusDropdown, setShowProductStatusDropdown] =
     useState<boolean>(false);
@@ -381,6 +389,9 @@ const SelectProductAction = ({ id, status }: { id: string; status?: any }) => {
       setShowProductStatusDropdown(false);
     });
   };
+  useEffect(() => {
+    setProductStatus(status);
+  }, [status]);
   return (
     <div className="space-y-1.5 flex flex-col items-center">
       <button
@@ -394,6 +405,7 @@ const SelectProductAction = ({ id, status }: { id: string; status?: any }) => {
           className={classNames("block w-4 h-4 rounded-full", {
             "bg-green-500": productStatus == "active",
             "bg-red-500": productStatus == "draft",
+            "bg-yellow-500": productStatus == "archived",
           })}
         ></span>
         <svg
@@ -424,32 +436,130 @@ const SelectProductAction = ({ id, status }: { id: string; status?: any }) => {
         )}
       >
         {[
-          { status: "active", color: "green" },
-          { status: "draft", color: "red" },
-        ].map((item, index) => (
-          <button
-            type="button"
-            key={index}
-            className="flex items-center text-xs gap-2 w-full px-4 py-2 hover:bg-gray-700"
-            onClick={() => onChange(item.status)}
-          >
-            <span
-              className={classNames("block w-2.5 h-2.5 rounded-full", {
-                "bg-red-500": item.color == "red",
-                "bg-green-500": item.color == "green",
-              })}
-            ></span>
-            {_.startCase(item.status)}
-          </button>
-        ))}
+          { status: "active", color: "green", visible: true },
+          { status: "draft", color: "red", visible: true },
+          { status: "archived", color: "yellow", visible: include_archived },
+        ].map(
+          (item, index) =>
+            item.visible && (
+              <button
+                type="button"
+                key={index}
+                className="flex items-center text-xs gap-2 w-full px-4 py-2 hover:bg-gray-700"
+                onClick={() => onChange(item.status)}
+              >
+                <span
+                  className={classNames("block w-2.5 h-2.5 rounded-full", {
+                    "bg-red-500": item.color == "red",
+                    "bg-green-500": item.color == "green",
+                    "bg-yellow-500": item.color == "yellow",
+                  })}
+                ></span>
+                {_.startCase(item.status)}
+              </button>
+            )
+        )}
       </div>
     </div>
   );
 };
 
 const AdminProductsComponent = () => {
+  const formRef = useRef<HTMLFormElement>(null);
   const { data: products } = useProductsData(undefined, true);
+  const { data: ukusedproducts } = useUkUsedProductData();
   const { control, handleSubmit, reset, watch } = useForm({ mode: "all" });
+  const ukused_columns = useMemo<ColumnDef<ProductItemType>[]>(
+    () => [
+      {
+        header: "Status",
+        accessorFn: (row) => row,
+        cell: (info) => (
+          <>
+            <SelectProductAction
+              id={(info.getValue() as any).id}
+              status={(info.getValue() as any).status}
+              include_archived
+            />
+          </>
+        ),
+        footer: (props) => props.column.id,
+        enableSorting: false,
+      },
+      {
+        accessorKey: "image",
+        cell: (info) => (
+          <>
+            {/* <div className="flex items-center gap-1 flex-wrap"> */}
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-1 min-w-60">
+              {(info.getValue() as any[]).map((item, index) => (
+                <>
+                  <Image
+                    key={index}
+                    src={item}
+                    className="w-full max-w-full max-h-full bg-zenos-200 rounded-sm overflow-hidden"
+                    width={120}
+                  />
+                </>
+              ))}
+            </div>
+          </>
+        ),
+        header: () => <span>Product Image</span>,
+        footer: (props) => props.column.id,
+        enableSorting: false,
+      },
+      {
+        accessorFn: (row) => row.name,
+        id: "name",
+        cell: (info) => (
+          <span className="underline underline-offset-4 decoration-dotted whitespace-nowrap">
+            {info.getValue() as any}
+          </span>
+        ),
+        header: () => <span>Product Name</span>,
+        footer: (props) => props.column.id,
+      },
+      {
+        accessorKey: "createdBy",
+        header: () => <span>Created By</span>,
+        footer: (props) => props.column.id,
+      },
+      {
+        accessorKey: "price",
+        header: () => "Price",
+        cell: (info) => <span>{price(info.getValue(), "currency", 0)}</span>,
+        footer: (props) => props.column.id,
+      },
+      {
+        accessorKey: "subcategory.value",
+        header: () => <span>Total Sold</span>,
+        footer: (props) => props.column.id,
+      },
+      {
+        accessorKey: "createdAt",
+        header: "Created",
+        cell: (info) => (
+          <span>
+            {moment((info.getValue() as Timestamp).seconds * 1000).format(
+              "MMM DD, YYYY hh:mma"
+            )}
+          </span>
+        ),
+        footer: (props) => props.column.id,
+      },
+      {
+        header: "Action",
+        accessorFn: (row) => row,
+        cell: (info) => {
+          return <ProductsAction values={info.getValue() as any} />;
+        },
+        footer: (props) => props.column.id,
+        enableSorting: false,
+      },
+    ],
+    []
+  );
   const columns = useMemo<ColumnDef<ProductItemType>[]>(
     () => [
       {
@@ -544,44 +654,45 @@ const AdminProductsComponent = () => {
   const [variants, setVariants] = useState([{}]);
   const submitProductsForm = (data: any) => {
     const auth = getAuth();
-  const currentUser = auth.currentUser;
+    const currentUser = auth.currentUser;
 
-  if (!currentUser) {
-    console.error("No user is signed in.");
-    return;
-  }
+    if (!currentUser) {
+      console.error("No user is signed in.");
+      return;
+    }
 
-  // Get the user's unique identifier (UUID)
-  const userUuid = currentUser.uid;
+    // Get the user's unique identifier (UUID)
+    const userUuid = currentUser.uid;
 
-  // Process images
-  let image = _.flatMap(data.image, (item) => item.media.fullPath);
+    // Process images
+    let image = _.flatMap(data.image, (item) => item.media.name);
 
-  // Add document to Firestore
-  addCollectionDoc(
-    "Products",
-    [
-      JSON.parse(
-        JSON.stringify({
-          ...data,
-          ...{
-            image: image,
-            status: "active",
-            createdBy: userUuid, // Assign the user UUID to the "createdBy" field
-            description: data.description?.replace(/\n/g, "\\n"),
-          },
-        })
-      ),
-    ],
-    `<span class="font-extrabold underline underline-offset-4 decoration-dotted decoration-green-500">${data.name}</span> added successfully.`
-  )
-    .then(() => {
-      addProductModal?.hide();
-    })
-    .finally(() => {
-      // Reset form or perform redirect
-      reset();
-    });
+    // Add document to Firestore
+    addCollectionDoc(
+      "Products",
+      [
+        JSON.parse(
+          JSON.stringify({
+            ...data,
+            ...{
+              image: image,
+              status: "active",
+              createdBy: userUuid, // Assign the user UUID to the "createdBy" field
+              description: data.description?.replace(/\n/g, "\\n"),
+            },
+          })
+        ),
+      ],
+      `<span class="font-extrabold underline underline-offset-4 decoration-dotted decoration-green-500">${data.name}</span> added successfully.`
+    )
+      .then(() => {
+        addProductModal?.hide();
+        formRef.current?.reset();
+      })
+      .finally(() => {
+        // Reset form or perform redirect
+        reset();
+      });
   };
   useLayoutEffect(() => {
     const $targetEl: HTMLElement | null =
@@ -605,7 +716,7 @@ const AdminProductsComponent = () => {
   }, []);
   return (
     <section id="AdminProductsSection" tabIndex={-1}>
-      <div className="pb-2 border-b-2 border-gray-500 mb-2 flex items-center justify-between">
+      <div className="pb-2 border-b-2 border-zenos-600 mb-2 flex items-center justify-between">
         <h4 className="text-3xl font-bold">Products</h4>
         <Button
           type="button"
@@ -633,12 +744,25 @@ const AdminProductsComponent = () => {
           </svg>
         </Button>
       </div>
-      <div className="py-8">
-        <Table
-          columns={columns}
-          data={products as any}
-          noDataText="No products available"
-        />
+      <div className="space-y-12">
+        <div className="py-8">
+          <Table
+            columns={columns}
+            data={products as any}
+            noDataText="No products available"
+          />
+        </div>
+        <div>
+          <h4 className="text-3xl font-semibold">Uk Used Products</h4>
+          <hr className="border-zenos-600 mt-4" />
+          <div className="py-8">
+            <Table
+              columns={ukused_columns}
+              data={ukusedproducts as any}
+              noDataText="No Uk Used product listed yet."
+            />
+          </div>
+        </div>
       </div>
       {/* add Products modal */}
       <div
@@ -682,6 +806,7 @@ const AdminProductsComponent = () => {
             </div>
             {/* Modal body */}
             <form
+              ref={formRef}
               className="px-4 py-4 space-y-5"
               //   className="relative bg-white rounded-lg shadow dark:bg-gray-700"
               onSubmit={handleSubmit(submitProductsForm)}

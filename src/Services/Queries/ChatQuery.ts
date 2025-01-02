@@ -259,7 +259,6 @@ export const queryToSendChatMessage = (
       notify.error({ text: "Error while sending message" });
     }
   });
-
 // Fetch all chats (remains the same)
 
 export const queryToFetchAllChats = (admin_uid?: string): Promise<{ data: ChatMetaListInterface[] }> =>

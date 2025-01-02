@@ -198,22 +198,26 @@ const Inbox = () => {
     }
   };
   const formatOrderDetails = (carts: LocationState['carts'], reference: string, amount: number) => {
+    if (!carts?.length) {
+      return `🛍️ New Order Details\nReference: ${reference}\nTotal Amount: $${amount?.toFixed(2) || 0}`;
+    }
+  
     return `
-🛍️ New Order Details
-------------------------
-Reference: ${reference}
-Total Amount: $${amount.toFixed(2)}
-
-📦 Order Items:
-${carts.map(item => `
-• ${item.name}
-  Quantity: ${item.quantity}
-  Price: $${item.price.toFixed(2)}
-  Subtotal: $${(item.quantity * item.price).toFixed(2)}
-`).join('')}
-------------------------
-Order Date: ${new Date().toLocaleString()}
-`;
+  🛍️ New Order Details
+  ------------------------
+  Reference: ${reference}
+  Total Amount: $${amount?.toFixed(2) || 0}
+  
+  📦 Order Items:
+  ${carts.filter(item => item?.price != null).map(item => `
+  - ${item.name}
+    Quantity: ${item.quantity}
+    Price: $${item.price?.toFixed(2)}
+    Subtotal: $${(item.quantity * item.price)?.toFixed(2)}
+  `).join('')}
+  ------------------------
+  Order Date: ${new Date().toLocaleString()}
+  `;
   };
 
   const onEmojiClick = (emojiData: EmojiClickData) => {

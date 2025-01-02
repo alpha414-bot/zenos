@@ -144,15 +144,36 @@ export const useAdminChat = (adminUid: string): UseAdminChatReturn => {
       notify.error({ text: 'No chat selected' });
       return;
     }
-
+  
+    // Ensure text is not undefined
+    const messageText = text?.trim();
+    if (!messageText && !options.media) {
+      notify.error({ text: 'Cannot send empty message' });
+      return;
+    }
+  
+    // Validate media object if present
+    if (options.media) {
+      const { name, fullPath, type } = options.media;
+      if (!name || !fullPath || !type) {
+        notify.error({ text: 'Invalid media object' });
+        return;
+      }
+    }
+  
     try {
-      const payload = {
-        text,
+      const payload: any = {
+        text: messageText || "",  // Ensure text is at least an empty string
         sender_uid: adminUid,
         recipient_uid: recipientUid,
-        ...options
+        createdAt: Timestamp.now(),
+        updatedAt: Timestamp.now(),
       };
-
+  
+      if (options.media) {
+        payload.media = options.media;
+      }
+  
       await queryToSendChatMessage(payload, selectedChatId);
       
       // Refresh chats to update last message

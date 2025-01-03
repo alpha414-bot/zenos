@@ -139,6 +139,7 @@ const AdminInbox: React.FC = () => {
     }
     return <p className="text-sm font-medium break-words">{msg.text}</p>;
   };
+
   return (
     <AdminLayout>
       <div className="flex h-[calc(100vh-64px)] bg-gray-900">

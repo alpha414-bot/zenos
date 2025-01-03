@@ -36,7 +36,7 @@ interface UseChatsReturn {
       recipient_uid?: string;
     }) => Promise<void>;
     initializeChat: (adminUid: string) => Promise<void>;
-  }
+}
 
 export const useChat = (recipientUid: string): UseChatsReturn => {
   const [chatId, setChatId] = useState<string | null>(null);
@@ -51,19 +51,13 @@ export const useChat = (recipientUid: string): UseChatsReturn => {
       return;
     }
 
-    // Prevent concurrent initialization and re-initialization
     if (isInitializing.current || chatInitialized.current) {
-      console.log('Chat initialization skipped:', {
-        isInitializing: isInitializing.current,
-        chatInitialized: chatInitialized.current
-      });
       return;
     }
 
     try {
       isInitializing.current = true;
       setLoading(true);
-      console.log('Initializing chat:', { adminUid, currentUser: auth.currentUser.uid });
       
       const chat = await queryToGetChat(
         (data: any) => data,
@@ -71,7 +65,6 @@ export const useChat = (recipientUid: string): UseChatsReturn => {
         { uid: adminUid }
       );
       
-      console.log('Chat successfully initialized:', chat.id);
       setChatId(chat.id);
       chatInitialized.current = true;
     } catch (error) {
@@ -108,7 +101,6 @@ export const useChat = (recipientUid: string): UseChatsReturn => {
       if (unsubscribe && typeof unsubscribe === 'function') {
         unsubscribe();
       }
-      // Reset initialization flags on cleanup
       isInitializing.current = false;
       chatInitialized.current = false;
     };

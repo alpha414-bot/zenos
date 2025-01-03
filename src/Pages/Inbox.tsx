@@ -197,6 +197,7 @@ const Inbox = () => {
       notify.error({ text: 'Failed to send initial messages' });
     }
   };
+
   const formatOrderDetails = (carts: LocationState['carts'], reference: string, amount: number) => {
     if (!carts?.length) {
       return `🛍️ New Order Details\nReference: ${reference}\nTotal Amount: $${amount?.toFixed(2) || 0}`;
@@ -260,63 +261,64 @@ const Inbox = () => {
         ) : (
           <>
             <div ref={messageListRef} className="flex-1 overflow-y-auto p-4 space-y-4">
-              {[...messages].reverse().map((msg) => (
-                <div
-                  key={msg.id}
-                  className={`flex ${
-                    msg.isSystemMessage ? 'justify-center' :
-                    msg.isAutoReply ? 'justify-start' :
-                    msg.sender_uid === auth.currentUser?.uid ? 'justify-end' : 'justify-start'
-                  }`}
-                >
-                  <div
-                    className={`max-w-[70%] rounded-lg p-3 ${
-                      msg.isSystemMessage ? 'w-full max-w-2xl bg-gray-800 text-gray-200' :
-                      msg.isAutoReply ? 'bg-gray-700 text-gray-200' :
-                      msg.sender_uid === auth.currentUser?.uid
-                        ? 'bg-orange-500 text-white'
-                        : 'bg-gray-800 text-white'
-                    } shadow-sm`}
-                  >
-                    {msg.media ? (
-                      <div>
-                        {msg.media.type.startsWith('image/') ? (
-                          <a 
-                            href={getMediaUrl(msg.media.fullPath)}
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="block"
-                          >
-                            <img 
-                              src={getMediaUrl(msg.media.fullPath)}
-                              alt={msg.media.name} 
-                              className="max-w-full h-auto rounded-lg"
-                              loading="lazy"
-                            />
-                          </a>
-                        ) : (
-                          <a 
-                            href={getMediaUrl(msg.media.fullPath)}
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="flex items-center space-x-2 text-orange-400 hover:text-orange-300"
-                          >
-                            <FaPaperclip />
-                            <span>{msg.media.name}</span>
-                          </a>
-                        )}
-                      </div>
-                    ) : (
-                      <p className="text-sm font-medium break-words whitespace-pre-line">
-                        {msg.text}
-                      </p>
-                    )}
-                    <p className="text-xs mt-1 text-gray-400">
-                      {formatTimestamp(msg.createdAt)}
-                    </p>
-                  </div>
-                </div>
-              ))}
+            {[...messages].reverse().map((msg) => (
+  <div
+    key={msg.id}
+    className={`flex ${
+      msg.isSystemMessage ? 'justify-center' :
+      msg.isAutoReply ? 'justify-start' :
+      msg.sender_uid === auth.currentUser?.uid ? 'justify-end' : 'justify-start'
+    }`}
+  >
+    <div
+      className={`max-w-[70%] rounded-lg p-3 ${
+        msg.isSystemMessage ? 'w-full max-w-2xl bg-gray-800 text-gray-200' :
+        msg.isAutoReply || msg.sender_uid === adminUid ? 'bg-orange-500 text-white' :
+        msg.sender_uid === auth.currentUser?.uid
+          ? 'bg-gray-800 text-white'
+          : 'bg-gray-800 text-white'
+      } shadow-sm`}
+    >
+      {msg.media ? (
+        <div>
+          {msg.media.type.startsWith('image/') ? (
+            <a 
+              href={getMediaUrl(msg.media.fullPath)}
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="block"
+            >
+              <img 
+                src={getMediaUrl(msg.media.fullPath)}
+                alt={msg.media.name} 
+                className="max-w-full h-auto rounded-lg"
+                loading="lazy"
+              />
+            </a>
+          ) : (
+            <a 
+              href={getMediaUrl(msg.media.fullPath)}
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="flex items-center space-x-2 text-orange-400 hover:text-orange-300"
+            >
+              <FaPaperclip />
+              <span>{msg.media.name}</span>
+            </a>
+          )}
+        </div>
+      ) : (
+        <p className="text-sm font-medium break-words whitespace-pre-line">
+          {msg.text}
+        </p>
+      )}
+      <p className="text-xs mt-1 text-gray-400">
+        {formatTimestamp(msg.createdAt)}
+      </p>
+    </div>
+  </div>
+))}
+
               <div ref={messagesEndRef} />
             </div>
 

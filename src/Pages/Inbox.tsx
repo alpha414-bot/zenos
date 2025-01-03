@@ -326,7 +326,7 @@ Order Date: ${new Date().toLocaleString()}
 
   return (
     <UserLayout>
-      <div className="flex flex-col h-[calc(100vh-64px)] bg-gray-50">
+      <div className="flex flex-col h-full bg-gray-50">
         {/* Messages Container */}
         <div 
           ref={messageListRef}
@@ -406,7 +406,7 @@ Order Date: ${new Date().toLocaleString()}
                 <input
                   {...control.register('message')}
                   placeholder="Type your message..."
-                  className="flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:border-gray-500"
+                  className="flex-1 text-gray-800 rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:border-gray-500"
                 />
                 
                 <button

@@ -493,14 +493,12 @@ const AdminProductsComponent = () => {
             {/* <div className="flex items-center gap-1 flex-wrap"> */}
             <div className="grid grid-cols-2 md:grid-cols-3 gap-1 min-w-60">
               {(info.getValue() as any[]).map((item, index) => (
-                <>
-                  <Image
-                    key={index}
-                    src={item}
-                    className="w-full max-w-full max-h-full bg-zenos-200 rounded-sm overflow-hidden"
-                    width={120}
-                  />
-                </>
+                <Image
+                  key={index}
+                  src={item}
+                  className="w-full max-w-full max-h-full bg-zenos-200 rounded-sm overflow-hidden"
+                  width={120}
+                />
               ))}
             </div>
           </>
@@ -583,14 +581,12 @@ const AdminProductsComponent = () => {
             {/* <div className="flex items-center gap-1 flex-wrap"> */}
             <div className="grid grid-cols-2 md:grid-cols-3 gap-1 min-w-60">
               {(info.getValue() as any[]).map((item, index) => (
-                <>
-                  <Image
-                    key={index}
-                    src={item}
-                    className="w-full max-w-full max-h-full bg-zenos-200 rounded-sm overflow-hidden"
-                    width={120}
-                  />
-                </>
+                <Image
+                  key={index}
+                  src={item}
+                  className="w-full max-w-full max-h-full bg-zenos-200 rounded-sm overflow-hidden"
+                  width={120}
+                />
               ))}
             </div>
           </>

@@ -3,7 +3,7 @@ import { notify } from "@/notify";
 import { useUserMedia } from "@/Services/Hooks";
 import { queryToUploadFiles } from "@/Services/Queries/MediaQuery.ts";
 import { useAppDispatch, useAppSelector } from "@/Services/Redux/Hook";
-import { setModalInstance } from "@/Services/Redux/MediaSlice";
+import { setMediaModalItems } from "@/Services/Redux/MediaSlice";
 import { getFileExtension, MIME_TYPE } from "@/System/function";
 import {
   ExtensionType,
@@ -14,14 +14,14 @@ import {
 import classNames from "classnames";
 import { InstanceOptions, Modal } from "flowbite";
 import _ from "lodash";
-import { useCallback, useLayoutEffect, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import Button from "./Button";
 import MediaItem from "./MediaItem";
 
 const MediaModal = () => {
   const dispatch = useAppDispatch();
-  const { multiSelect, mediaType, onChange } = useAppSelector(
+  const { multiSelect, mediaType, show } = useAppSelector(
     (state) => state.media
   );
   const [isMediaUploading, setIsImageUploading] = useState(false);
@@ -121,9 +121,13 @@ const MediaModal = () => {
       instanceOptions
     );
     setModal(modalInstance);
-    dispatch(setModalInstance(modalInstance));
+    // dispatch(setModalInstance(modalInstance));
     return modalInstance.hide();
   }, []);
+
+  useEffect(() => {
+    modal?.toggle();
+  }, [show]);
 
   const selectMultiMedia = (file: any) => {
     if (medias && medias?.length > 0) {
@@ -141,12 +145,17 @@ const MediaModal = () => {
       }
     }
   };
+
+  // subscribe to onChange
+  const onChange = (item: any) => {
+    let serializeItem = _.map(item, (obj: any) => _.omit(obj, ["createdAt", "updatedAt"]));
+    dispatch(setMediaModalItems(serializeItem));
+  };
   return (
     <>
       <div
         id={`MediaModal`}
         tabIndex={-1}
-        aria-hidden="true"
         className="hidden overflow-y-auto bg-gray-900/70 overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-modal md:h-full"
       >
         <div className="relative w-full max-w-2xl h-auto overflow-hidden">

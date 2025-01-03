@@ -1,5 +1,4 @@
 import About from "@/Pages/About";
-import AddProduct from "@/Pages/AddProduct";
 import AuthPage from "@/Pages/Auth/AuthPage";
 import ForgotPassword from "@/Pages/Auth/ForgotPassword";
 import Checkout from "@/Pages/Checkout";
@@ -7,6 +6,7 @@ import ErrorPage from "@/Pages/ErrorPage";
 import Home from "@/Pages/Home";
 import Inbox from "@/Pages/Inbox";
 import Product from "@/Pages/Product";
+import Shop from "@/Pages/Shop";
 import Carts from "@/Pages/Subpages/Carts";
 import Orders from "@/Pages/Subpages/Orders";
 import { Outlet, RouteObject, createBrowserRouter } from "react-router-dom";
@@ -54,8 +54,8 @@ const RootRouter: RouteObject[] = [
         element: <Carts />,
       },
       {
-        path: "products",
-        element: <AddProduct />,
+        path: "shop",
+        element: <Shop />,
       },
       // inbox
       {

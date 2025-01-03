@@ -6,6 +6,7 @@ import RichEditor from "@/Components/RichEditor";
 import SelectDropdown from "@/Components/SelectDropdown";
 import Table from "@/Components/Table";
 import VariantsType from "@/Components/VariantsType";
+import UserLayout from "@/Layouts/UserLayout";
 import { useProductsData } from "@/Services/Hooks";
 import { addCollectionDoc, updateCollectionDoc } from "@/Services/Queries";
 import { queryToDeleteProduct } from "@/Services/Queries/ProductQuery";
@@ -461,7 +462,9 @@ const UserProductsComponent = () => {
       {
         header: "Status",
         accessorFn: (row) => row.status,
-        cell: (info) => <span>{info.getValue() as any}</span>,
+        cell: (info) => (
+          <span className="capitalize">{info.getValue() as any}</span>
+        ),
         footer: (props) => props.column.id,
         enableSorting: false,
       },
@@ -808,4 +811,13 @@ const UserProductsComponent = () => {
     </section>
   );
 };
-export default UserProductsComponent;
+
+const Shop = () => {
+  return (
+    <UserLayout>
+      <UserProductsComponent />
+    </UserLayout>
+  );
+};
+
+export default Shop;

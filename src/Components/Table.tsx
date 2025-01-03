@@ -51,10 +51,10 @@ const Table: FC<{
               }}
             >
               {[10, 20, 30, 40, 50, data?.length > 50 ? "ALL" : undefined].map(
-                (pageSize) =>
+                (pageSize, index) =>
                   pageSize && (
                     <option
-                      key={pageSize}
+                      key={`${index}-${pageSize}`}
                       value={pageSize == "ALL" ? data?.length : pageSize}
                     >
                       Show {pageSize}

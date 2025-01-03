@@ -2,7 +2,7 @@ import { useAuthUser } from "@/Services/Hooks";
 import { queryToLogout } from "@/Services/Queries/AuthQuery";
 import classNames from "classnames";
 import _ from "lodash";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { NavLink } from "react-router-dom";
 
 interface LinkItemInterface {
@@ -29,7 +29,7 @@ const MobileFooterBar = () => {
       {
         icon: "fa-solid fa-shop",
         text: "Shop",
-        link: "/user/products",
+        link: "/user/shop",
         notvisible: ifSignedOut,
       },
       {
@@ -73,7 +73,7 @@ const MobileFooterBar = () => {
   return (
     <div
       className={classNames(
-        "fixed z-50 -bottom-2 left-0 right-0 pt-4 pb-7 px-4 bg-gray-900 w-full gap-x-0.5 rounded-t-2xl grid items-center md:hidden",
+        " z-50 -bottom-2 left-0 right-0 pt-4 pb-7 px-4 bg-gray-900 w-full gap-x-0.5 rounded-t-2xl grid items-center md:hidden",
         {
           "grid-cols-5": VisibleFilteredLink.length === 5,
           "grid-cols-4": VisibleFilteredLink.length === 4,
@@ -95,7 +95,7 @@ const NavLinkChild = ({
 }: {
   item: { link: string; icon: string; text: string; onClick?: () => void };
 }) => {
-  const [isActive, setIsActive] = useState<boolean>(false);
+  const [isNavActive, setNavIsActive] = useState<boolean>(false);
   return (
     <NavLink
       to={item.link}
@@ -106,7 +106,9 @@ const NavLinkChild = ({
         }
       }}
       className={({ isActive }) => {
-        setIsActive(isActive);
+        useEffect(() => {
+          setNavIsActive(isActive);
+        }, [isActive]);
         return classNames(
           "h-full w-full flex flex-col items-center justify-center gap-y-1",
           {
@@ -117,11 +119,11 @@ const NavLinkChild = ({
     >
       <i
         className={classNames("inline leading-none", item.icon, {
-          "fa-xl": !isActive,
-          "fa-2xl": isActive,
+          "fa-xl": !isNavActive,
+          "fa-2xl": isNavActive,
         })}
       ></i>
-      {!isActive && (
+      {!isNavActive && (
         <p className="text-sm uppercase font-medium">{item.text}</p>
       )}
     </NavLink>

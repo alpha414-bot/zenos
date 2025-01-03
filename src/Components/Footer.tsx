@@ -1,11 +1,31 @@
 import { Config } from "@/System/Constants";
+import classNames from "classnames";
 import { Link } from "react-router-dom";
 
-const Footer = () => {
+const Footer = ({
+  type = "general",
+}: {
+  type: "user" | "general" | "admin";
+}) => {
   return (
-    <div className="mt-8 px-3 py-6 md:px-10 md:py-3 shadow-lg">
-      <div className="py-4 px-4 grid grid-cols-1 items-stretch justify-center gap-x-2 gap-y-8 md:px-5 md:items-start md:grid-cols-4">
-        <img src="/assets/images/zenos.svg" alt="Zenos Logo" className="max-w-ful mx-auto max-w-56" />
+    <div
+      className={classNames("mt-8 py-6 md:py-3 shadow-lg", {
+        "px-3 md:px-10": type === "general",
+      })}
+    >
+      <div
+        className={classNames(
+          "py-4 grid grid-cols-1 items-stretch justify-center gap-x-2 gap-y-8 md:items-start md:grid-cols-4",
+          {
+            "px-4 md:px-5": type === "general",
+          }
+        )}
+      >
+        <img
+          src="/assets/images/zenos.svg"
+          alt="Zenos Logo"
+          className="max-w-ful mx-auto max-w-56"
+        />
         <div className="space-y-3">
           <h6 className="text-2xl font-semibold text-gray-400">Contact Us</h6>
           <div className="space-y-2 flex flex-col text-white">
@@ -36,10 +56,10 @@ const Footer = () => {
           <h6 className="text-2xl font-semibold text-gray-400">My Account</h6>
           <div className="space-y-2 flex flex-col text-white">
             {[
-              { text: "Dashboard", link: "/user/" },
-              { text: "My Orders", link: "/user/my_orders" },
-              { text: "My Reviews", link: "/user/my_reviews" },
-              { text: "My Profile", link: "/user/my_profile" },
+              { text: "Home", link: "/" },
+              { text: "Dashboard", link: "/user/shop" },
+              { text: "My Orders", link: "/user/orders" },
+              { text: "My Profile", link: "/user/profile" },
             ].map((item, index) => (
               <a
                 key={index}
@@ -78,7 +98,9 @@ const Footer = () => {
       <hr className="border-gray-500" />
       <div className="flex flex-col items-center justify-center gap-2 mt-2 py-2">
         <p className="text-center text-base font-medium leading-none w-full md:text-left">
-          Copyright&nbsp;&copy; <span className="text-zenos-600 font-semibold">Zenos</span> {new Date().getFullYear()}. All rights reserved.
+          Copyright&nbsp;&copy;{" "}
+          <span className="text-zenos-600 font-semibold">Zenos</span>{" "}
+          {new Date().getFullYear()}. All rights reserved.
         </p>
         <Link
           target="_blank"

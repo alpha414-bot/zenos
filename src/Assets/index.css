@@ -17,7 +17,7 @@
   }
   .firebase-emulator-warning {
     animation: glowing-border 2s infinite;
-    @apply !fixed !left-auto !right-4 !top-2 !rounded-full !border-4 !w-8 !h-8 !text-white !bg-white !text-opacity-0 !bg-no-repeat !bg-contain !bg-center bg-[url('https://firebase.google.com/static/images/brand-guidelines/logo-logomark.png')] !shadow-sm !shadow-gray-200;
+    @apply !fixed !left-auto !right-4 !top-2 !rounded-full !border-4 !w-8 !h-8 !text-white !bg-white !text-opacity-0 !bg-no-repeat !bg-contain !bg-center bg-[url('https://firebase.google.com/static/images/brand-guidelines/logo-logomark.png')] !shadow-sm !shadow-gray-200 !overflow-hidden;
   }
 
   /* Slick */
@@ -145,14 +145,11 @@
   }
 
   /* Customize scrollbar */
-  .scroll-mobile {
-    @apply md:pr-2  mb-16;
-  }
   .scroll-mobile::-webkit-scrollbar {
     @apply hidden w-0 md:block md:w-2;
   }
   ::-webkit-scrollbar {
-    width: 8px;
+    @apply w-2;
   }
 
   ::-webkit-scrollbar-thumb {

@@ -252,7 +252,7 @@ const AdminInbox: React.FC = () => {
 
   return (
     <AdminLayout>
-      <div className="flex h-[calc(100vh-64px)] bg-gray-900">
+      <div className="flex h-full bg-gray-900">
         {/* Chat List Sidebar */}
         <div className="w-1/4 border-r border-gray-700 bg-gray-800 overflow-y-auto">
           <div className="p-4 border-b border-gray-700">

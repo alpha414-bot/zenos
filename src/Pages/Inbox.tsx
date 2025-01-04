@@ -101,25 +101,22 @@ const Inbox = () => {
       }
 
       try {
-        // Only initialize if we don't have a chatId yet
         if (!chatId) {
           await initializeChat(adminUid);
         }
         
-        // Add a small delay to ensure chat is fully initialized
         setTimeout(async () => {
           if (state && !initialMessageSent && chatId) {
             await sendInitialMessages();
           }
         }, 1000);
       } catch (error) {
-        console.error('Error initializing chat:', error);
         notify.error({ text: 'Failed to initialize chat' });
       }
     };
 
     setup();
-  }, [state, chatId]); // Changed dependency to chatId instead of initialMessageSent
+  }, [state, chatId]);
 
   useEffect(() => {
     if (messageListRef.current) {
@@ -158,7 +155,6 @@ const Inbox = () => {
 
       reset({ message: '', attachments: [] });
     } catch (error) {
-      console.error('Error sending message:', error);
       notify.error({ text: 'Failed to send message' });
     } finally {
       setUploading(false);
@@ -167,24 +163,15 @@ const Inbox = () => {
 
   const sendInitialMessages = async () => {
     if (!auth.currentUser || !state || initialMessageSent || !chatId) {
-      console.log('Cannot send initial messages:', {
-        hasUser: !!auth.currentUser,
-        hasState: !!state,
-        alreadySent: initialMessageSent,
-        hasChatId: !!chatId
-      });
       return;
     }
 
     try {
-      console.log('Sending initial messages...'); // Add logging
-
       await sendMessage(
         `Hello @Zenos, I would like to place this order`,
         { isSystemMessage: true }
       );
 
-      // Add a small delay between messages
       await new Promise(resolve => setTimeout(resolve, 500));
 
       await sendMessage(
@@ -217,7 +204,6 @@ const Inbox = () => {
       setInitialMessageSent(true);
       setOrderDetailsSent(true);
     } catch (error) {
-      console.error('Error sending initial messages:', error);
       notify.error({ text: 'Failed to send initial messages' });
     }
   };
@@ -262,7 +248,6 @@ Order Date: ${new Date().toLocaleString()}
         { isSystemMessage: true }
       );
     } catch (error) {
-      console.error('Error connecting to agent:', error);
       notify.error({ text: 'Failed to connect with agent' });
     }
   };

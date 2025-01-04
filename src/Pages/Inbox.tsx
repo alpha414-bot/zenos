@@ -62,7 +62,6 @@ const Inbox = () => {
   const state = location.state as LocationState;
   const adminUid = "Y4P4ECBLLWRbk7VZUqkpqqixE7H2";
 
-  // Use the chat hook with proper typing
   const { 
     chatId, 
     messages, 
@@ -83,6 +82,7 @@ const Inbox = () => {
       attachments: []
     }
   });
+
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [initialMessageSent, setInitialMessageSent] = useState(false);
@@ -101,10 +101,17 @@ const Inbox = () => {
       }
 
       try {
-        await initializeChat(adminUid);
-        if (state && !initialMessageSent) {
-          await sendInitialMessages();
+        // Only initialize if we don't have a chatId yet
+        if (!chatId) {
+          await initializeChat(adminUid);
         }
+        
+        // Add a small delay to ensure chat is fully initialized
+        setTimeout(async () => {
+          if (state && !initialMessageSent && chatId) {
+            await sendInitialMessages();
+          }
+        }, 1000);
       } catch (error) {
         console.error('Error initializing chat:', error);
         notify.error({ text: 'Failed to initialize chat' });
@@ -112,7 +119,7 @@ const Inbox = () => {
     };
 
     setup();
-  }, [state, initialMessageSent]);
+  }, [state, chatId]); // Changed dependency to chatId instead of initialMessageSent
 
   useEffect(() => {
     if (messageListRef.current) {
@@ -159,18 +166,33 @@ const Inbox = () => {
   };
 
   const sendInitialMessages = async () => {
-    if (!auth.currentUser || !state || initialMessageSent) return;
+    if (!auth.currentUser || !state || initialMessageSent || !chatId) {
+      console.log('Cannot send initial messages:', {
+        hasUser: !!auth.currentUser,
+        hasState: !!state,
+        alreadySent: initialMessageSent,
+        hasChatId: !!chatId
+      });
+      return;
+    }
 
     try {
+      console.log('Sending initial messages...'); // Add logging
+
       await sendMessage(
         `Hello @Zenos, I would like to place this order`,
         { isSystemMessage: true }
       );
 
+      // Add a small delay between messages
+      await new Promise(resolve => setTimeout(resolve, 500));
+
       await sendMessage(
         formatOrderDetails(state.carts, state.reference, state.amount),
         { isSystemMessage: true }
       );
+
+      await new Promise(resolve => setTimeout(resolve, 500));
 
       await sendMessage(
         AUTO_REPLIES.WELCOME(auth.currentUser.displayName || 'there'),
@@ -180,6 +202,8 @@ const Inbox = () => {
           recipient_uid: auth.currentUser.uid
         }
       );
+
+      await new Promise(resolve => setTimeout(resolve, 500));
 
       await sendMessage(
         AUTO_REPLIES.DISCOUNT_PROMPT,
@@ -204,21 +228,21 @@ const Inbox = () => {
     }
   
     return `
-  🛍️ New Order Details
-  ------------------------
-  Reference: ${reference}
-  Total Amount: $${amount?.toFixed(2) || 0}
-  
-  📦 Order Items:
-  ${carts.filter(item => item?.price != null).map(item => `
-  - ${item.name}
-    Quantity: ${item.quantity}
-    Price: $${item.price?.toFixed(2)}
-    Subtotal: $${(item.quantity * item.price)?.toFixed(2)}
-  `).join('')}
-  ------------------------
-  Order Date: ${new Date().toLocaleString()}
-  `;
+🛍️ New Order Details
+------------------------
+Reference: ${reference}
+Total Amount: $${amount?.toFixed(2) || 0}
+
+📦 Order Items:
+${carts.filter(item => item?.price != null).map(item => `
+- ${item.name}
+  Quantity: ${item.quantity}
+  Price: $${item.price?.toFixed(2)}
+  Subtotal: $${(item.quantity * item.price)?.toFixed(2)}
+`).join('')}
+------------------------
+Order Date: ${new Date().toLocaleString()}
+`;
   };
 
   const onEmojiClick = (emojiData: EmojiClickData) => {
@@ -261,64 +285,63 @@ const Inbox = () => {
         ) : (
           <>
             <div ref={messageListRef} className="flex-1 overflow-y-auto p-4 space-y-4">
-            {[...messages].reverse().map((msg) => (
-  <div
-    key={msg.id}
-    className={`flex ${
-      msg.isSystemMessage ? 'justify-center' :
-      msg.isAutoReply ? 'justify-start' :
-      msg.sender_uid === auth.currentUser?.uid ? 'justify-end' : 'justify-start'
-    }`}
-  >
-    <div
-      className={`max-w-[70%] rounded-lg p-3 ${
-        msg.isSystemMessage ? 'w-full max-w-2xl bg-gray-800 text-gray-200' :
-        msg.isAutoReply || msg.sender_uid === adminUid ? 'bg-orange-500 text-white' :
-        msg.sender_uid === auth.currentUser?.uid
-          ? 'bg-gray-800 text-white'
-          : 'bg-gray-800 text-white'
-      } shadow-sm`}
-    >
-      {msg.media ? (
-        <div>
-          {msg.media.type.startsWith('image/') ? (
-            <a 
-              href={getMediaUrl(msg.media.fullPath)}
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="block"
-            >
-              <img 
-                src={getMediaUrl(msg.media.fullPath)}
-                alt={msg.media.name} 
-                className="max-w-full h-auto rounded-lg"
-                loading="lazy"
-              />
-            </a>
-          ) : (
-            <a 
-              href={getMediaUrl(msg.media.fullPath)}
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="flex items-center space-x-2 text-orange-400 hover:text-orange-300"
-            >
-              <FaPaperclip />
-              <span>{msg.media.name}</span>
-            </a>
-          )}
-        </div>
-      ) : (
-        <p className="text-sm font-medium break-words whitespace-pre-line">
-          {msg.text}
-        </p>
-      )}
-      <p className="text-xs mt-1 text-gray-400">
-        {formatTimestamp(msg.createdAt)}
-      </p>
-    </div>
-  </div>
-))}
-
+              {[...messages].reverse().map((msg) => (
+                <div
+                  key={msg.id}
+                  className={`flex ${
+                    msg.isSystemMessage ? 'justify-center' :
+                    msg.isAutoReply ? 'justify-start' :
+                    msg.sender_uid === auth.currentUser?.uid ? 'justify-end' : 'justify-start'
+                  }`}
+                >
+                  <div
+                    className={`max-w-[70%] rounded-lg p-3 ${
+                      msg.isSystemMessage ? 'w-full max-w-2xl bg-gray-800 text-gray-200' :
+                      msg.isAutoReply || msg.sender_uid === adminUid ? 'bg-orange-500 text-white' :
+                      msg.sender_uid === auth.currentUser?.uid
+                        ? 'bg-gray-800 text-white'
+                        : 'bg-gray-800 text-white'
+                    } shadow-sm`}
+                  >
+                    {msg.media ? (
+                      <div>
+                        {msg.media.type.startsWith('image/') ? (
+                          <a 
+                            href={getMediaUrl(msg.media.fullPath)}
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="block"
+                          >
+                            <img 
+                              src={getMediaUrl(msg.media.fullPath)}
+                              alt={msg.media.name} 
+                              className="max-w-full h-auto rounded-lg"
+                              loading="lazy"
+                            />
+                          </a>
+                        ) : (
+                          <a 
+                            href={getMediaUrl(msg.media.fullPath)}
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="flex items-center space-x-2 text-orange-400 hover:text-orange-300"
+                          >
+                            <FaPaperclip />
+                            <span>{msg.media.name}</span>
+                          </a>
+                        )}
+                      </div>
+                    ) : (
+                      <p className="text-sm font-medium break-words whitespace-pre-line">
+                        {msg.text}
+                      </p>
+                    )}
+                    <p className="text-xs mt-1 text-gray-400">
+                      {formatTimestamp(msg.createdAt)}
+                    </p>
+                  </div>
+                </div>
+              ))}
               <div ref={messagesEndRef} />
             </div>
 

@@ -1,8 +1,8 @@
-import Cookie from "@/Components/Cookie";
 import Footer from "@/Components/Footer";
 import MediaModal from "@/Components/MediaModal";
 import MobileFooterBar from "@/Components/MobileFooterBar";
 import Navbar from "@/Components/Navbar";
+import classNames from "classnames";
 import React, { useLayoutEffect, useState } from "react";
 import LoadingBar from "react-top-loading-bar";
 
@@ -17,25 +17,40 @@ const MainLayout: React.FC<{
   }, []);
   return (
     <>
-      <Cookie />
-      {showLoadingBar && (
-        <LoadingBar
-          height={3}
-          color="#fc6902"
-          transitionTime={800}
-          progress={100}
-        />
-      )}
-      <div className="pb-24 md:pb-0">
-        {/* <div className="inline-flex flex-col justify-between w-full min-h-screen "> */}
-        {!no_navbar && <Navbar />}
-        <div id="page" className="relative z-40">
-          <div id="wrapper">{children}</div>
+      <div className="h-screen overflow-hidden md:h-auto md:overflow-auto">
+        <div className="grid grid-rows-[minmax(10vh,90vh)_auto] items-start !p-0 !m-0 bg-gry-900 md:block">
+          <div
+            className={classNames("relative", {
+              "overflow-y-auto h-full scroll-mobile md:h-auto md:overflow-auto":
+                true,
+            })}
+          >
+            {showLoadingBar && (
+              <LoadingBar
+                height={3}
+                color="#fc6902"
+                transitionTime={800}
+                progress={100}
+              />
+            )}
+
+            <div>
+              {!no_navbar && <Navbar />}
+              <div
+                id="page"
+                className={classNames({
+                  "px-0 py-2 space-y-4": true, // if not in chat component
+                })}
+              >
+                <div id="wrapper">{children}</div>
+              </div>
+              {!no_footer && <Footer type="user" />}
+            </div>
+          </div>
+          <MobileFooterBar />
         </div>
-        {!no_footer && <Footer />}
-        <MobileFooterBar />
-        <MediaModal />
       </div>
+      <MediaModal />
     </>
   );
 };

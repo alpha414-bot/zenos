@@ -12,6 +12,7 @@ import "./Assets/index.css";
 import { QueryClient } from "./Services/Queries/QueryClient";
 import router from "./Services/Router";
 import { store } from "./Services/Store";
+import Cookie from "./Components/Cookie";
 
 // localStorage.theme = /"dark";
 // window._ = _;
@@ -57,6 +58,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             pauseOnHover
             transition={Slide}
           />
+          <Cookie />
           <RouterProvider router={router} />
         </Provider>
       </QueryClientProvider>

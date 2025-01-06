@@ -41,11 +41,11 @@ const AuthPage = () => {
         title="Login to your dashboard"
         description="Login to your account to view and track your order"
       >
-        <div className="px-6 py-12 flex flex-col items-start gap-12 md:flex-row">
+        <div className="px-3 py-12 flex flex-col items-start gap-12 md:px-6 md:flex-row">
           {/* SignIn Section */}
           <form
             onSubmit={SignInHandleSubmit(onSignInFormSubmit)}
-            className="border-2 border-gray-200 rounded-lg px-6 py-5 w-full md:w-1/2"
+            className="border-2 border-gray-200 rounded-lg px-4 py-5 md:px-6 w-full md:w-1/2"
           >
             <p className="text-3xl font-extrabold tracking-wider">Sign In</p>
             <p className="text-xs">
@@ -90,7 +90,7 @@ const AuthPage = () => {
           {/* SignUp Section */}
           <form
             onSubmit={SignUpHandleSubmit(onSignUpFormSubmit)}
-            className="border-2 border-gray-200 rounded-lg px-6 py-5 w-full md:w-1/2"
+            className="border-2 border-gray-200 rounded-lg px-4 py-5 md:px-6 w-full md:w-1/2"
           >
             <p className="text-3xl font-extrabold tracking-wider">Sign Up</p>
             <p className="text-xs">

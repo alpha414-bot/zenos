@@ -438,7 +438,7 @@ const UserProductsComponent = () => {
 
   if (!currentUser) {
     console.error("No user is signed in.");
-    return <div>No user signed in</div>; // You can handle it appropriately
+    return <div>No user signed in</div>;
   }
 
   const userUuid = currentUser.uid;
@@ -450,7 +450,7 @@ const UserProductsComponent = () => {
     false
   );
 
-  // Reassign products to filtered products based on the user's UUID
+  // Filter products based on the user's UUID
   if (Array.isArray(products)) {
     products = products.filter((product) => product.createdBy === userUuid);
   }
@@ -468,23 +468,20 @@ const UserProductsComponent = () => {
         footer: (props) => props.column.id,
         enableSorting: false,
       },
-
       {
         accessorKey: "image",
         cell: (info) => (
-          <>
-            {/* <div className="flex items-center gap-1 flex-wrap"> */}
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-1 min-w-60">
-              {(info.getValue() as any[]).map((item, index) => (
-                <Image
-                  key={index}
-                  src={item}
-                  className="w-full max-w-full max-h-full bg-zenos-200 rounded-sm overflow-hidden"
-                  width={120}
-                />
-              ))}
-            </div>
-          </>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-1 min-w-60">
+            {(info.getValue() as string[]).map((item, index) => (
+              <Image
+                key={index}
+                src={item}
+                className="w-full max-w-full max-h-full bg-zenos-200 rounded-sm overflow-hidden"
+                width={120}
+                alt="Product Image"
+              />
+            ))}
+          </div>
         ),
         header: () => <span>Product Image</span>,
         footer: (props) => props.column.id,
@@ -495,7 +492,7 @@ const UserProductsComponent = () => {
         id: "name",
         cell: (info) => (
           <span className="underline underline-offset-4 decoration-dotted whitespace-nowrap">
-            {info.getValue() as any}
+            {info.getValue() as string}
           </span>
         ),
         header: () => <span>Product Name</span>,
@@ -607,9 +604,9 @@ const UserProductsComponent = () => {
     return modalInstance.hide();
   }, []);
   return (
-    <section id="AdminProductsSection" tabIndex={-1}>
-      <div className="pb-2 border-b-2 border-gray-500 mb-2 flex items-center justify-between">
-        <h4 className="text-3xl font-bold">Products</h4>
+    <section id="UserProductsSection" tabIndex={-1}>
+      <div className="pb-2 border-b-2 border-zenos-600 mb-2 flex items-center justify-between">
+        <h4 className="text-3xl font-bold">My Products</h4>
         <Button
           type="button"
           className="!px-3 !py-2 gap-1.5"
@@ -639,7 +636,7 @@ const UserProductsComponent = () => {
       <div className="py-8">
         <Table
           columns={columns}
-          data={products as any}
+          data={products as ProductItemType[]}
           noDataText="No products available"
         />
       </div>

@@ -88,7 +88,7 @@ export const useProductsData = <T>(
     (): Promise<T> => getProductData(snapshotListener, product_id, admin, for_public),
     {
       keepPreviousData: true,
-      placeholderData: !!product_id ? [] : ({} as T),
+      placeholderData: product_id ? [] : ({} as T),
     }
   );
 };

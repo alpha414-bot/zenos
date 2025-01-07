@@ -7,7 +7,7 @@ const firebaseConfig = {
   authDomain: "vint-ecommerce.firebaseapp.com",
   databaseURL: "https://vint-ecommerce-default-rtdb.firebaseio.com",
   projectId: "vint-ecommerce",
-  storageBucket: "vint-ecommerce.firebasestorage.app",
+  storageBucket: "vint-ecommerce.appspot.com",
   messagingSenderId: "875924243691",
   appId: "1:875924243691:web:39c861280476191c30eaae",
   measurementId: "G-GW51SXRFJ3",

@@ -7,7 +7,7 @@ export default function SliderArrow(props: {
   iconClassName?: string;
   onClick?: any;
 }) {
-  let { type, arrowClassName, className, onClick, iconClassName } = props;
+  const { type, arrowClassName, className, onClick, iconClassName } = props;
   return (
     <div
       className={classNames(

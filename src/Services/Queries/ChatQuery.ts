@@ -11,11 +11,11 @@ import {
   orderBy,
   query,
   runTransaction,
+  setDoc,
   Timestamp,
   where,
 } from "firebase/firestore";
 
-// Updated interface with media support
 interface ChatMetaListInterface {
   id: string;
   has_messages: boolean;
@@ -27,7 +27,6 @@ interface ChatMetaListInterface {
   sent_by_uid?: string;
 }
 
-// Updated interface with media support
 interface ChatMessagesInterface {
   id: string;
   text: string;
@@ -42,7 +41,6 @@ interface ChatMessagesInterface {
   };
 }
 
-// Check or create chat (remains the same)
 export const queryToCreateChat = (
   recipient_uid?: string,
   auth_user?: AuthUserType
@@ -56,7 +54,6 @@ export const queryToCreateChat = (
 
       const chatsCollection = collection(firestore, "UserMessages");
 
-      // Check if a chat already exists
       const existingChatQuery = query(
         chatsCollection,
         where("members", "array-contains", auth_user.uid)
@@ -69,11 +66,8 @@ export const queryToCreateChat = (
           );
 
           if (existingChat) {
-            console.log("Existing chat found:", existingChat.id);
             resolve({ id: existingChat.id, ...existingChat.data() });
           } else {
-            // No existing chat, create a new one
-            console.log("Creating new chat...");
             addDoc(chatsCollection, {
               has_messages: false,
               text: "Start conversation",
@@ -97,43 +91,73 @@ export const queryToCreateChat = (
     }
   });
 
-// Fetch chat by recipient UID (remains the same)
 export const queryToGetChat = (
   listener: any,
-  recipient_uid?: string,
-  auth_user?: AuthUserType
+  auth_uid?: string,
+  recipient?: AuthUserType
 ): Promise<ChatMetaListInterface> =>
-  new Promise((resolve, reject) => {
-    if (!recipient_uid || !auth_user?.uid) {
+  new Promise(async (resolve, reject) => {
+    if (!auth_uid || !recipient?.uid) {
       reject(new Error("Recipient or Auth User is missing"));
       return;
     }
 
     try {
       const chatCollection = collection(firestore, "UserMessages");
-      const chatQuery = query(
+
+      const existingChatQuery = query(
         chatCollection,
-        where("members", "array-contains", auth_user.uid)
+        where("members", "array-contains", auth_uid)
       );
 
-      getDocs(chatQuery)
-        .then((snapshot) => {
-          const matchingChat = snapshot.docs.find((doc) =>
-            doc.data().members.includes(recipient_uid)
-          );
+      const chatSnapshot = await getDocs(existingChatQuery);
 
-          if (matchingChat) {
-            const chatData = {
-              id: matchingChat.id,
-              ...matchingChat.data(),
-            } as ChatMetaListInterface;
-            resolve(listener(chatData));
-          } else {
-            reject(new Error("No chat found"));
-          }
-        })
-        .catch(reject);
+      const existingChat = chatSnapshot.docs.find((doc) => {
+        const members = doc.data().members;
+        return members.includes(recipient.uid);
+      });
+
+      if (existingChat) {
+        const chatData = {
+          id: existingChat.id,
+          ...existingChat.data(),
+        } as ChatMetaListInterface;
+        return resolve(listener(chatData));
+      }
+
+      const sortedMembers = [auth_uid, recipient.uid].sort();
+      const deterministicChatId = `chat_${sortedMembers.join("_")}`;
+
+      const deterministicChatRef = doc(chatCollection, deterministicChatId);
+      const deterministicChatDoc = await getDoc(deterministicChatRef);
+
+      if (deterministicChatDoc.exists()) {
+        const chatData = {
+          id: deterministicChatId,
+          ...deterministicChatDoc.data(),
+        } as ChatMetaListInterface;
+        return resolve(listener(chatData));
+      }
+
+      const newChatData = {
+        has_messages: false,
+        text: "Start conversation",
+        unread: false,
+        createdAt: Timestamp.now(),
+        updatedAt: Timestamp.now(),
+        members: [auth_uid, recipient.uid],
+      };
+
+      await setDoc(deterministicChatRef, newChatData, { merge: true });
+
+      const chatData = {
+        id: deterministicChatId,
+        ...newChatData,
+      } as ChatMetaListInterface;
+
+      resolve(listener(chatData));
     } catch (error) {
+      console.error("Error in queryToGetChat:", error);
       reject(error);
       notify.error({
         text: "Error connecting to server. [UNABLE_TO_QUERY_CHAT]",
@@ -141,7 +165,6 @@ export const queryToGetChat = (
     }
   });
 
-// Send message (updated with media support)
 export const queryToSendChatMessage = (
   payload: {
     text: string;
@@ -184,7 +207,6 @@ export const queryToSendChatMessage = (
         const newMessageRef = doc(messagesCollection);
         transaction.set(newMessageRef, messageData);
 
-        // Update chat metadata with media information if present
         const chatUpdateData: any = {
           has_messages: true,
           text: payload.media
@@ -208,8 +230,6 @@ export const queryToSendChatMessage = (
     }
   });
 
-// Fetch all chats (remains the same)
-
 export const queryToFetchAllChats = (
   admin_uid?: string
 ): Promise<{ data: ChatMetaListInterface[] }> =>
@@ -220,39 +240,25 @@ export const queryToFetchAllChats = (
     }
 
     try {
-      console.log("Fetching all chats for admin:", admin_uid);
-
       const chatsCollection = collection(firestore, "UserMessages");
 
-      // Query to fetch all chats for the admin user
       const allChatsQuery = query(
         chatsCollection,
         where("members", "array-contains", admin_uid),
-        orderBy("updatedAt", "desc") // Sort chats by the most recently updated
+        orderBy("updatedAt", "desc")
       );
-
-      console.log("Query to fetch all chats:", allChatsQuery);
 
       getDocs(allChatsQuery)
         .then((snapshot) => {
-          console.log("Snapshot fetched:", snapshot);
-
           const chats: ChatMetaListInterface[] = snapshot.docs.map((doc) => {
             const data = doc.data() as ChatMetaListInterface;
             return {
-              ...data, // Spread the data object
-              id: doc.id, // Add the id separately
+              ...data,
+              id: doc.id,
             };
           });
 
-          // If no chats are found, return an empty array
-          if (chats.length === 0) {
-            resolve({ data: [] });
-            console.log("No chats found for admin:", admin_uid);
-          } else {
-            console.log("Fetched chats:", chats);
-            resolve({ data: chats }); // Return the fetched chats in the correct structure
-          }
+          resolve({ data: chats });
         })
         .catch((error) => {
           console.error("Error fetching all chats:", error);
@@ -267,7 +273,6 @@ export const queryToFetchAllChats = (
       notify.error({ text: "Error while fetching chats." });
     }
   });
-// Add this function to your ChatQuery file
 
 export const queryToFetchChatMessages = (
   listener: (data: { data: ChatMessagesInterface[]; chat_id: string }) => void,

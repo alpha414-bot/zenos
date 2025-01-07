@@ -1,8 +1,8 @@
-import { firestore } from "@/firebase-config";
-import { getProductData } from "@/Services/Queries/ProductQuery";
-import { collection, getDocs } from "firebase/firestore";
-import { useEffect, useState } from "react";
-import { FaBox, FaShoppingCart } from "react-icons/fa";
+import { useState, useEffect } from 'react';
+import { FaShoppingCart, FaBox } from 'react-icons/fa';
+import { getProductData } from '@/Services/Queries/ProductQuery';
+import { collection, getDocs } from 'firebase/firestore';
+import { firestore } from '@/firebase-config';
 
 interface ProductData {
   id: string;
@@ -68,18 +68,13 @@ const AdminEcommerceComponent = () => {
   }, []);
 
   return (
-    <section
-      data-scroll
-      data-scroll-speed=".05"
-      id="AdminEcommerceSection"
-      className="bg-gray-900 p-6 rounded-lg"
-    >
+    <section data-scroll data-scroll-speed=".05" id="AdminEcommerceSection" className="bg-gray-900 p-4 sm:p-6 rounded-lg">
       <div className="pb-2 border-b-2 border-orange-500 mb-4">
-        <h4 className="text-3xl font-bold text-white">Ecommerce Overview</h4>
+        <h4 className="text-2xl sm:text-3xl font-bold text-white">Ecommerce Overview</h4>
       </div>
 
       {loading ? (
-        <div className="grid grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           {[1, 2, 3, 4].map((i) => (
             <div
               key={i}
@@ -90,7 +85,7 @@ const AdminEcommerceComponent = () => {
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <div className="bg-gray-800 p-4 rounded-lg shadow hover:shadow-orange-500/20 transition-all duration-300">
             <div className="flex items-center">
               <div className="p-3 bg-orange-500 rounded-full">
@@ -106,23 +101,6 @@ const AdminEcommerceComponent = () => {
               </div>
             </div>
           </div>
-
-          {/* <div className="bg-gray-800 p-4 rounded-lg shadow hover:shadow-orange-500/20 transition-all duration-300">
-            <div className="flex items-center">
-              <div className="p-3 bg-orange-500 rounded-full">
-                <FaDollarSign className="text-gray-900 text-xl" />
-              </div>
-              <div className="ml-4">
-                <p className="text-gray-400 text-sm font-medium">Inventory Value</p>
-                <h3 className="text-2xl font-bold text-white">
-                  ₦{stats.totalValue.toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                  })}
-                </h3>
-              </div>
-            </div>
-          </div> */}
 
           <div className="bg-gray-800 p-4 rounded-lg shadow hover:shadow-orange-500/20 transition-all duration-300">
             <div className="flex items-center">

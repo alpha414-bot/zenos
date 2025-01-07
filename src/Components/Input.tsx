@@ -30,7 +30,7 @@ const Input = forwardRef<HTMLInputElement, TextInputProps>(function TextInput(
 ) {
   const [focus, setFocus] = useState<boolean>(false);
   const [inputType, setInputType] = useState<any>(type);
-  const input = !!ref ? ref : useRef<HTMLInputElement>(null);
+  const input = ref ? ref : useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (isFocused && input?.current) {

@@ -86,7 +86,7 @@ function Navbar() {
             {(currentUser?.uid && !currentUser.isAnonymous && (
               <li>
                 <NavLink
-                  to={!!currentUser.admin ? "/admin/dashboard" : "/user/carts"}
+                  to={currentUser.admin ? "/admin/dashboard" : "/user/carts"}
                   className={({ isActive }) =>
                     `tracking-wide ${
                       isActive

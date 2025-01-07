@@ -13,6 +13,7 @@ import { Outlet, RouteObject, createBrowserRouter } from "react-router-dom";
 import AdminRouter from "./AdminRouter";
 import { ProtectedRoute, withScrollToTop } from "./utils";
 
+
 const RootRouter: RouteObject[] = [
   {
     path: "/",

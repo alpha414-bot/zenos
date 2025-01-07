@@ -45,7 +45,7 @@ const SelectDropdown = forwardRef<HTMLInputElement, SelectDropdownInterface>(
     },
     ref: any
   ) {
-    const TextInputRef = !!ref ? ref : useRef<HTMLInputElement>(null);
+    const TextInputRef = ref ? ref : useRef<HTMLInputElement>(null);
     const [focus, setFocus] = useState<boolean>(false);
     const [, setPlaceholderTextInput] = useState<string | undefined>(
       placeholder
@@ -66,7 +66,7 @@ const SelectDropdown = forwardRef<HTMLInputElement, SelectDropdownInterface>(
 
     useEffect(() => {
       if (dropdownQuery && dropdownQuery?.length > 0) {
-        let filtering = options.filter(
+        const filtering = options.filter(
           (elem) =>
             elem.key.toLowerCase().includes(dropdownQuery) ||
             elem.value.toLowerCase().includes(dropdownQuery)
@@ -238,7 +238,7 @@ const SelectDropdown = forwardRef<HTMLInputElement, SelectDropdownInterface>(
                         {(dropdownFiltering &&
                           ((dropdownFiltering.length > 0 &&
                             dropdownFiltering.map((item, index) => {
-                              let disable =
+                              const disable =
                                 disableOptionKeys &&
                                 disableOptionKeys?.includes(item?.key);
                               return (

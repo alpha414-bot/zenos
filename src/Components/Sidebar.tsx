@@ -1,4 +1,4 @@
-import { useCartProducts } from "@/Services/Hooks";
+import { useAuthUser, useCartProducts } from "@/Services/Hooks";
 import { queryToLogout } from "@/Services/Queries/AuthQuery";
 import classNames from "classnames";
 import { FC } from "react";
@@ -11,7 +11,7 @@ interface SidebarBarInterface {
 
 const Sidebar: FC<SidebarBarInterface> = ({ type }) => {
   const { data: carts } = useCartProducts() as { data: CartMetaItem[] };
-
+  const { data: currentUser } = useAuthUser();
   return (
     <>
       <aside
@@ -150,25 +150,27 @@ const Sidebar: FC<SidebarBarInterface> = ({ type }) => {
             )}
             {type == "user" && (
               <>
-                <li>
-                  <ButtonAsLink
-                    to="/"
-                    custom
-                    asNavLink
-                    className={({ isActive }) =>
-                      classNames(
-                        "flex items-center px-4 py-2 rounded-lg hover:bg-gray-700 group",
-                        {
-                          "text-zenos-600 bg-gray-700": !!isActive,
-                          "text-white": !isActive,
-                        }
-                      )
-                    }
-                  >
-                    <i className="flex-shrink-0 transition duration-75 fa-lg fa-solid fa-home"></i>
-                    <span className="ms-3">Home</span>
-                  </ButtonAsLink>
-                </li>
+                {!currentUser?.isAnonymous && (
+                  <li>
+                    <ButtonAsLink
+                      to="/"
+                      custom
+                      asNavLink
+                      className={({ isActive }) =>
+                        classNames(
+                          "flex items-center px-4 py-2 rounded-lg hover:bg-gray-700 group",
+                          {
+                            "text-zenos-600 bg-gray-700": !!isActive,
+                            "text-white": !isActive,
+                          }
+                        )
+                      }
+                    >
+                      <i className="flex-shrink-0 transition duration-75 fa-lg fa-solid fa-home"></i>
+                      <span className="ms-3">Home</span>
+                    </ButtonAsLink>
+                  </li>
+                )}
                 <li>
                   <ButtonAsLink
                     to="/user/carts"
@@ -191,82 +193,112 @@ const Sidebar: FC<SidebarBarInterface> = ({ type }) => {
                     </span>
                   </ButtonAsLink>
                 </li>
-                <li>
-                  <ButtonAsLink
-                    to="/user/shop"
-                    custom
-                    asNavLink
-                    className={({ isActive }) =>
-                      classNames(
-                        "flex items-center px-4 py-2 rounded-lg hover:bg-gray-700 group",
-                        {
-                          "text-zenos-600 bg-gray-700": !!isActive,
-                          "text-white": !isActive,
-                        }
-                      )
-                    }
-                  >
-                    <i className="flex-shrink-0 transition duration-75 fa-lg fa-solid fa-shop"></i>
-                    <span className="ms-3">Shop</span>
-                  </ButtonAsLink>
-                </li>
-                <li>
-                  <ButtonAsLink
-                    to="/user/orders"
-                    custom
-                    asNavLink
-                    className={({ isActive }) =>
-                      classNames(
-                        "flex items-center px-4 py-2 rounded-lg hover:bg-gray-700 group",
-                        {
-                          "text-zenos-600 bg-gray-700": !!isActive,
-                          "text-white": !isActive,
-                        }
-                      )
-                    }
-                  >
-                    <i className="flex-shrink-0 transition duration-75 fa-lg fa-solid fa-credit-card"></i>
-                    <span className="ms-3">My Orders</span>
-                  </ButtonAsLink>
-                </li>
-                <li>
-                  <ButtonAsLink
-                    to="/user/inbox"
-                    custom
-                    asNavLink
-                    className={({ isActive }) =>
-                      classNames(
-                        "flex items-center px-4 py-2 rounded-lg hover:bg-gray-700 group",
-                        {
-                          "text-zenos-600 bg-gray-700": !!isActive,
-                          "text-white": !isActive,
-                        }
-                      )
-                    }
-                  >
-                    <i className="flex-shrink-0 transition duration-75 fa-lg fa-solid fa-inbox"></i>
-                    <span className="flex-1 ms-3 whitespace-nowrap">Inbox</span>
-                    <span className="inline-flex items-center justify-center w-3 h-3 p-3 ms-3 text-sm font-medium rounded-full bg-zenos-900 text-zenos-300">
-                      3
-                    </span>
-                  </ButtonAsLink>
-                </li>
+                {!currentUser?.isAnonymous && (
+                  <li>
+                    <ButtonAsLink
+                      to="/user/shop"
+                      custom
+                      asNavLink
+                      className={({ isActive }) =>
+                        classNames(
+                          "flex items-center px-4 py-2 rounded-lg hover:bg-gray-700 group",
+                          {
+                            "text-zenos-600 bg-gray-700": !!isActive,
+                            "text-white": !isActive,
+                          }
+                        )
+                      }
+                    >
+                      <i className="flex-shrink-0 transition duration-75 fa-lg fa-solid fa-shop"></i>
+                      <span className="ms-3">Shop</span>
+                    </ButtonAsLink>
+                  </li>
+                )}
+                {!currentUser?.isAnonymous && (
+                  <li>
+                    <ButtonAsLink
+                      to="/user/orders"
+                      custom
+                      asNavLink
+                      className={({ isActive }) =>
+                        classNames(
+                          "flex items-center px-4 py-2 rounded-lg hover:bg-gray-700 group",
+                          {
+                            "text-zenos-600 bg-gray-700": !!isActive,
+                            "text-white": !isActive,
+                          }
+                        )
+                      }
+                    >
+                      <i className="flex-shrink-0 transition duration-75 fa-lg fa-solid fa-credit-card"></i>
+                      <span className="ms-3">My Orders</span>
+                    </ButtonAsLink>
+                  </li>
+                )}
+                {!currentUser?.isAnonymous && (
+                  <li>
+                    <ButtonAsLink
+                      to="/user/inbox"
+                      custom
+                      asNavLink
+                      className={({ isActive }) =>
+                        classNames(
+                          "flex items-center px-4 py-2 rounded-lg hover:bg-gray-700 group",
+                          {
+                            "text-zenos-600 bg-gray-700": !!isActive,
+                            "text-white": !isActive,
+                          }
+                        )
+                      }
+                    >
+                      <i className="flex-shrink-0 transition duration-75 fa-lg fa-solid fa-inbox"></i>
+                      <span className="flex-1 ms-3 whitespace-nowrap">
+                        Inbox
+                      </span>
+                    </ButtonAsLink>
+                  </li>
+                )}
+                {currentUser?.isAnonymous && (
+                  <li>
+                    <ButtonAsLink
+                      to="/auth"
+                      custom
+                      asNavLink
+                      className={({ isActive }) =>
+                        classNames(
+                          "flex items-center px-4 py-2 rounded-lg hover:bg-gray-700 group",
+                          {
+                            "text-zenos-600 bg-gray-700": !!isActive,
+                            "text-white": !isActive,
+                          }
+                        )
+                      }
+                    >
+                      <i className="flex-shrink-0 transition duration-75 fa-lg fa-solid fa-circle-user"></i>
+                      <span className="flex-1 ms-3 whitespace-nowrap">
+                        Sign In/Sign Up
+                      </span>
+                    </ButtonAsLink>
+                  </li>
+                )}
               </>
             )}
-            <li>
-              <ButtonAsLink
-                to="#logout"
-                custom
-                onClick={(e) => {
-                  e.preventDefault();
-                  return queryToLogout();
-                }}
-                className="flex items-center px-4 py-2 rounded-lg text-white hover:bg-gray-700 group"
-              >
-                <i className="flex-shrink-0 transition duration-75 fa-lg fa-solid fa-arrow-right-from-bracket"></i>
-                <span className="flex-1 ms-3 whitespace-nowrap">Logout</span>
-              </ButtonAsLink>
-            </li>
+            {!currentUser?.isAnonymous && (
+              <li>
+                <ButtonAsLink
+                  to="#logout"
+                  custom
+                  onClick={(e) => {
+                    e.preventDefault();
+                    return queryToLogout();
+                  }}
+                  className="flex items-center px-4 py-2 rounded-lg text-white hover:bg-gray-700 group"
+                >
+                  <i className="flex-shrink-0 transition duration-75 fa-lg fa-solid fa-arrow-right-from-bracket"></i>
+                  <span className="flex-1 ms-3 whitespace-nowrap">Logout</span>
+                </ButtonAsLink>
+              </li>
+            )}
           </ul>
         </div>
       </aside>

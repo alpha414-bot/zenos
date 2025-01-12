@@ -4,7 +4,7 @@ import SelectDropdown from "@/Components/SelectDropdown";
 import TextArea from "@/Components/TextArea";
 import MainLayout from "@/Layouts/MainLayout";
 import PageMeta from "@/Layouts/PageMeta";
-import { useCartProducts } from "@/Services/Hooks";
+import { useAuthUser, useCartProducts } from "@/Services/Hooks";
 import { queryToRegisterUser } from "@/Services/Queries/AuthQuery";
 import { newOrderQuery } from "@/Services/Queries/OrderQuery";
 import {
@@ -15,7 +15,6 @@ import {
   PasswordPattern,
   price,
 } from "@/System/function";
-import { auth } from "@/firebase-config";
 import _ from "lodash";
 import { useEffect, useMemo, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -23,6 +22,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 const Checkout = () => {
   const { data: carts } = useCartProducts() as { data: CartMetaItem[] };
+  const { data: currentUser } = useAuthUser();
   const reference = useMemo(
     () => generateRandomString(_.random(24, 32)),
     [carts]
@@ -32,12 +32,23 @@ const Checkout = () => {
   const { control, handleSubmit, reset, watch } =
     useForm<BillingInputInterface>({
       mode: "all",
+      defaultValues: {
+        first_name: currentUser?.first_name,
+        last_name: currentUser?.last_name,
+        email: currentUser?.email,
+        phone_number: currentUser?.phone_number,
+        postal_code: currentUser?.postal_code,
+        state: currentUser?.state,
+        street_address: currentUser?.street_address,
+        town: currentUser?.town,
+        username: currentUser?.username,
+      },
     });
   const FormValue = watch();
   const onSubmit: SubmitHandler<BillingInputInterface> = (data) => {
     if (isForm === 1) {
       // about creating an account...
-      if (!auth.currentUser?.isAnonymous) {
+      if (!currentUser?.isAnonymous) {
         // user is not anonymous
         setIsForm((current) => current + 1);
       } else {
@@ -77,6 +88,7 @@ const Checkout = () => {
         title="Checkout"
         description="Start pushing your cart to the finishing line"
       >
+        {reference}
         <div className="relative flex flex-col-reverse lg:block">
           <form
             onSubmit={handleSubmit(onSubmit)}
@@ -307,14 +319,14 @@ const Checkout = () => {
               )}
               {isForm == 1 && (
                 <div>
-                  {(auth.currentUser?.uid && !auth.currentUser.isAnonymous && (
+                  {(currentUser?.uid && !currentUser.isAnonymous && (
                     <div className="border border-gray-200 p-4 rounded-md">
                       <p
                         className="text-base font-medium"
                         dangerouslySetInnerHTML={{
-                          __html: auth.currentUser.displayName
+                          __html: currentUser.displayName
                             ? `Hello, <strong>${_.startCase(
-                                auth.currentUser.displayName
+                                currentUser.displayName
                               )}</strong>`
                             : "",
                         }}
@@ -481,33 +493,38 @@ const Checkout = () => {
                     </div>
                   </div>
                   <div className="mt-8 flex flex-wrap items-stretch gap-4">
-                  <Button
-  className="gap-2"
-  onClick={() => {
-    newOrderQuery(
-      {
-        reference,
-        amount: TotalProductPrice,
-        status: "pending",
-      },
-      carts,
-      FormValue
-    ).then(() => {
-      reset();
-      
-      navigate("/user/inbox", {
-        state: {
-          reference,
-          amount: TotalProductPrice,
-          carts, 
-        },
-      });
-    });
-  }}
->
-  Place Order
-</Button>
+                    <Button
+                      className="gap-2"
+                      onClick={() => {
+                        newOrderQuery(
+                          {
+                            reference,
+                            amount: TotalProductPrice,
+                            status: "pending",
+                          },
+                          carts,
+                          {
+                            ...FormValue,
+                            ...{
+                              username: currentUser?.username,
+                              uid: currentUser?.uid,
+                            },
+                          }
+                        ).then(() => {
+                          reset();
 
+                          navigate("/user/inbox", {
+                            state: {
+                              reference,
+                              amount: TotalProductPrice,
+                              carts,
+                            },
+                          });
+                        });
+                      }}
+                    >
+                      Place Order
+                    </Button>
                   </div>
                 </div>
               )}

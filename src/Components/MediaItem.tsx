@@ -11,9 +11,11 @@ import Image from "./Image";
 const MediaItem: React.FC<{
   item: MediaItemInterface;
   modal?: ModalInterface;
+  imageClassName?: string;
   onBlur?: any;
   onChange?: any;
   showThumbnail?: boolean;
+  asDiv?: boolean;
   multiSelect?: boolean;
   onSelect?: any;
   clearSelect?: any;
@@ -22,9 +24,11 @@ const MediaItem: React.FC<{
   modal,
   onBlur,
   onChange,
+  imageClassName,
   showThumbnail = false,
   multiSelect,
   onSelect,
+  asDiv = false,
   clearSelect,
 }) => {
   const type = _.split(item?.media?.mimetype, "/")[0];
@@ -50,7 +54,7 @@ const MediaItem: React.FC<{
       onBlur={onBlur}
       className={`relative z-10 ${
         showThumbnail ? "h-full" : "h-auto"
-      } bg-zenos-400 bg-opacity-50 rounded-md border-0 overflow-hidden group`}
+      } bg-zenos-400/20 bg-opacity-50 rounded-md border-0 overflow-hidden group`}
     >
       {/* Button to Select media */}
       {!showThumbnail && multiSelect && (
@@ -188,8 +192,12 @@ const MediaItem: React.FC<{
           {type == "image" && (
             <Image
               src={item.media.name}
-              className="w-full min-h-32 h-full object-contain"
+              className={classNames(
+                "w-full min-h-52 h-full object-contain ",
+                imageClassName
+              )}
               alt={media?.name}
+              asDiv={asDiv}
             />
           )}
           {type != "image" && type != "video" && (

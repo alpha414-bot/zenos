@@ -75,7 +75,8 @@ export const getProductData = <T>(
   listener: any,
   product_id?: any,
   admin: boolean = false,
-  for_public: boolean = true
+  for_public: boolean = true,
+  productLimit: any = "all"
 ): Promise<T> =>
   new Promise(async (resolve, reject) => {
     try {
@@ -101,6 +102,10 @@ export const getProductData = <T>(
       } else {
         // return all the products in the ProductCollection with pagination
         let productQuery = query(ProductCollection, orderBy("createdAt"));
+        if (productLimit && productLimit != "all" && !isNaN(productLimit)) {
+          // limiting the number of displayed products, if to display all, productLimit would be undefined
+          productQuery = query(productQuery, limit(productLimit));
+        }
         if (!admin) {
           // if current user is not an admin requesting
           if (for_public) {

@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { HelmetProvider } from "react-helmet-async";
 import { QueryClientProvider } from "react-query";
+import { ReactQueryDevtools } from "react-query/devtools";
 import { Provider } from "react-redux";
 import { RouterProvider } from "react-router-dom";
 import { Slide, ToastContainer } from "react-toastify";
@@ -9,10 +10,10 @@ import "react-toastify/dist/ReactToastify.css";
 import "slick-carousel/slick/slick-theme.css";
 import "slick-carousel/slick/slick.css";
 import "./Assets/index.css";
+import Cookie from "./Components/Cookie";
 import { QueryClient } from "./Services/Queries/QueryClient";
 import router from "./Services/Router";
 import { store } from "./Services/Store";
-import Cookie from "./Components/Cookie";
 
 // localStorage.theme = /"dark";
 // window._ = _;
@@ -60,6 +61,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           />
           <Cookie />
           <RouterProvider router={router} />
+          <ReactQueryDevtools />
         </Provider>
       </QueryClientProvider>
     </HelmetProvider>

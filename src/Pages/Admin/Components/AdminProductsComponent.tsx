@@ -82,7 +82,7 @@ const ProductsAction = ({ values }: { values: ProductItemType }) => {
     <>
       <div className="flex items-center gap-2 flex-nowrap">
         <ButtonAsLink
-          to={`/products/${values?.id}`}
+          to={`/product/${values?.id}`}
           target="_blank"
           className="btn !bg-blue-500 !px-2 flex gap-0.5"
           custom
@@ -466,7 +466,7 @@ const SelectProductAction = ({
 
 const AdminProductsComponent = () => {
   const formRef = useRef<HTMLFormElement>(null);
-  const { data: products } = useProductsData(undefined, true);
+  const { data: products } = useProductsData({ admin: true });
   const { data: ukusedproducts } = useUkUsedProductData();
   const { control, handleSubmit, reset, watch } = useForm({ mode: "all" });
   const ukused_columns = useMemo<ColumnDef<ProductItemType>[]>(

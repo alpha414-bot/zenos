@@ -1,6 +1,10 @@
+@import "../../node_modules/lightgallery/css/lg-thumbnail.css";
+@import "../../node_modules/lightgallery/css/lg-zoom.css";
+@import "../../node_modules/lightgallery/css/lightgallery.css";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 
 @layer {
   /* Firebase Emulator */
@@ -17,7 +21,7 @@
   }
   .firebase-emulator-warning {
     animation: glowing-border 2s infinite;
-    @apply !fixed !left-auto !right-4 !top-2 !rounded-full !border-4 !w-8 !h-8 !text-white !bg-white !text-opacity-0 !bg-no-repeat !bg-contain !bg-center bg-[url('https://firebase.google.com/static/images/brand-guidelines/logo-logomark.png')] !shadow-sm !shadow-gray-200 !overflow-hidden;
+    @apply hidden !fixed !right-4 !top-2 !rounded-full !border-4 !w-8 !h-8 !text-white !bg-white !text-opacity-0 !bg-no-repeat !bg-contain !bg-center bg-[url('https://firebase.google.com/static/images/brand-guidelines/logo-logomark.png')] !shadow-sm !shadow-gray-200 !overflow-hidden;
   }
 
   /* Slick */
@@ -98,7 +102,7 @@
     @apply !bg-gray-500 !text-white !cursor-not-allowed hover:!bg-gray-500;
   }
   .mixitup-page-list > .mixitup-control {
-    @apply !border-2 !border-white !px-4 py-2 rounded-md !text-lg font-extrabold shadow shadow-gray-700 !transition-all !duration-150 !ease-in-out hover:!bg-gray-500 disabled:!bg-zinc-500 disabled:!text-gray-400 disabled:!cursor-not-allowed;
+    @apply !border-2 !border-white !px-4 !py-1 rounded-md !text-lg font-extrabold shadow shadow-gray-700 !transition-all !duration-150 !ease-in-out hover:!bg-gray-500 disabled:!bg-zinc-500 disabled:!text-gray-400 disabled:!cursor-not-allowed;
   }
   /* Glassmorphism */
   .glass-container {
@@ -146,10 +150,10 @@
 
   /* Customize scrollbar */
   .scroll-mobile::-webkit-scrollbar {
-    @apply hidden w-0 md:block md:w-2;
+    @apply hidden w-0 md:block md:w-1.5 md:h-1.5;
   }
   ::-webkit-scrollbar {
-    @apply w-2;
+    @apply w-1.5 h-1.5;
   }
 
   ::-webkit-scrollbar-thumb {
@@ -157,6 +161,6 @@
   }
 
   ::-webkit-scrollbar-track {
-    @apply bg-gray-200 w-1 rounded-lg overflow-hidden;
+    @apply bg-gray-200 w-1 h-1 rounded-lg overflow-hidden;
   }
 }

@@ -5,9 +5,13 @@ export interface AuthUserInterface {
   email?: any;
   first_name?: any;
   last_name?: any;
-  // role?: "admin" | "user" | "guest" | "admin";
+  phone_number?: any;
   uid?: string;
   username?: any;
+  postal_code?: any;
+  town?: string;
+  state?: any;
+  street_address?: any;
   isAnonymous?: boolean;
   emailVerified?: boolean;
   admin?: boolean;

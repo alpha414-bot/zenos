@@ -67,25 +67,35 @@ export const useUkUsedProductData = <T>() => {
     (): Promise<T> => getUkUsedProductData(snapshotListener),
     {
       keepPreviousData: true,
-      placeholderData: [] as any
+      placeholderData: [] as any,
     }
   );
 };
 
-export const useProductsData = <T>(
-  product_id?: any,
-  admin: boolean = false,
-  for_public: boolean = true,
-) => {
+export const useProductsData = <T>({
+  product_id,
+  admin = false,
+  limit = "all",
+  for_public = true,
+}: {
+  product_id?: any;
+  limit?: any;
+  admin?: boolean;
+  for_public?: boolean;
+}) => {
   const queryClient = useQueryClient();
   // listener to subscribe to firestore snappshot
   const snapshotListener = useCallback((data: any) => {
-    queryClient.setQueryData(keys.product_data(product_id, admin), data);
+    queryClient.setQueryData(
+      keys.product_data(product_id, admin, { limit }),
+      data
+    );
     return data;
   }, []);
   return useQuery(
-    keys.product_data(product_id, admin),
-    (): Promise<T> => getProductData(snapshotListener, product_id, admin, for_public),
+    keys.product_data(product_id, admin, { limit }),
+    (): Promise<T> =>
+      getProductData(snapshotListener, product_id, admin, for_public, limit),
     {
       keepPreviousData: true,
       placeholderData: product_id ? [] : ({} as T),

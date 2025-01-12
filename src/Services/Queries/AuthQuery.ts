@@ -100,7 +100,7 @@ export const queryToRegisterUser = (
             const UsersCollection = collection(firestore, "Users");
             const { user: currentUser } = user;
             const UserDoc = doc(UsersCollection, currentUser.uid);
-            delete(payload.password)
+            delete payload.password;
             setDoc(
               UserDoc,
               JSON.parse(
@@ -152,7 +152,7 @@ export const queryToRegisterUser = (
             const UsersCollection = collection(firestore, "Users");
             const { user: currentUser } = newuser;
             const UserDoc = doc(UsersCollection, currentUser.uid);
-            delete(payload.password)
+            delete payload.password;
             setDoc(
               UserDoc,
               JSON.parse(

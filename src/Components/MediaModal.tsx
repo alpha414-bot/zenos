@@ -148,7 +148,9 @@ const MediaModal = () => {
 
   // subscribe to onChange
   const onChange = (item: any) => {
-    let serializeItem = _.map(item, (obj: any) => _.omit(obj, ["createdAt", "updatedAt"]));
+    let serializeItem = _.map(item, (obj: any) =>
+      _.omit(obj, ["createdAt", "updatedAt"])
+    );
     dispatch(setMediaModalItems(serializeItem));
   };
   return (

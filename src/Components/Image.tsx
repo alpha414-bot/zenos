@@ -32,7 +32,7 @@ const Image: FC<ImagePropsInterface> = ({
     )) ||
     (asDiv && (
       <div
-        className={className}
+        className={classNames("bg-contain bg-center bg-no-repeat", className)}
         {...props}
         style={{ backgroundImage: `url("${image}")` }}
       >

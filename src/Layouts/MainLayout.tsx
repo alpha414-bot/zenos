@@ -17,11 +17,11 @@ const MainLayout: React.FC<{
   }, []);
   return (
     <>
-      <div className="h-screen overflow-hidden md:h-auto md:overflow-auto">
-        <div className="grid grid-rows-[minmax(10vh,90vh)_auto] items-start !p-0 !m-0 bg-gry-900 md:block">
+      <div className="h-screen md:h-full">
+        <div className="relative grid grid-rows-[minmax(10vh,90vh)_auto] items-start !p-0 !m-0 bg-gry-900 md:block">
           <div
-            className={classNames("relative", {
-              "overflow-y-auto h-full scroll-mobile md:h-auto md:overflow-auto":
+            className={classNames("", {
+              "overflow-y-auto h-full scroll-mobile md:h-auto md:overflow-clip":
                 true,
             })}
           >

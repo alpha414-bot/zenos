@@ -6,6 +6,7 @@ import RichEditor from "@/Components/RichEditor";
 import SelectDropdown from "@/Components/SelectDropdown";
 import Table from "@/Components/Table";
 import VariantsType from "@/Components/VariantsType";
+import PageMeta from "@/Layouts/PageMeta";
 import UserLayout from "@/Layouts/UserLayout";
 import { useProductsData } from "@/Services/Hooks";
 import { addCollectionDoc, updateCollectionDoc } from "@/Services/Queries";
@@ -431,7 +432,7 @@ export const SelectProductAction = ({
   );
 };
 
-const UserProductsComponent = () => {
+const Shop = () => {
   const formRef = useRef<HTMLFormElement>(null);
   const auth = getAuth();
   const currentUser = auth.currentUser;
@@ -444,11 +445,9 @@ const UserProductsComponent = () => {
   const userUuid = currentUser.uid;
 
   // Fetch products
-  let { data: products = [] } = useProductsData<ProductItemType[]>(
-    undefined,
-    false,
-    false
-  );
+  let { data: products = [] } = useProductsData<ProductItemType[]>({
+    for_public: false,
+  });
 
   // Filter products based on the user's UUID
   if (Array.isArray(products)) {
@@ -604,215 +603,214 @@ const UserProductsComponent = () => {
     return modalInstance.hide();
   }, []);
   return (
-    <section id="UserProductsSection" tabIndex={-1}>
-      <div className="pb-2 border-b-2 border-zenos-600 mb-2 flex items-center justify-between">
-        <h4 className="text-3xl font-bold">My Products</h4>
-        <Button
-          type="button"
-          className="!px-3 !py-2 gap-1.5"
-          onClick={() => {
-            addProductModal?.show();
-          }}
-        >
-          <svg
-            className="w-6 h-6 text-white"
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="4"
-              d="M5 12h14m-7 7V5"
-            />
-          </svg>
-        </Button>
-      </div>
-      <div className="py-8">
-        <Table
-          columns={columns}
-          data={products as ProductItemType[]}
-          noDataText="No products available"
-        />
-      </div>
-      {/* add Products modal */}
-      <div
-        id="add-product-modal"
-        tabIndex={-1}
-        aria-hidden="true"
-        className="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 py-6 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full bg-gray-800/30"
-      >
-        <div className="relative w-full max-w-4xl max-h-full">
-          {/* Modal content */}
-          <div className="relative bg-white rounded-lg shadow dark:bg-gray-800">
-            {/* Modal header */}
-            <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
-              <h3 className="text-2xl font-semibold text-gray-900 dark:text-white">
-                Create New Product
-              </h3>
-              <button
-                type="button"
-                className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
-                onClick={() => {
-                  addProductModal?.hide();
-                }}
-              >
-                <svg
-                  className="w-3 h-3"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 14 14"
-                >
-                  <path
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
-                  />
-                </svg>
-                <span className="sr-only">Close modal</span>
-              </button>
-            </div>
-            {/* Modal body */}
-            <form
-              ref={formRef}
-              className="px-4 py-4 space-y-5"
-              //   className="relative bg-white rounded-lg shadow dark:bg-gray-700"
-              onSubmit={handleSubmit(submitProductsForm)}
-            >
-              <div className="flex flex-col items-start gap-6 md:flex-row">
-                <div
-                  data-type="dropzone"
-                  className="min-w-full md:min-w-[40%] max-w-[40%]"
-                >
-                  <Media
-                    control={control}
-                    name="image"
-                    placeholder="Upload Product Image(s)"
-                    align="col"
-                    multiSelect
-                    rules={{ required: "Image is required" }}
-                  />
-                </div>
-                <div className="space-y-4 grow w-full">
-                  <Input
-                    control={control}
-                    name="name"
-                    placeholder="Product Name"
-                    rules={{ required: "Product name is required" }}
-                  />
-                  <RichEditor
-                    serialize="html"
-                    name="description"
-                    control={control}
-                    rules={{ required: "Product description is required" }}
-                  />
-                  <SelectDropdown
-                    name="category"
-                    options={ZenosCategory}
-                    control={control}
-                    placeholder="Category"
-                    disableOptionKeys={["oraimo", "new-age"]}
-                    defaultOptionKey="uk-used"
-                    containerClassName="z-30"
-                    rules={{ required: "Category is required" }}
-                  />
-                  {watch("category")?.key == "oraimo" && (
-                    <SelectDropdown
-                      name="subcategory"
-                      options={ZenosOraimoSubCategory}
-                      control={control}
-                      containerClassName="z-10"
-                      placeholder="Subcategory"
-                      rules={{ required: "Subcategory is required" }}
-                    />
-                  )}
-                  {watch("category")?.key == "new-age" && (
-                    <SelectDropdown
-                      name="subcategory"
-                      options={ZenosNewAgeSubCategory}
-                      control={control}
-                      containerClassName="z-10"
-                      placeholder="Subcategory"
-                      rules={{ required: "Subcategory is required" }}
-                    />
-                  )}
-                  <Input
-                    control={control}
-                    name="price"
-                    placeholder="Price"
-                    rules={{ required: "Price is required" }}
-                  />
-                  <Input
-                    control={control}
-                    name="salesPrice"
-                    placeholder="Discounted/Old Price"
-                  />
-                  <div className="flex justify-end">
-                    <Button type="submit" className="py-1 px-6 text-lg">
-                      Save
-                    </Button>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between py-2 border-b border-dotted">
-                      <p className="text-2xl font-semibold">Variants</p>
-                      <button
-                        type="button"
-                        className="border p-0.5 rounded-md"
-                        onClick={() => {
-                          setVariants([...variants, ...[{}]]);
-                        }}
-                      >
-                        <svg
-                          className="w-9 h-9 text-white"
-                          aria-hidden="true"
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            stroke="currentColor"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M5 12h14m-7 7V5"
-                          />
-                        </svg>
-                      </button>
-                    </div>
-                    {/* <div className="grid grid-cols-2 gap-4 md:grid-cols-4"> */}
-                    <div className="space-y-6">
-                      {variants &&
-                        variants.map((_item, i) => {
-                          return (
-                            <VariantsType control={control} i={i} key={i} />
-                          );
-                        })}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-};
-
-const Shop = () => {
-  return (
     <UserLayout>
-      <UserProductsComponent />
+      <PageMeta
+        title="Shop "
+        description="Manage your products, add new items, and update existing ones."
+      >
+        <section id="UserProductsSection" tabIndex={-1}>
+          <div className="pb-2 border-b-2 border-zenos-600 mb-2 flex items-center justify-between">
+            <h4 className="text-3xl font-bold">My Products</h4>
+            <Button
+              type="button"
+              className="!px-3 !py-2 gap-1.5"
+              onClick={() => {
+                addProductModal?.show();
+              }}
+            >
+              <svg
+                className="w-6 h-6 text-white"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="4"
+                  d="M5 12h14m-7 7V5"
+                />
+              </svg>
+            </Button>
+          </div>
+          <div className="py-8">
+            <Table
+              columns={columns}
+              data={products as ProductItemType[]}
+              noDataText="No products available"
+            />
+          </div>
+          {/* add Products modal */}
+          <div
+            id="add-product-modal"
+            tabIndex={-1}
+            aria-hidden="true"
+            className="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 py-6 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full bg-gray-800/30"
+          >
+            <div className="relative w-full max-w-4xl max-h-full">
+              {/* Modal content */}
+              <div className="relative bg-white rounded-lg shadow dark:bg-gray-800">
+                {/* Modal header */}
+                <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
+                  <h3 className="text-2xl font-semibold text-gray-900 dark:text-white">
+                    Create New Product
+                  </h3>
+                  <button
+                    type="button"
+                    className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+                    onClick={() => {
+                      addProductModal?.hide();
+                    }}
+                  >
+                    <svg
+                      className="w-3 h-3"
+                      aria-hidden="true"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 14 14"
+                    >
+                      <path
+                        stroke="currentColor"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
+                      />
+                    </svg>
+                    <span className="sr-only">Close modal</span>
+                  </button>
+                </div>
+                {/* Modal body */}
+                <form
+                  ref={formRef}
+                  className="px-4 py-4 space-y-5"
+                  //   className="relative bg-white rounded-lg shadow dark:bg-gray-700"
+                  onSubmit={handleSubmit(submitProductsForm)}
+                >
+                  <div className="flex flex-col items-start gap-6 md:flex-row">
+                    <div
+                      data-type="dropzone"
+                      className="min-w-full md:min-w-[40%] max-w-[40%]"
+                    >
+                      <Media
+                        control={control}
+                        name="image"
+                        placeholder="Upload Product Image(s)"
+                        align="col"
+                        multiSelect
+                        rules={{ required: "Image is required" }}
+                      />
+                    </div>
+                    <div className="space-y-4 grow w-full">
+                      <Input
+                        control={control}
+                        name="name"
+                        placeholder="Product Name"
+                        rules={{ required: "Product name is required" }}
+                      />
+                      <RichEditor
+                        serialize="html"
+                        name="description"
+                        control={control}
+                        rules={{ required: "Product description is required" }}
+                      />
+                      <SelectDropdown
+                        name="category"
+                        options={ZenosCategory}
+                        control={control}
+                        placeholder="Category"
+                        disableOptionKeys={["oraimo", "new-age"]}
+                        defaultOptionKey="uk-used"
+                        containerClassName="z-30"
+                        rules={{ required: "Category is required" }}
+                      />
+                      {watch("category")?.key == "oraimo" && (
+                        <SelectDropdown
+                          name="subcategory"
+                          options={ZenosOraimoSubCategory}
+                          control={control}
+                          containerClassName="z-10"
+                          placeholder="Subcategory"
+                          rules={{ required: "Subcategory is required" }}
+                        />
+                      )}
+                      {watch("category")?.key == "new-age" && (
+                        <SelectDropdown
+                          name="subcategory"
+                          options={ZenosNewAgeSubCategory}
+                          control={control}
+                          containerClassName="z-10"
+                          placeholder="Subcategory"
+                          rules={{ required: "Subcategory is required" }}
+                        />
+                      )}
+                      <Input
+                        control={control}
+                        name="price"
+                        placeholder="Price"
+                        rules={{ required: "Price is required" }}
+                      />
+                      <Input
+                        control={control}
+                        name="salesPrice"
+                        placeholder="Discounted/Old Price"
+                      />
+                      <div className="flex justify-end">
+                        <Button type="submit" className="py-1 px-6 text-lg">
+                          Save
+                        </Button>
+                      </div>
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between py-2 border-b border-dotted">
+                          <p className="text-2xl font-semibold">Variants</p>
+                          <button
+                            type="button"
+                            className="border p-0.5 rounded-md"
+                            onClick={() => {
+                              setVariants([...variants, ...[{}]]);
+                            }}
+                          >
+                            <svg
+                              className="w-9 h-9 text-white"
+                              aria-hidden="true"
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="24"
+                              height="24"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                stroke="currentColor"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M5 12h14m-7 7V5"
+                              />
+                            </svg>
+                          </button>
+                        </div>
+                        {/* <div className="grid grid-cols-2 gap-4 md:grid-cols-4"> */}
+                        <div className="space-y-6">
+                          {variants &&
+                            variants.map((_item, i) => {
+                              return (
+                                <VariantsType control={control} i={i} key={i} />
+                              );
+                            })}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </section>
+      </PageMeta>
     </UserLayout>
   );
 };

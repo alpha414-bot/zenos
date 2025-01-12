@@ -1,5 +1,7 @@
 import { auth, firestore } from "@/firebase-config";
 import { notify } from "@/notify";
+import { baseURL } from "@/System/Constants";
+import axios, { AxiosError } from "axios";
 import {
   collection,
   doc,
@@ -9,6 +11,7 @@ import {
   query,
   setDoc,
 } from "firebase/firestore";
+import _ from "lodash";
 import { clearCartProducts } from "./CartQuery";
 
 export const newOrderQuery = (
@@ -20,16 +23,19 @@ export const newOrderQuery = (
     try {
       if (auth.currentUser?.uid) {
         const OrderCollection = collection(firestore, "Orders");
-        const PaymentReferenceDoc = doc(OrderCollection, instance.reference);
+        const OrderReferenceDoc = doc(OrderCollection, instance.reference);
 
-        getDoc(PaymentReferenceDoc).then((UserProductItems) => {
+        getDoc(OrderReferenceDoc).then((UserProductItems) => {
           const UserOrderProducts =
             UserProductItems.data() as OrderDataInterface;
           if (UserProductItems.exists() && UserOrderProducts) {
             // retrieving the order payment reference
-            resolve(UserProductItems.data());
+            resolve(UserOrderProducts);
+            // resolve(UserProductItems.data());
           } else {
-            setDoc(PaymentReferenceDoc, {
+            delete billing_info.password;
+            delete billing_info.confirm_password;
+            setDoc(OrderReferenceDoc, {
               instance: instance,
               products: carts,
               billing_info: billing_info,
@@ -37,13 +43,60 @@ export const newOrderQuery = (
               createdAt: new Date(),
               updatedAt: new Date(),
             })
-              .then((data) => {
-                notify.success({
-                  text: `Payment is successful and order received. You would be redirected to order page to track your products.`,
-                });
-                clearCartProducts();
-                resolve(data);
-                // #notification to admin
+              .then(() => {
+                axios
+                  .request({
+                    baseURL,
+                    url: "mailer/new/order",
+                    method: "post",
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
+                    maxBodyLength: Infinity,
+                    responseType: "json",
+                    data: JSON.stringify({
+                      username: billing_info.username,
+                      email: billing_info.email,
+                      order_id: instance.reference,
+                      products: carts.map((item) => ({
+                        id: item.productID,
+                        name: _.trim(item.metadata?.name),
+                        price:
+                          (item.quantity || 1) * Number(item.metadata?.price),
+                      })),
+                    }),
+                  })
+                  .then((res) => {
+                    // #notification to admin
+                    console.log("respsone", res.data);
+                    notify.success({
+                      text: `Payment is successful and order received. You would be redirected to order page to track your products.`,
+                    });
+                    clearCartProducts();
+                    resolve({});
+                  })
+                  .catch(
+                    (
+                      error: AxiosError<{
+                        data: { message: string };
+                        error: boolean;
+                        success: boolean;
+                      }>
+                    ) => {
+                      console.log(error.response);
+                      if (error.response && error.response.data.data) {
+                        notify.error({
+                          text: `Notification failed to triggered. ${JSON.stringify(
+                            error.response.data.data.message
+                          )}`,
+                        });
+                      } else {
+                        notify.error({
+                          text: "Internal Server Error. Please customer support.",
+                        });
+                      }
+                    }
+                  );
               })
               .catch((error) => {
                 notify.error({

@@ -45,7 +45,7 @@ function Navbar() {
             )}
           </div>
         )}
-      <nav className="mynavbar md:sticky top-0 z-50 flex items-center justify-between bg-gray-950 shadow-md w-full shadow-gray-900/50 px-4 py-3.5 md:px-10 md:py-3">
+      <nav className="sticky top-0 z-50 flex items-center justify-between bg-gray-950 shadow-md w-full shadow-gray-900/50 px-4 py-3.5 md:px-10 md:py-3">
         <Link to="/">
           <img
             src="/assets/images/zenos.svg"

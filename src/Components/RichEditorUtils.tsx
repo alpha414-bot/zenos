@@ -22,8 +22,8 @@ const LIST_TYPES = ["numbered-list", "bulleted-list"];
 const TEXT_ALIGN_TYPES = ["left", "center", "right", "justify"];
 
 interface BaseProps {
-  className: string;
-  [key: string]: unknown;
+  className?: string;
+  // [key: string]: unknown;
 }
 
 type LinkElement = { type: "link"; url: string; children: Descendant[] };
@@ -45,14 +45,17 @@ const Button = React.forwardRef(
       className,
       active,
       reversed,
+      onMouseDown,
       ...props
     }: PropsWithChildren<
       {
         active: boolean;
-        reversed: boolean;
+        reversed?: boolean;
+        className?: string;
+        onMouseDown?: (event: any) => void;
       } & BaseProps
     >,
-    ref: Ref<HTMLSpanElement>
+    ref: Ref<HTMLButtonElement>
   ) => (
     <span
       {...props}
@@ -138,7 +141,10 @@ const toggleBlock = (editor: any, format: any) => {
 };
 
 export const Toolbar = React.forwardRef(
-  ({ className, ...props }: PropsWithChildren<BaseProps>, ref: Ref<HTMLDivElement>) => (
+  (
+    { className, ...props }: PropsWithChildren<BaseProps>,
+    ref: Ref<HTMLDivElement>
+  ) => (
     <div
       {...props}
       data-test-id="menu"

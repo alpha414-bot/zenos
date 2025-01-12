@@ -17,7 +17,9 @@ import { useForm } from "react-hook-form";
 import Slider from "react-slick";
 
 const Home = () => {
-  const { data, isLoading, isFetching } = useProductsData<ProductItemType[]>();
+  const { data, isLoading, isFetching } = useProductsData<ProductItemType[]>({
+    limit: 12,
+  });
   const { control, handleSubmit } = useForm();
   const JoinNewsletter = () => {
     notify.success({
@@ -32,14 +34,14 @@ const Home = () => {
         description="The ecommerce with the latest in laptops, mobile and gadgets"
       >
         <div className="space-y-7">
-          <div className="grid grid-cols-1 items-stretch gap-x-14 py-8 px-2 md:py-8 md:px-12 md:grid-cols-[69%_auto]">
+          <div className="grid grid-cols-1 items-stretch gap-x-14 py-8 px-2 md:py-8 md:px-12 lg:grid-cols-[69%_auto]">
             <Slider
               {...{
                 fade: true,
                 slidesToShow: 1,
                 slidesToScroll: 1,
-                // autoplay: true,
-                autoplaySpeed: 6000,
+                autoplay: true,
+                autoplaySpeed: 5500,
                 adaptiveHeight: true,
                 arrows: !false,
                 // infinite: false,
@@ -72,28 +74,41 @@ const Home = () => {
             >
               {[
                 {
-                  image: "OraimoBannerB.jpg",
+                  lg_image: "OraimoBannerB.jpg",
+                  sm_image: "BannerG.jpg",
                 },
-                { image: "BannerB.png" },
+                { lg_image: "BannerB.png", sm_image: "BannerB_2.png" },
                 {
-                  image: "BannerC.png",
+                  lg_image: "BannerC.png",
+                  sm_image: "newage-flyer.jpg",
+                },
+                {
+                  lg_image: "BannerH.jpg",
+                  sm_image: "oraimo-flyer.jpg",
                 },
               ].map((item, index) => (
                 <div
                   key={index}
                   className={classNames("relative w-full !h-auto md:!h-[75vh]")}
                 >
-                  <img
-                    src={`/assets/images/${item.image}`}
-                    alt="1st Slider image"
-                    className="!block w-full rounded-lg md:!hidden"
-                  />
+                  {/* Large Screen */}
                   <div
-                    className="!hidden w-full h-full bg-no-repeat bg-center bg-cover rounded-lg md:rounded-3xl md:!block"
+                    className={classNames(
+                      "!hidden w-full min-h-96 h-full bg-no-repeat bg-center bg-cover rounded-lg md:rounded-3xl md:!block"
+                    )}
                     style={{
-                      backgroundImage: `url('/assets/images/${item.image}')`,
+                      backgroundImage: `url('/assets/images/${item.lg_image}')`,
                     }}
-                  ></div>
+                  />
+                  {/* Small Screen */}
+                  <div
+                    className={classNames(
+                      "!block w-full min-h-96 h-full bg-no-repeat bg-center bg-cover rounded-xl md:rounded-3xl md:!hidden"
+                    )}
+                    style={{
+                      backgroundImage: `url('/assets/images/${item.sm_image}')`,
+                    }}
+                  />
                 </div>
               ))}
             </Slider>
@@ -138,7 +153,6 @@ const Home = () => {
             </div>
           </div>
           {/* Quick About Us */}
-          {/* <div className="border border-gray-700 mx-2 px-6 py-6 rounded-lg grid grid-cols- gap-y-6 divide-gray-700 md:grid-cols-5 md:py-4 md:divide-x-2 md:mx-12"> */}
           <Slider
             {...{
               slidesToShow: 5,
@@ -149,7 +163,7 @@ const Home = () => {
               dots: false,
               responsive: [
                 {
-                  breakpoint: 600,
+                  breakpoint: 1024,
                   settings: {
                     slidesToShow: 1,
                     slidesToScroll: 1,
@@ -210,17 +224,21 @@ const Home = () => {
               );
             })}
           </Slider>
-          {/* </div> */}
           <div className="py-10 px-3 md:px-10 space-y-10">
             <div id="shop">
-              <div className="">
-                <Title>Best Selling Products</Title>
-                <p className="text-sm font-semibold py-1 px-2">
-                  Products with a lot of sale this month and last. Browse
-                  through and enjoy.
-                </p>
-                <hr className="mt-3 border-gray-300" />
+              <div className="flex flex-col text-center gap-y-4 items-center justify-between md:flex-row md:text-left md:justify-between">
+                <div>
+                  <Title>Best Selling Products</Title>
+                  <p className="text-sm font-semibold py-1 px-2">
+                    Products with a lot of sale this month and last. Browse
+                    through and enjoy.
+                  </p>
+                </div>
+                <div>
+                  <ButtonAsLink to="/products">See More</ButtonAsLink>
+                </div>
               </div>
+              <hr className="mt-3 border-gray-300" />
               <div className="mt-6 py-8 grid grid-cols-1 sm:grid-cols-[1fr_2fr] xl:grid-cols-[1fr_3fr] gap-10">
                 <div className="grow">
                   <Filter products={data || []} paginateLimit={6} />

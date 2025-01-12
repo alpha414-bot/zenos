@@ -1,4 +1,4 @@
-import { MediaMimeType } from "@/Types/Media";
+import { MediaItemInterface, MediaMimeType } from "@/Types/Media";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface MediaModalInterface {
@@ -7,7 +7,7 @@ interface MediaModalInterface {
   placeholder?: string | null;
   multiSelect: boolean;
   show: boolean;
-  selectedItems?: any;
+  selectedItems?: MediaItemInterface[] | null;
 }
 
 const initialState: MediaModalInterface = {
@@ -29,7 +29,8 @@ export const MediaSlice = createSlice({
     ) => {
       state.multiSelect = action.payload.multiSelect;
     },
-    setModalState: (state) => {
+    setModalState: (state, action: PayloadAction<{ multiSelect: boolean }>) => {
+      state.multiSelect = action.payload.multiSelect;
       state.show = !state.show;
     },
     setMediaModalItems: (state, action: PayloadAction<any>) => {
@@ -38,5 +39,6 @@ export const MediaSlice = createSlice({
   },
 });
 
-export const { setMediaModalOnChange, setModalState, setMediaModalItems } = MediaSlice.actions;
+export const { setMediaModalOnChange, setModalState, setMediaModalItems } =
+  MediaSlice.actions;
 export default MediaSlice.reducer;

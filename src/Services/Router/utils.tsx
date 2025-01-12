@@ -30,10 +30,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     isFetching: cartIsFetching,
   } = useCartProducts();
   const PauseAuthorization =
-    isUserLoading ||
-    isUserFetching ||
-    cartIsLoading ||
-    cartIsFetching;
+    isUserLoading || isUserFetching || cartIsLoading || cartIsFetching;
   useLayoutEffect(() => {
     if (!PauseAuthorization && isUserFetched) {
       // middleware is for admin, currentuser needs to be authenticated and must be an administrator

@@ -123,17 +123,20 @@ const ProductItem: React.FC<{
       </div>
       {/* Product metadata */}
       <div
-        className={classNames("flex flex-col justify-between w-full whitespace-[", {
-          "px-3 py-0 grow": TypeCartListing,
-          "px-2 py-1": TypeSimilarListing,
-          "p-0 grow": TypeOrderListing,
-          "px-4 mt-4 grow w-full": TypeProductListing,
-        })}
+        className={classNames(
+          "flex flex-col justify-between w-full whitespace-[",
+          {
+            "px-3 py-0 grow": TypeCartListing,
+            "px-2 py-1": TypeSimilarListing,
+            "p-0 grow": TypeOrderListing,
+            "px-4 mt-4 grow w-full": TypeProductListing,
+          }
+        )}
       >
         <div>
           <div className="flex flex-col items-start justify-between gap-1.5 mb-1 lg:flex-row overflow-hidden">
             {/* Product name-description and quantity */}
-            <Link to={`/products/${product.id}`} className="w-full">
+            <Link to={`/product/${product.id}`} className="w-full">
               {/* Product name/ <description> */}
               <div>
                 <h3
@@ -145,6 +148,9 @@ const ProductItem: React.FC<{
                       : "text-xl font-bold"
                   }`}
                 >
+                  <span className="underline underline-offset-2 decoration-dashed">
+                    {product.category.key == "uk-used" ? "UK-USED - " : ""}
+                  </span>
                   {product.name}
                 </h3>
                 <div className="mt-0.5 flex items-center justify-start gap-2">
@@ -157,7 +163,11 @@ const ProductItem: React.FC<{
                 </div>
               </div>
               {TypeCartListing && (
-                <p className={"text-white text-sm font-medium mt-4 whitespace-pre-line"}>
+                <p
+                  className={
+                    "text-white text-sm font-medium mt-4 whitespace-pre-line"
+                  }
+                >
                   {stripHtml(product?.description, " ")}
                 </p>
               )}
@@ -192,7 +202,7 @@ const ProductItem: React.FC<{
             )}
           </div>
           {!TypeCartListing && !TypeOrderListing && !TypeSimilarListing && (
-            <Link to={`/products/${product.id}`}>
+            <Link to={`/product/${product.id}`}>
               <p className="hidden lg:block text-gray-200 text-sm">
                 {short(stripHtml(product?.description, " "), 120)}
               </p>

@@ -1,7 +1,6 @@
 import { useAppDispatch, useAppSelector } from "@/Services/Redux/Hook.ts";
 import {
-  setMediaModalOnChange,
-  setModalState,
+  setModalState
 } from "@/Services/Redux/MediaSlice.ts";
 import { MediaItemInterface, MediaMimeType } from "@/Types/Media.js";
 import _ from "lodash";
@@ -52,12 +51,10 @@ const Media: React.FC<{
           id={`${name}MediaButton`}
           onClick={() => {
             dispatch(
-              setMediaModalOnChange({
-                // onChange: onChange,
+              setModalState({
                 multiSelect: multiSelect,
               })
             );
-            dispatch(setModalState());
           }}
           type="button"
           className="w-full cursorpointer text-center text-lg font-bold flex flex-col gap-y-2 items-center justify-center py-6 px-2 border-4 border-white border-dotted rounded-lg text-white min-h-56 tracking-wider"

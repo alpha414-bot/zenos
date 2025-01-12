@@ -1,7 +1,7 @@
 import { initializeApp } from "firebase/app";
-import { connectAuthEmulator, getAuth } from "firebase/auth";
-import { connectFirestoreEmulator, getFirestore } from "firebase/firestore";
-import { connectStorageEmulator, getStorage } from "firebase/storage";
+import { getAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
   apiKey: "AIzaSyA-w9v45sGFqymT0_3OwqExBxc4MFur0tk",
@@ -10,7 +10,7 @@ const firebaseConfig = {
   storageBucket: "zenos-ecommerce.firebasestorage.app",
   messagingSenderId: "354715463819",
   appId: "1:354715463819:web:ccb15c2a017599a21de48e",
-  measurementId: "G-V1XNM8WP44"
+  measurementId: "G-V1XNM8WP44",
 };
 
 // Initialize Firebase
@@ -20,9 +20,10 @@ const firestore = getFirestore(app);
 const storage = getStorage(app);
 
 // const IP = "192.168.0.5";
-const IP = "127.0.0.1";
-connectAuthEmulator(auth, `http://${IP}:9099`);
-connectFirestoreEmulator(firestore, IP, 8080);
-connectStorageEmulator(storage, IP, 9199);
+// const IP = "127.0.0.1";
+// connectAuthEmulator(auth, `http://${IP}:9099`);
+// connectFirestoreEmulator(firestore, IP, 8080);
+// connectStorageEmulator(storage, IP, 9199);
 
 export { app, auth, firestore, storage };
+

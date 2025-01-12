@@ -12,7 +12,7 @@ import {
   MimesType,
 } from "@/Types/Media.js";
 import classNames from "classnames";
-import { InstanceOptions, Modal } from "flowbite";
+import { initFlowbite, InstanceOptions, Modal } from "flowbite";
 import _ from "lodash";
 import { useCallback, useEffect, useLayoutEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
@@ -145,6 +145,9 @@ const MediaModal = () => {
       }
     }
   };
+  useEffect(() => {
+    initFlowbite();
+  }, [mediaType, multiSelect]);
 
   // subscribe to onChange
   const onChange = (item: any) => {
@@ -251,7 +254,9 @@ const MediaModal = () => {
                       return (
                         <div
                           key={index}
-                          className="hidden p-2"
+                          className={classNames("p-2", {
+                            "hidden ": media_name == "video",
+                          })}
                           // id={`${media_name}_tab`}
                           id={`${media_name}_tab_Modal`}
                           role="tabpanel"

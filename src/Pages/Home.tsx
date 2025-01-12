@@ -118,12 +118,12 @@ const Home = () => {
                 {
                   placeholder: "oraimo-flyer.jpg",
                   title: "Oraimo",
-                  link: "oraimo",
+                  link: "/products/oraimo",
                 },
                 {
                   placeholder: "newage-flyer.jpg",
                   title: "New Age",
-                  link: "newage",
+                  link: "/products/new-age",
                 },
               ].map((item, index) => (
                 <div
@@ -136,7 +136,7 @@ const Home = () => {
                       {item.title} Gadgets
                     </h2>
                     <ButtonAsLink
-                      to="/shop/oraimo"
+                      to={item.link}
                       className="whitespace-nowrap !m-0"
                     >
                       Shop Now

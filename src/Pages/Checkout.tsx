@@ -88,7 +88,6 @@ const Checkout = () => {
         title="Checkout"
         description="Start pushing your cart to the finishing line"
       >
-        {reference}
         <div className="relative flex flex-col-reverse lg:block">
           <form
             onSubmit={handleSubmit(onSubmit)}

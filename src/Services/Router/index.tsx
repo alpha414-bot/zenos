@@ -128,7 +128,7 @@ const RootRouter: RouteObject[] = [
   {
     path: "/checkout",
     element: (
-      <ProtectedRoute middlewares={["checkout"]}>
+      <ProtectedRoute middlewares={["auth"]}>
         <Checkout />
       </ProtectedRoute>
     ),

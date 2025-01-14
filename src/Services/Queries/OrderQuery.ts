@@ -74,7 +74,7 @@ export const newOrderQuery = (
                       })),
                     }),
                   })
-                  .then((res) => {
+                  .then(() => {
                     notify.success({
                       text: `Payment is successful and order received. You would be redirected to order page to track your products.`,
                     });

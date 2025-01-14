@@ -45,10 +45,6 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     if (middlewares?.includes("guest") && isAuthenticated) {
       return navigate("/", { replace: true });
     }
-
-    if (middlewares?.includes("checkout") && !carts?.length) {
-      return navigate("/user/carts", { replace: true });
-    }
   }, [currentUser, carts, isLoading, isUserFetched, navigate, middlewares]);
 
   if (isLoading) {

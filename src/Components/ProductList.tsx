@@ -1,16 +1,23 @@
 // ProductList: Components displaying a category of product based on different section of the web app
+import { useAppDispatch } from "@/Services/Redux/Hook";
+import { setMixerContainerEnable } from "@/Services/Redux/MixerSlice";
 import classNames from "classnames";
-import React from "react";
+import React, { useEffect } from "react";
 import ProductItem from "./ProductItem";
 
 const ProductList: React.FC<ProductListInterface> = ({
   products,
   type = "product_listing",
 }) => {
+  const dispatch = useAppDispatch();
   const TypeCartListing = type === "carts_listing";
   const TypeSimilarListing = type === "similar_listing";
   const TypeOrderListing = type === "order_listing";
   const TypeProductListing = type === "product_listing";
+  useEffect(() => {
+    dispatch(setMixerContainerEnable(true));
+    console.log("initialized here");
+  }, []);
   return (
     <div
       className={classNames("relative grid mixitup-product-wrapper", {

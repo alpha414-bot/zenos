@@ -115,7 +115,7 @@ function Navbar() {
           <div className="flex items-center gap-x-1 md:gap-x-2">
             {/* Search Icon */}
             <Link
-              to="/products/oraimo"
+              to="/products/"
               className="relative inline-flex items-center px-1 py-1 rounded-full"
             >
               <svg

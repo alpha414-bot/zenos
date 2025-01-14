@@ -3,6 +3,7 @@ import { notify } from "@/notify";
 import { ErrorFilter } from "@/System/function";
 import { AuthUserType } from "@/Types/Auth";
 import {
+  AuthError,
   createUserWithEmailAndPassword,
   EmailAuthProvider,
   linkWithCredential,
@@ -10,8 +11,6 @@ import {
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signOut,
-  AuthError
-  
 } from "firebase/auth";
 import {
   collection,
@@ -29,15 +28,17 @@ import { QueryClient } from "./QueryClient";
 interface UserSignInFormInput {
   email?: string;
   phone?: string;
-  password: string;
+  password?: string;
   admin?: boolean;
 }
 
 interface UserSignUpFormInput {
   email?: string;
-  phone: string;
-  password: string;
-  username: string;
+  phone?: string;
+  password?: string;
+  username?: string;
+  first_name?: string;
+  last_name?: string;
 }
 
 /**
@@ -94,9 +95,9 @@ export const queryToGetUserData = (user: AuthUserType): Promise<AuthUserType> =>
 
 const generateEmailFromPhone = (phone: string | undefined): string => {
   if (!phone) {
-    throw new Error('Phone number is required');
+    throw new Error("Phone number is required");
   }
-  const cleanPhone = phone.replace(/[^0-9]/g, '');
+  const cleanPhone = phone.replace(/[^0-9]/g, "");
   return `user.${cleanPhone}@generated.app`;
 };
 
@@ -112,21 +113,21 @@ export const queryToRegisterUser = (
   new Promise((resolve, reject) => {
     try {
       if (!payload.phone && !payload.email) {
-        throw new Error('Either phone or email is required');
+        throw new Error("Either phone or email is required");
       }
 
       if (admin && !payload.email) {
-        throw new Error('Email is required for admin registration');
+        throw new Error("Email is required for admin registration");
       }
 
       if (admin) {
         if (!payload.email) {
-          throw new Error('Email is required for admin registration');
+          throw new Error("Email is required for admin registration");
         }
         createUserWithEmailAndPassword(
           auth,
           payload.email,
-          payload.password
+          payload.password || ""
         )
           .then((user) => {
             const UsersCollection = collection(firestore, "Users");
@@ -154,7 +155,7 @@ export const queryToRegisterUser = (
                   text: "Admin has been registered successfully.",
                 });
               })
-              .catch(err => {
+              .catch((err) => {
                 queryToLogout(true);
                 reject(err);
                 notify.error(
@@ -173,14 +174,14 @@ export const queryToRegisterUser = (
         const generatedEmail = generateEmailFromPhone(payload.phone);
         const currentUser = auth.currentUser;
         if (!currentUser) {
-          throw new Error('No authenticated user found');
+          throw new Error("No authenticated user found");
         }
-        
+
         const Credential = EmailAuthProvider.credential(
           generatedEmail,
-          payload.password
+          payload.password || ""
         );
-        
+
         linkWithCredential(currentUser, Credential)
           .then((newuser) => {
             notify.success({
@@ -233,15 +234,15 @@ export const queryToLoginUser = (payload: UserSignInFormInput) =>
   new Promise((resolve, reject) => {
     try {
       const UsersCollection = collection(firestore, "Users");
-      
+
       if (payload.admin && !payload.email) {
-        throw new Error('Email is required for admin login');
+        throw new Error("Email is required for admin login");
       }
       if (!payload.admin && !payload.phone) {
-        throw new Error('Phone number is required for user login');
+        throw new Error("Phone number is required for user login");
       }
 
-      const QueryForUser = payload.admin 
+      const QueryForUser = payload.admin
         ? query(
             UsersCollection,
             where("admin", "==", true),
@@ -255,22 +256,19 @@ export const queryToLoginUser = (payload: UserSignInFormInput) =>
 
       getDocs(QueryForUser).then((user) => {
         if (user.docs.length > 0) {
-          const loginEmail = payload.admin 
-            ? payload.email! 
+          const loginEmail = payload.admin
+            ? payload.email!
             : generateEmailFromPhone(payload.phone);
 
-          signInWithEmailAndPassword(
-            auth,
-            loginEmail,
-            payload.password
-          )
+          signInWithEmailAndPassword(auth, loginEmail, payload?.password || "")
             .then((user) => {
               notify.success({
                 text: "Signed in successfully.",
               });
               resolve(user);
             })
-            .catch((error: AuthError) => {  // Updated error type
+            .catch((error: AuthError) => {
+              // Updated error type
               notify.error({ text: ErrorFilter(error) });
               reject(error);
             });
@@ -281,7 +279,7 @@ export const queryToLoginUser = (payload: UserSignInFormInput) =>
         }
       });
     } catch (error) {
-      const authError = error as AuthError;  // Type assertion for the catch block
+      const authError = error as AuthError; // Type assertion for the catch block
       notify.error({
         title: "Error",
         text: "An error occurred during login. Please try again.",
@@ -290,13 +288,12 @@ export const queryToLoginUser = (payload: UserSignInFormInput) =>
     }
   });
 
-
 export const queryToVerifyAccount = () =>
   new Promise((resolve, reject) => {
     try {
       const currentUser = auth.currentUser;
       if (!currentUser) {
-        throw new Error('No authenticated user found');
+        throw new Error("No authenticated user found");
       }
 
       sendEmailVerification(currentUser)

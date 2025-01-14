@@ -12,6 +12,7 @@ import { addCollectionDoc, updateCollectionDoc } from "@/Services/Queries";
 import { queryToDeleteProduct } from "@/Services/Queries/ProductQuery";
 import {
   ZenosCategory,
+  ZenosItelSubCategory,
   ZenosNewAgeSubCategory,
   ZenosOraimoSubCategory,
 } from "@/System/Constants";
@@ -253,6 +254,18 @@ const ProductsAction = ({ values }: { values: ProductItemType }) => {
                   <SelectDropdown
                     name="subcategory"
                     options={ZenosNewAgeSubCategory}
+                    control={control}
+                    containerClassName="z-10"
+                    placeholder="Subcategory"
+                    label="Subcategory"
+                    defaultValue={values?.subcategory}
+                    rules={{ required: "Subcategory is required" }}
+                  />
+                )}
+                {watch("category")?.key == "itel" && (
+                  <SelectDropdown
+                    name="subcategory"
+                    options={ZenosItelSubCategory}
                     control={control}
                     containerClassName="z-10"
                     placeholder="Subcategory"

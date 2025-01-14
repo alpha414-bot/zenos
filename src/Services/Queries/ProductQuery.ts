@@ -37,10 +37,46 @@ export const queryToDeleteProduct = (id?: string) =>
     }
   });
 
+export const getUkUsedProductData = <T>(listener: any): Promise<T> =>
+  new Promise((resolve, reject) => {
+    try {
+      const ProductCollection = collection(firestore, "Products");
+      const productQuery = query(
+        ProductCollection,
+        where("category.key", "==", "uk-used")
+      );
+      onSnapshot(
+        productQuery,
+        (snap) => {
+          resolve(
+            listener(snap.docs.map((doc) => ({ ...doc.data(), id: doc.id })))
+          );
+        },
+        (error) => {
+          notify.error({
+            title: "Error",
+            text: `SNAPSHOT_ERROR_WHILE_RETRIEVING_PRODUCTS: ${JSON.stringify(
+              error
+            )}. <br/>Contact administrator`,
+          });
+          reject(error);
+        }
+      );
+    } catch (error) {
+      notify.error({
+        title: "Error",
+        text: `${JSON.stringify(error)}. <br/>Contact administrator.`,
+      });
+      reject(error);
+    }
+  });
+
 export const getProductData = <T>(
   listener: any,
   product_id?: any,
-  admin: boolean = false
+  admin: boolean = false,
+  for_public: boolean = true,
+  productLimit: any = "all"
 ): Promise<T> =>
   new Promise(async (resolve, reject) => {
     try {
@@ -65,11 +101,26 @@ export const getProductData = <T>(
         );
       } else {
         // return all the products in the ProductCollection with pagination
-
         let productQuery = query(ProductCollection, orderBy("createdAt"));
+        if (productLimit && productLimit != "all" && !isNaN(productLimit)) {
+          // limiting the number of displayed products, if to display all, productLimit would be undefined
+          productQuery = query(productQuery, limit(productLimit));
+        }
         if (!admin) {
-          // user is the one quering
-          productQuery = query(productQuery, where("status", "==", "active"));
+          // if current user is not an admin requesting
+          if (for_public) {
+            // only show active products to the public
+            productQuery = query(
+              productQuery,
+              where("status", "==", "active"),
+              where("status", "!=", "archived")
+            );
+          }
+        } else {
+          productQuery = query(
+            productQuery,
+            where("category.key", "!=", "uk-used")
+          );
         }
 
         onSnapshot(

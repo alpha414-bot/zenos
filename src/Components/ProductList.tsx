@@ -29,7 +29,7 @@ const ProductList: React.FC<ProductListInterface> = ({
               type={type}
             />
           ))}
-          {TypeProductListing && (
+          {false && (
             <img
               src="/assets/images/BannerE.png"
               className="w-full rounded-lg transition-all duration-700 product-placeholder"
@@ -37,7 +37,10 @@ const ProductList: React.FC<ProductListInterface> = ({
           )}
         </>
       )}
-      <p className="hidden no-product-data bottom-0">No Record Found</p>
+      <div className="hidden no-product-data bottom-0 space-y-2">
+        <i className="fa-3x fa-solid fa-bug block text-zenos-600"></i>
+        <p>Oops! No product found.</p>
+      </div>
     </div>
   );
 };

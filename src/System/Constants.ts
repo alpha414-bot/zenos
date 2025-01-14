@@ -1,3 +1,18 @@
+import { backend_url as BackendUrl } from "../../package.json";
+
+export const baseURL = BackendUrl;
+export const getMediaUrl = (path: string, w: any = "original") => {
+  return `${baseURL}/media/cdn/images/${w}/${path}`;
+};
+export const headers = ({
+  content_type,
+}: {
+  content_type: "application/json";
+}) => {
+  const myHeaders = new Headers();
+  myHeaders.append("Content-Type", content_type);
+  return myHeaders;
+};
 export const Config = {
   phone: "09036279887",
   email: "info@zenos.com.ng",

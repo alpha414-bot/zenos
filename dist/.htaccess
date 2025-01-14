@@ -1,0 +1,14 @@
+RewriteEngine On
+
+# Serve index.html for all requests except existing files or directories
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.html [L]
+
+# Exclude PDF files from the above rule and serve them directly
+RewriteCond %{REQUEST_URI} \.pdf$
+RewriteRule ^ - [L]
+
+# php -- BEGIN cPanel-generated handler, do not edit
+# This domain inherits the “PHP” package.
+# php -- END cPanel-generated handler, do not edit

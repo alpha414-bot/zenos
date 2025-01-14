@@ -1,21 +1,22 @@
-import { MediaMimeType, ModalInterface } from "@/Types/Media";
+import { MediaItemInterface, MediaMimeType } from "@/Types/Media";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import _ from "lodash";
 
 interface MediaModalInterface {
   mediaType?: MediaMimeType[];
   name?: string | null;
   placeholder?: string | null;
-  onChange?: any;
-  multiSelect: boolean,
-  modal?: ModalInterface;
+  multiSelect: boolean;
+  show: boolean;
+  selectedItems?: MediaItemInterface[] | null;
 }
 
 const initialState: MediaModalInterface = {
   mediaType: ["image", "video"],
   name: null,
   placeholder: null,
-  multiSelect: false
+  multiSelect: false,
+  show: false,
+  selectedItems: null,
 };
 
 export const MediaSlice = createSlice({
@@ -24,19 +25,20 @@ export const MediaSlice = createSlice({
   reducers: {
     setMediaModalOnChange: (
       state,
-      action: PayloadAction<{ onChange?: any; multiSelect: boolean }>
+      action: PayloadAction<{ multiSelect: boolean }>
     ) => {
-      if (state.modal) {
-        state.multiSelect = action.payload.multiSelect
-        state.onChange = action.payload.onChange;
-      }
+      state.multiSelect = action.payload.multiSelect;
     },
-    setModalInstance: (state, action) => {
-      // console.log("setting modal", action.payload);
-      state.modal = action.payload;
+    setModalState: (state, action: PayloadAction<{ multiSelect: boolean }>) => {
+      state.multiSelect = action.payload.multiSelect;
+      state.show = !state.show;
+    },
+    setMediaModalItems: (state, action: PayloadAction<any>) => {
+      state.selectedItems = action.payload;
     },
   },
 });
 
-export const { setMediaModalOnChange, setModalInstance } = MediaSlice.actions;
+export const { setMediaModalOnChange, setModalState, setMediaModalItems } =
+  MediaSlice.actions;
 export default MediaSlice.reducer;

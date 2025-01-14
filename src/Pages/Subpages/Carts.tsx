@@ -15,7 +15,7 @@ const Carts = () => {
         title="User - My Carts"
         description="View, Manage and your carts"
       >
-        <h3 className="text-4xl font-bold tracking-wider">
+        <h3 className="text-4xl font-bold tracking-wider underline underline-offset-8 decoration-dotted">
           My Carts [{data.length}]
         </h3>
         {(data.length > 0 && (
@@ -63,8 +63,8 @@ const Carts = () => {
             </div>
           </>
         )) || (
-          <div className="mt-9 bg-gray-200 bg-opacity-50 rounded px-2 py-6">
-            <p className="font-bold text-center">No item in cart</p>
+          <div className="mt-9 bg-gray-400 bg-opacity-50 rounded px-2 py-4">
+            <p className="font-bold text-center text-lg">No item in cart</p>
           </div>
         )}
       </PageMeta>

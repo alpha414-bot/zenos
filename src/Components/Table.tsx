@@ -50,12 +50,12 @@ const Table: FC<{
                 table.setPageSize(Number(e.target.value));
               }}
             >
-              {[10, 20, 30, 40, 50, data.length > 50 ? "ALL" : undefined].map(
-                (pageSize) =>
+              {[10, 20, 30, 40, 50, data?.length > 50 ? "ALL" : undefined].map(
+                (pageSize, index) =>
                   pageSize && (
                     <option
-                      key={pageSize}
-                      value={pageSize == "ALL" ? data.length : pageSize}
+                      key={`${index}-${pageSize}`}
+                      value={pageSize == "ALL" ? data?.length : pageSize}
                     >
                       Show {pageSize}
                     </option>
@@ -160,7 +160,7 @@ const Table: FC<{
                 ))}
               </thead>
               <tbody className="align-top">
-                {(table.getRowModel().rows.length > 0 &&
+                {(table.getRowModel()?.rows?.length > 0 &&
                   table.getRowModel().rows.map((row) => {
                     return (
                       <tr
@@ -186,7 +186,7 @@ const Table: FC<{
                   <tr>
                     <td
                       className="px-6 py-4 text-center text-lg font-medium text-gray-300 bg-gray-800"
-                      colSpan={columns.length}
+                      colSpan={columns?.length}
                     >
                       {noDataText || "No records available"}
                     </td>

@@ -4,15 +4,20 @@ import ForgotPassword from "@/Pages/Auth/ForgotPassword";
 import Checkout from "@/Pages/Checkout";
 import ErrorPage from "@/Pages/ErrorPage";
 import Home from "@/Pages/Home";
-import AddProduct from "@/Pages/AddProduct";
 import Inbox from "@/Pages/Inbox";
-import Product from "@/Pages/Product";
+import ProductDetails from "@/Pages/ProductDetails";
+import Products from "@/Pages/Products";
+import Shop from "@/Pages/Shop";
 import Carts from "@/Pages/Subpages/Carts";
 import Orders from "@/Pages/Subpages/Orders";
-import { Outlet, RouteObject, createBrowserRouter } from "react-router-dom";
+import {
+  Navigate,
+  Outlet,
+  RouteObject,
+  createBrowserRouter,
+} from "react-router-dom";
 import AdminRouter from "./AdminRouter";
 import { ProtectedRoute, withScrollToTop } from "./utils";
-
 
 const RootRouter: RouteObject[] = [
   {
@@ -44,6 +49,10 @@ const RootRouter: RouteObject[] = [
     ),
     errorElement: <ErrorPage />,
     children: [
+      {
+        path: "",
+        element: <Navigate to={"/user/carts"} />,
+      },
       // orders
       {
         path: "orders",
@@ -55,8 +64,8 @@ const RootRouter: RouteObject[] = [
         element: <Carts />,
       },
       {
-        path: "products",
-        element: <AddProduct/>,
+        path: "shop",
+        element: <Shop />,
       },
       // inbox
       {
@@ -95,12 +104,22 @@ const RootRouter: RouteObject[] = [
     ),
     errorElement: <ErrorPage />,
   },
-  // products
+  // all products and filtering
   {
-    path: "/products/:product_id",
+    path: "/products/:category?/:subcategory?",
     element: (
       <ProtectedRoute>
-        <Product />
+        <Products />
+      </ProtectedRoute>
+    ),
+    errorElement: <ErrorPage />,
+  },
+  // products
+  {
+    path: "/product/:product_id",
+    element: (
+      <ProtectedRoute>
+        <ProductDetails />
       </ProtectedRoute>
     ),
     errorElement: <ErrorPage />,
@@ -109,7 +128,7 @@ const RootRouter: RouteObject[] = [
   {
     path: "/checkout",
     element: (
-      <ProtectedRoute middlewares={["checkout"]}>
+      <ProtectedRoute middlewares={["auth"]}>
         <Checkout />
       </ProtectedRoute>
     ),

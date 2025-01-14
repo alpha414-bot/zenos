@@ -1,5 +1,7 @@
 import { useAppDispatch, useAppSelector } from "@/Services/Redux/Hook.ts";
-import { setMediaModalOnChange } from "@/Services/Redux/MediaSlice.ts";
+import {
+  setModalState
+} from "@/Services/Redux/MediaSlice.ts";
 import { MediaItemInterface, MediaMimeType } from "@/Types/Media.js";
 import _ from "lodash";
 import React, { useEffect } from "react";
@@ -32,11 +34,14 @@ const Media: React.FC<{
     control,
     rules,
   });
-  const { modal } = useAppSelector((state) => state.media);
+  const { selectedItems } = useAppSelector((state) => state.media);
   useEffect(() => {
     // Reset media value if multiSelect is changed
     onChange(null);
   }, [multiSelect]);
+  useEffect(() => {
+    onChange(selectedItems);
+  }, [selectedItems]);
   return (
     <>
       <div
@@ -45,8 +50,11 @@ const Media: React.FC<{
         <button
           id={`${name}MediaButton`}
           onClick={() => {
-            dispatch(setMediaModalOnChange({ onChange, multiSelect }));
-            modal?.show();
+            dispatch(
+              setModalState({
+                multiSelect: multiSelect,
+              })
+            );
           }}
           type="button"
           className="w-full cursorpointer text-center text-lg font-bold flex flex-col gap-y-2 items-center justify-center py-6 px-2 border-4 border-white border-dotted rounded-lg text-white min-h-56 tracking-wider"

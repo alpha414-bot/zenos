@@ -1,62 +1,35 @@
 import Button from "@/Components/Button";
-import Image from "@/Components/Image";
+import GallerySlider from "@/Components/GallerySlider";
 import ProductList from "@/Components/ProductList";
 import MainLayout from "@/Layouts/MainLayout";
 import PageMeta from "@/Layouts/PageMeta";
 import { useProductsData, useSimilarProductsData } from "@/Services/Hooks";
 import { addToCartQuery } from "@/Services/Queries/CartQuery";
-import { queryToGetAssetFile } from "@/Services/Queries/MediaQuery";
+import { getMediaUrl } from "@/System/Constants";
 import { price } from "@/System/function";
-import classNames from "classnames";
-import FsLightbox from "fslightbox-react";
 import _ from "lodash";
-import { useEffect, useMemo, useState } from "react";
-import ImageGallery from "react-image-gallery";
+import { useMemo } from "react";
 import "react-image-gallery/styles/css/image-gallery.css";
 import { Link, useParams } from "react-router-dom";
 
-const Product = () => {
+const ProductDetails = () => {
   // trigger view products
   const { product_id } = useParams();
-  const [toggler, setToggler] = useState<boolean>(false);
-  const [visible, setVisible] = useState(false);
-  const [lightboxImage, setLightboxImage] = useState<
-    { path: string; url: string }[]
-  >([]);
-  const { data: product } = useProductsData(product_id) as {
+  const { data: product } = useProductsData({ product_id }) as {
     data: ProductItemType;
   };
   const { data: SimilarProducts } = useSimilarProductsData(product) as {
     data: ProductItemType[];
   };
   const images = useMemo(() => {
-    return _.map(product.image, (value) => {
-      return value;
+    return _.map(product.image, (value, key) => {
+      return {
+        key,
+        original: getMediaUrl(value),
+        thumbnail: getMediaUrl(value),
+      };
     });
   }, [product.image]);
-  // Lightbox Images
-  useEffect(() => {
-    const imagePromises = _.map(product.image, async (value) => {
-      const url = await queryToGetAssetFile(value, (data: any) => data);
-      return { path: value, url: url };
-    });
-    Promise.all(imagePromises).then((d: any) => setLightboxImage(d));
-  }, [product.image]);
-
-  useEffect(() => {
-    const element = document.querySelectorAll(".mynavbar");
-    if (element) {
-      if (visible) {
-        element.forEach((el) => {
-          el.classList.remove("z-50");
-        });
-      } else {
-        element.forEach((el) => {
-          el.classList.add("z-50");
-        });
-      }
-    }
-  }, [visible]);
   return (
     <MainLayout>
       <PageMeta
@@ -71,98 +44,10 @@ const Product = () => {
             <div className="w-full lg:w-3/4">
               {/* Products Image and Metadata */}
               <div className="grid grid-cols-1 gap-x-8 gap-y-2 md:grid-cols-2">
-                <div className="">
-                  <ImageGallery
-                    items={_.map(images, (value, key) => ({
-                      key,
-                      original: value,
-                      thumbnail: value,
-                      // loading: "eager",
-                      originalClass:
-                        "bg-zenos-400/20 rounded-xl overflow-hidden",
-                      thumbnailClass: "border foc",
-                    }))}
-                    renderItem={({ original }) => (
-                      <Image
-                        onClick={() => {
-                          setToggler(!toggler);
-                        }}
-                        src={original}
-                        className="w-full object-contain"
-                      />
-                    )}
-                    renderThumbInner={({
-                      thumbnail,
-                      thumbnailAlt,
-                      thumbnailClass,
-                    }) =>
-                      thumbnail && (
-                        <Image
-                          src={thumbnail}
-                          className={classNames(
-                            "w-full object-contain",
-                            thumbnailClass
-                          )}
-                          alt={thumbnailAlt}
-                        />
-                      )
-                    }
-                    showFullscreenButton={false}
-                    useBrowserFullscreen={false}
-                    renderRightNav={(onClick, disabled) => (
-                      <button
-                        type="button"
-                        onClick={onClick}
-                        disabled={disabled}
-                        className="absolute top-2/4 right-2 z-20 bg-zenos-500/60 hover:bg-zenos-600 rounded-lg inline !w-auto !p-0 disabled:hidden"
-                      >
-                        <svg
-                          className="w-12 h-12 text-white"
-                          aria-hidden="true"
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            stroke="currentColor"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="m10 16 4-4-4-4"
-                          />
-                        </svg>
-                      </button>
-                    )}
-                    renderLeftNav={(onClick, disabled) => (
-                      <button
-                        type="button"
-                        onClick={onClick}
-                        disabled={disabled}
-                        className="absolute top-2/4 left-2 z-20 bg-zenos-500/60 hover:bg-zenos-600 rounded-lg inline !w-auto !p-0 disabled:hidden"
-                      >
-                        <svg
-                          className="w-12 h-12 text-white"
-                          aria-hidden="true"
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            stroke="currentColor"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="1.5"
-                            d="m14 8-4 4 4 4"
-                          />
-                        </svg>
-                      </button>
-                    )}
-                  />
+                <div>
+                  <GallerySlider images={images as any} />
                 </div>
+
                 <div className="">
                   {/* name */}
                   <p className="text-6xl font-extrabold leading-[4.5rem]">
@@ -194,13 +79,31 @@ const Product = () => {
                         </p>
                       )}
                     </div>
-                    <div className="flex items-center justify-end gap-2">
-                      <p className="bg-zenos-700 px-2 py-0.5 rounded font-medium text-xs">
-                        Category:
-                      </p>
-                      <p className="text-xs font-medium underline underline-offset-4 decoration-double">
-                        {_.startCase(product?.category?.value)}
-                      </p>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-end gap-2">
+                        <p className="bg-zenos-700 px-2 py-0.5 rounded font-medium text-xs">
+                          Category:
+                        </p>
+                        <Link
+                          to={`/products/${product?.category?.key}`}
+                          className="text-xs font-medium underline underline-offset-4 decoration-double"
+                        >
+                          {_.startCase(product?.category?.value)}
+                        </Link>
+                      </div>
+                      {product?.subcategory && (
+                        <div className="flex items-center justify-end gap-2">
+                          <p className="bg-zenos-700 px-2 py-0.5 rounded font-medium text-xs">
+                            Subcategory:
+                          </p>
+                          <Link
+                            to={`/products/${product?.category?.key}/${product?.subcategory?.key}`}
+                            className="text-xs font-medium underline underline-offset-4 decoration-double"
+                          >
+                            {_.startCase(product?.subcategory?.value)}
+                          </Link>
+                        </div>
+                      )}
                     </div>
                   </div>
                   {/* Add to cart */}
@@ -396,20 +299,9 @@ const Product = () => {
             </div>
           </div>
         </div>
-
-        {lightboxImage.length > 0 && (
-          <div className="relative z-50">
-            <FsLightbox
-              toggler={!!toggler}
-              onOpen={() => setVisible(true)}
-              onClose={() => setVisible(false)}
-              sources={_.map(lightboxImage, "url")}
-            />
-          </div>
-        )}
       </PageMeta>
     </MainLayout>
   );
 };
 
-export default Product;
+export default ProductDetails;

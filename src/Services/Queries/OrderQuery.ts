@@ -1,5 +1,7 @@
 import { auth, firestore } from "@/firebase-config";
 import { notify } from "@/notify";
+import { baseURL } from "@/System/Constants";
+import axios, { AxiosError } from "axios";
 import {
   collection,
   doc,
@@ -9,41 +11,98 @@ import {
   query,
   setDoc,
 } from "firebase/firestore";
+import _ from "lodash";
 import { clearCartProducts } from "./CartQuery";
+
+interface SimplifiedBillingInfo {
+  uid: string;
+  username: string;
+  email?: string;
+  phone_number?: string;
+}
 
 export const newOrderQuery = (
   instance: PaymentOnSuccessProps,
   carts: CartMetaItem[],
-  billing_info: BillingInputInterface
+  billing_info: SimplifiedBillingInfo
 ) =>
   new Promise((resolve, reject) => {
     try {
       if (auth.currentUser?.uid) {
         const OrderCollection = collection(firestore, "Orders");
-        const PaymentReferenceDoc = doc(OrderCollection, instance.reference);
+        const OrderReferenceDoc = doc(OrderCollection, instance.reference);
 
-        getDoc(PaymentReferenceDoc).then((UserProductItems) => {
+        getDoc(OrderReferenceDoc).then((UserProductItems) => {
           const UserOrderProducts =
             UserProductItems.data() as OrderDataInterface;
           if (UserProductItems.exists() && UserOrderProducts) {
-            // retrieving the order payment reference
-            resolve(UserProductItems.data());
+            resolve(UserOrderProducts);
           } else {
-            setDoc(PaymentReferenceDoc, {
+            setDoc(OrderReferenceDoc, {
               instance: instance,
               products: carts,
-              billing_info: billing_info,
+              billing_info: {
+                uid: billing_info.uid,
+                username: billing_info.username,
+                email: billing_info.email || "", // Blank if not available
+                phone_number: billing_info.phone_number || "", // Blank if not available
+              },
               user_uid: auth.currentUser?.uid,
               createdAt: new Date(),
               updatedAt: new Date(),
             })
-              .then((data) => {
-                notify.success({
-                  text: `Payment is successful and order received. You would be redirected to order page to track your products.`,
-                });
-                clearCartProducts();
-                resolve(data);
-                // #notification to admin
+              .then(() => {
+                axios
+                  .request({
+                    baseURL,
+                    url: "mailer/new/order",
+                    method: "post",
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
+                    maxBodyLength: Infinity,
+                    responseType: "json",
+                    data: JSON.stringify({
+                      username: billing_info.username,
+                      email: billing_info.email || "", // Blank if not available
+                      order_id: instance.reference,
+                      products: carts.map((item) => ({
+                        id: item.productID,
+                        name: _.trim(item.metadata?.name),
+                        price:
+                          (item.quantity || 1) * Number(item.metadata?.price),
+                      })),
+                    }),
+                  })
+                  .then((res) => {
+                    notify.success({
+                      text: `Payment is successful and order received. You would be redirected to order page to track your products.`,
+                    });
+                    clearCartProducts();
+                    resolve({});
+                  })
+                  .catch(
+                    (
+                      error: AxiosError<{
+                        data: { message: string };
+                        error: boolean;
+                        success: boolean;
+                      }>
+                    ) => {
+                      console.log(error.response);
+                      if (error.response && error.response.data.data) {
+                        notify.error({
+                          text: `Notification failed to trigger. ${JSON.stringify(
+                            error.response.data.data.message
+                          )}`,
+                        });
+                      } else {
+                        notify.error({
+                          text: "Internal Server Error. Please contact customer support.",
+                        });
+                      }
+                    }
+                  );
               })
               .catch((error) => {
                 notify.error({
@@ -72,6 +131,7 @@ export const newOrderQuery = (
       reject(error);
     }
   });
+
 
 export const getOrders = (listener: any): Promise<OrderDataInterface[]> =>
   new Promise((resolve, reject) => {

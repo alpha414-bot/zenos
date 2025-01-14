@@ -8,12 +8,12 @@ import {
   getDoc,
   getDocs,
   onSnapshot,
-  runTransaction,
-  Timestamp,
-  query,
   orderBy,
+  query,
+  runTransaction,
+  setDoc,
+  Timestamp,
   where,
-  setDoc
 } from "firebase/firestore";
 
 interface ChatMetaListInterface {
@@ -41,7 +41,10 @@ interface ChatMessagesInterface {
   };
 }
 
-export const queryToCreateChat = (recipient_uid?: string, auth_user?: AuthUserType) =>
+export const queryToCreateChat = (
+  recipient_uid?: string,
+  auth_user?: AuthUserType
+) =>
   new Promise((resolve, reject) => {
     try {
       if (!recipient_uid || !auth_user?.uid) {
@@ -101,7 +104,7 @@ export const queryToGetChat = (
 
     try {
       const chatCollection = collection(firestore, "UserMessages");
-      
+
       const existingChatQuery = query(
         chatCollection,
         where("members", "array-contains", auth_uid)
@@ -109,7 +112,7 @@ export const queryToGetChat = (
 
       const chatSnapshot = await getDocs(existingChatQuery);
 
-      const existingChat = chatSnapshot.docs.find(doc => {
+      const existingChat = chatSnapshot.docs.find((doc) => {
         const members = doc.data().members;
         return members.includes(recipient.uid);
       });
@@ -117,13 +120,13 @@ export const queryToGetChat = (
       if (existingChat) {
         const chatData = {
           id: existingChat.id,
-          ...existingChat.data()
+          ...existingChat.data(),
         } as ChatMetaListInterface;
         return resolve(listener(chatData));
       }
 
       const sortedMembers = [auth_uid, recipient.uid].sort();
-      const deterministicChatId = `chat_${sortedMembers.join('_')}`;
+      const deterministicChatId = `chat_${sortedMembers.join("_")}`;
 
       const deterministicChatRef = doc(chatCollection, deterministicChatId);
       const deterministicChatDoc = await getDoc(deterministicChatRef);
@@ -131,7 +134,7 @@ export const queryToGetChat = (
       if (deterministicChatDoc.exists()) {
         const chatData = {
           id: deterministicChatId,
-          ...deterministicChatDoc.data()
+          ...deterministicChatDoc.data(),
         } as ChatMetaListInterface;
         return resolve(listener(chatData));
       }
@@ -142,21 +145,23 @@ export const queryToGetChat = (
         unread: false,
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now(),
-        members: [auth_uid, recipient.uid]
+        members: [auth_uid, recipient.uid],
       };
 
       await setDoc(deterministicChatRef, newChatData, { merge: true });
 
       const chatData = {
         id: deterministicChatId,
-        ...newChatData
+        ...newChatData,
       } as ChatMetaListInterface;
 
       resolve(listener(chatData));
     } catch (error) {
       console.error("Error in queryToGetChat:", error);
       reject(error);
-      notify.error({ text: "Error connecting to server. [UNABLE_TO_QUERY_CHAT]" });
+      notify.error({
+        text: "Error connecting to server. [UNABLE_TO_QUERY_CHAT]",
+      });
     }
   });
 
@@ -175,13 +180,17 @@ export const queryToSendChatMessage = (
 ) =>
   new Promise(async (resolve, reject) => {
     if (!chat_id) {
-      reject(new Error("Please try refreshing the page, unable to send message"));
-      return notify.error({ text: "Please try refreshing the page, unable to send message" });
+      reject(
+        new Error("Please try refreshing the page, unable to send message")
+      );
+      return notify.error({
+        text: "Please try refreshing the page, unable to send message",
+      });
     }
 
     try {
       const chatDocRef = doc(firestore, "UserMessages", chat_id);
-      
+
       const chatDoc = await getDoc(chatDocRef);
       if (!chatDoc.exists()) {
         throw new Error("Chat does not exist");
@@ -200,7 +209,11 @@ export const queryToSendChatMessage = (
 
         const chatUpdateData: any = {
           has_messages: true,
-          text: payload.media ? `Sent ${payload.media.type.startsWith('image/') ? 'an image' : 'a file'}` : payload.text,
+          text: payload.media
+            ? `Sent ${
+                payload.media.type.startsWith("image/") ? "an image" : "a file"
+              }`
+            : payload.text,
           unread: true,
           updatedAt: Timestamp.now(),
           sent_by_uid: payload.sender_uid,
@@ -217,7 +230,9 @@ export const queryToSendChatMessage = (
     }
   });
 
-export const queryToFetchAllChats = (admin_uid?: string): Promise<{ data: ChatMetaListInterface[] }> =>
+export const queryToFetchAllChats = (
+  admin_uid?: string
+): Promise<{ data: ChatMetaListInterface[] }> =>
   new Promise((resolve, reject) => {
     if (!admin_uid) {
       reject(new Error("Admin UID not provided."));
@@ -248,7 +263,9 @@ export const queryToFetchAllChats = (admin_uid?: string): Promise<{ data: ChatMe
         .catch((error) => {
           console.error("Error fetching all chats:", error);
           reject(error);
-          notify.error({ text: "Failed to fetch chats. Please try again later." });
+          notify.error({
+            text: "Failed to fetch chats. Please try again later.",
+          });
         });
     } catch (error) {
       console.error("Unexpected error:", error);
@@ -277,10 +294,13 @@ export const queryToFetchChatMessages = (
       const unsubscribe = onSnapshot(
         messagesQuery,
         (snapshot) => {
-          const messages = snapshot.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-          } as ChatMessagesInterface));
+          const messages = snapshot.docs.map(
+            (doc) =>
+              ({
+                id: doc.id,
+                ...doc.data(),
+              } as ChatMessagesInterface)
+          );
 
           listener({ data: messages, chat_id });
           resolve(messages);

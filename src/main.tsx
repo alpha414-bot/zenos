@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { HelmetProvider } from "react-helmet-async";
 import { QueryClientProvider } from "react-query";
-import { ReactQueryDevtools } from "react-query/devtools";
+// import { ReactQueryDevtools } from "react-query/devtools";
 import { Provider } from "react-redux";
 import { RouterProvider } from "react-router-dom";
 import { Slide, ToastContainer } from "react-toastify";
@@ -61,7 +61,6 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           />
           <Cookie />
           <RouterProvider router={router} />
-          <ReactQueryDevtools />
         </Provider>
       </QueryClientProvider>
     </HelmetProvider>

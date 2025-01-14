@@ -1,9 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
 import MediaSlice from "./Redux/MediaSlice";
+import MixerSlice from "./Redux/MixerSlice";
 
 export const store = configureStore({
   reducer: {
     media: MediaSlice,
+    mixer: MixerSlice,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

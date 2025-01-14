@@ -21,6 +21,7 @@ export const Config = {
 export const ZenosCategory = [
   { key: "oraimo", value: "Oraimo" },
   { key: "new-age", value: "New Age" },
+  { key: "itel", value: "Itel" },
   { key: "uk-used", value: "UK Used" },
 ];
 
@@ -37,4 +38,11 @@ export const ZenosNewAgeSubCategory = [
   { key: "audio", value: "Audio" },
   { key: "cables", value: "Cables" },
   { key: "chargers", value: "Chargers" },
+];
+
+export const ZenosItelSubCategory = [
+  { key: "audio", value: "Audio" },
+  { key: "electrics", value: "Electrics" },
+  { key: "power-banks", value: "Power Banks" },
+  { key: "smart-watch", value: "Smart Watch" },
 ];

@@ -70,7 +70,7 @@ interface ProductItemType {
   status?: string;
   name: string;
   description: string;
-  category: { key: "oraimo" | "new-age" | "uk-used"; value: string };
+  category: { key: "oraimo" | "new-age" | "itel" | "uk-used"; value: string };
   subcategory?: { key: string; value: string };
   price: number;
   salesPrice?: number;

@@ -65,7 +65,7 @@ const UserLayout: FC<AdminLayoutInterface> = ({ children }) => {
                   })}
                 >
                   {currentUser?.displayName && (
-                    <p className="text-lg text-gray-200 font-bold lg:text-xl">
+                    <p className="text-lg text-gray-200 font-bold">
                       Hey,&nbsp;
                       <span className="underline underline-offset-4 decoration-dotted">
                         {currentUser?.displayName}

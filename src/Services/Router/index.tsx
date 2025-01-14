@@ -1,7 +1,6 @@
 import About from "@/Pages/About";
 import AuthPage from "@/Pages/Auth/AuthPage";
 import ForgotPassword from "@/Pages/Auth/ForgotPassword";
-import Checkout from "@/Pages/Checkout";
 import ErrorPage from "@/Pages/ErrorPage";
 import Home from "@/Pages/Home";
 import Inbox from "@/Pages/Inbox";
@@ -123,15 +122,6 @@ const RootRouter: RouteObject[] = [
       </ProtectedRoute>
     ),
     errorElement: <ErrorPage />,
-  },
-  // checkout
-  {
-    path: "/checkout",
-    element: (
-      <ProtectedRoute middlewares={["checkout"]}>
-        <Checkout />
-      </ProtectedRoute>
-    ),
   },
 ];
 

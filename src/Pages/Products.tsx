@@ -12,7 +12,7 @@ const Products = () => {
   const { category, subcategory } = useParams();
   useEffect(() => {
     if (!!category) {
-      if (!["oraimo", "uk-used", "new-age"].includes(category)) {
+      if (!["oraimo", "uk-used", "new-age", "itel"].includes(category)) {
         throw new Response("", {
           status: 404,
           statusText: "Not Found",

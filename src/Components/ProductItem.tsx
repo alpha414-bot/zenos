@@ -32,7 +32,8 @@ const ProductItem: React.FC<{
       data-product-name={`${createSlug(product?.name.toLowerCase())}`}
       data-price={product?.price}
       className={classNames(
-        `mix-target product-category-${createSlug(
+        "mix-target",
+        `product-category-${createSlug(
           product?.category?.value?.toLowerCase()
         )} product-subcategory-${createSlug(
           product?.subcategory?.value?.toLowerCase()

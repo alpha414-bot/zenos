@@ -13,6 +13,7 @@ import { addCollectionDoc, updateCollectionDoc } from "@/Services/Queries";
 import { queryToDeleteProduct } from "@/Services/Queries/ProductQuery";
 import {
   ZenosCategory,
+  ZenosItelSubCategory,
   ZenosNewAgeSubCategory,
   ZenosOraimoSubCategory,
 } from "@/System/Constants";
@@ -239,6 +240,18 @@ const ProductsAction = ({ values }: { values: ProductItemType }) => {
                     rules={{ required: "Subcategory is required" }}
                   />
                 )}
+                {watch("category")?.key == "itel" && (
+                  <SelectDropdown
+                    name="subcategory"
+                    options={ZenosItelSubCategory}
+                    control={control}
+                    containerClassName="z-10"
+                    placeholder="Subcategory"
+                    label="Subcategory"
+                    defaultValue={values?.subcategory}
+                    rules={{ required: "Subcategory is required" }}
+                  />
+                )}
                 <Input
                   control={control}
                   name="price"
@@ -454,7 +467,7 @@ const Shop = () => {
     products = products.filter((product) => product.createdBy === userUuid);
   }
 
-  const { control, handleSubmit, reset, watch } = useForm({ mode: "all" });
+  const { control, handleSubmit, reset } = useForm({ mode: "all" });
 
   const columns = useMemo<ColumnDef<ProductItemType>[]>(
     () => [
@@ -723,31 +736,11 @@ const Shop = () => {
                         options={ZenosCategory}
                         control={control}
                         placeholder="Category"
-                        disableOptionKeys={["oraimo", "new-age"]}
+                        disableOptionKeys={["oraimo", "new-age", "itel"]}
                         defaultOptionKey="uk-used"
                         containerClassName="z-30"
                         rules={{ required: "Category is required" }}
                       />
-                      {watch("category")?.key == "oraimo" && (
-                        <SelectDropdown
-                          name="subcategory"
-                          options={ZenosOraimoSubCategory}
-                          control={control}
-                          containerClassName="z-10"
-                          placeholder="Subcategory"
-                          rules={{ required: "Subcategory is required" }}
-                        />
-                      )}
-                      {watch("category")?.key == "new-age" && (
-                        <SelectDropdown
-                          name="subcategory"
-                          options={ZenosNewAgeSubCategory}
-                          control={control}
-                          containerClassName="z-10"
-                          placeholder="Subcategory"
-                          rules={{ required: "Subcategory is required" }}
-                        />
-                      )}
                       <Input
                         control={control}
                         name="price"

@@ -1,5 +1,3 @@
-// Sample React Component for Navbar
-
 import { useAuthUser, useCartProducts } from "@/Services/Hooks";
 import { queryToVerifyAccount } from "@/Services/Queries/AuthQuery";
 import { Link, NavLink } from "react-router-dom";
@@ -9,7 +7,6 @@ function Navbar() {
   const { data: CartProducts } = useCartProducts() as { data: CartMetaItem[] };
   const { data: currentUser } = useAuthUser();
   return (
-    // Example of using TailwindCSS in the Navbar Component
     <>
       {currentUser &&
         currentUser?.uid &&
@@ -116,6 +113,32 @@ function Navbar() {
             )}
           </ul>
           <div className="flex items-center gap-x-1 md:gap-x-2">
+            {/* Search Icon */}
+            <Link
+              to="/products/"
+              className="relative inline-flex items-center px-1 py-1 rounded-full"
+            >
+              <svg
+                className="w-8 h-8 md:w-8 md:h-8 text-zenos-500"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 2a8 8 0 1 0 0 16 8 8 0 0 0 0-16Zm-10 8a10 10 0 1 1 20 0 10 10 0 0 1-20 0Z"
+                  clipRule="evenodd"
+                />
+                <path
+                  fillRule="evenodd"
+                  d="M15.93 15.93a1 1 0 0 1 1.414 0l4.95 4.95a1 1 0 0 1-1.414 1.414l-4.95-4.95a1 1 0 0 1 0-1.414Z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </Link>
             {/* Cart viewer */}
             <Link
               to={

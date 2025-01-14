@@ -4,6 +4,7 @@ import AdminLayout from "@/Layouts/AdminLayout";
 import PageMeta from "@/Layouts/PageMeta";
 import { notify } from "@/notify";
 import { useAdminChat } from "@/Services/Hooks/useAdminChat";
+import { useAppDispatch } from "@/Services/Redux/Hook";
 import { setModalState } from "@/Services/Redux/MediaSlice";
 import { getMediaUrl } from "@/System/Constants";
 import { MediaItemInterface } from "@/Types/Media";
@@ -21,7 +22,6 @@ import _ from "lodash";
 import moment from "moment";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 
 interface ChatFormData {
@@ -30,7 +30,7 @@ interface ChatFormData {
 }
 
 const AdminInbox: React.FC = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { control, handleSubmit, reset, watch, setValue } =
     useForm<ChatFormData>({
       defaultValues: {

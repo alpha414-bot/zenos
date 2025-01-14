@@ -4,7 +4,7 @@ import PageMeta from "@/Layouts/PageMeta";
 import UserLayout from "@/Layouts/UserLayout";
 import { useAuthUser } from "@/Services/Hooks";
 import { useChat } from "@/Services/Hooks/UseChat";
-import { useAppSelector } from "@/Services/Redux/Hook";
+import { useAppDispatch, useAppSelector } from "@/Services/Redux/Hook";
 import { setModalState } from "@/Services/Redux/MediaSlice";
 import { getMediaUrl } from "@/System/Constants";
 import { MediaItemInterface } from "@/Types/Media";
@@ -23,7 +23,6 @@ import _ from "lodash";
 import moment from "moment";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useDispatch } from "react-redux";
 import { useLocation } from "react-router-dom";
 
 interface ChatMessage {
@@ -74,7 +73,7 @@ const AUTO_REPLIES = {
 
 const Inbox = () => {
   const { data: currentUser } = useAuthUser();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const location = useLocation();
   const state = location.state as LocationState;
   const adminUid = "Y4P4ECBLLWRbk7VZUqkpqqixE7H2";

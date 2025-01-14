@@ -2,50 +2,45 @@ import Button from "@/Components/Button";
 import Input from "@/Components/Input";
 import MainLayout from "@/Layouts/MainLayout";
 import PageMeta from "@/Layouts/PageMeta";
-import { queryToLoginUser,queryToRegisterUser } from "@/Services/Queries/AuthQuery";
-import {
-  EmailPattern,
-  NumberPattern,
-  PasswordPattern,
-} from "@/System/function";
+import { queryToLoginUser, queryToRegisterUser } from "@/Services/Queries/AuthQuery";
+import { NumberPattern, PasswordPattern } from "@/System/function";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 
 const AuthPage = () => {
   const navigate = useNavigate();
-  const { control: SignInControl, handleSubmit: SignInHandleSubmit } =
-    useForm<UserSignInFormInput>({
-      mode: "all",
-    });
-  const { control: SignUpControl, handleSubmit: SignUpHandleSubmit } =
-    useForm<UserSignUpFormInput>({
-      mode: "all",
-    });
+  const { control: SignInControl, handleSubmit: SignInHandleSubmit } = useForm<UserSignInFormInput>({
+    mode: "all",
+  });
+  const { control: SignUpControl, handleSubmit: SignUpHandleSubmit } = useForm<UserSignUpFormInput>({
+    mode: "all",
+  });
+
   const onSignUpFormSubmit: SubmitHandler<UserSignUpFormInput> = (data) => {
     queryToRegisterUser(data)
-    .then(() => {
-      // Optionally, you can navigate to a different page after successful signup
-      navigate("/"); // Redirect to home or dashboard
-    })
-    .catch((error) => {
-      // Handle any errors that occur during signup
-      console.error("Signup error:", error);
-    });
+      .then(() => {
+        navigate("/"); // Redirect to home or dashboard
+      })
+      .catch((error) => {
+        console.error("Signup error:", error);
+      });
   };
+
   const onSignInFormSubmit: SubmitHandler<UserSignInFormInput> = (data) => {
     queryToLoginUser(data).then(() => navigate("/"));
   };
+
   return (
     <MainLayout>
       <PageMeta
         title="Login to your dashboard"
         description="Login to your account to view and track your order"
       >
-        <div className="px-3 py-12 flex flex-col items-start gap-12 md:px-6 md:flex-row">
+        <div className="px-6 py-12 flex flex-col items-start gap-12 md:flex-row">
           {/* SignIn Section */}
           <form
             onSubmit={SignInHandleSubmit(onSignInFormSubmit)}
-            className="border-2 border-gray-200 rounded-lg px-4 py-5 md:px-6 w-full md:w-1/2"
+            className="border-2 border-gray-200 rounded-lg px-6 py-5 w-full md:w-1/2"
           >
             <p className="text-3xl font-extrabold tracking-wider">Sign In</p>
             <p className="text-xs">
@@ -56,15 +51,15 @@ const AuthPage = () => {
                 <Input
                   control={SignInControl}
                   rules={{
-                    required: "Email field is required",
+                    required: "Phone number is required",
                     pattern: {
-                      value: EmailPattern,
-                      message: "Ouch, that doesn't look like an email!",
+                      value: NumberPattern,
+                      message: "Phone number can't contain letters",
                     },
                   }}
-                  name="email"
-                  type="email"
-                  placeholder="Email address"
+                  name="phone"
+                  type="tel"
+                  placeholder="Phone number"
                 />
               </div>
               <div>
@@ -87,10 +82,11 @@ const AuthPage = () => {
               <Button>Sign In</Button>
             </div>
           </form>
+
           {/* SignUp Section */}
           <form
             onSubmit={SignUpHandleSubmit(onSignUpFormSubmit)}
-            className="border-2 border-gray-200 rounded-lg px-4 py-5 md:px-6 w-full md:w-1/2"
+            className="border-2 border-gray-200 rounded-lg px-6 py-5 w-full md:w-1/2"
           >
             <p className="text-3xl font-extrabold tracking-wider">Sign Up</p>
             <p className="text-xs">
@@ -100,9 +96,7 @@ const AuthPage = () => {
               <div>
                 <Input
                   control={SignUpControl}
-                  rules={{
-                    required: "First Name field is required",
-                  }}
+                  rules={{ required: "First Name field is required" }}
                   name="first_name"
                   placeholder="First Name"
                 />
@@ -110,9 +104,7 @@ const AuthPage = () => {
               <div>
                 <Input
                   control={SignUpControl}
-                  rules={{
-                    required: "Last Name field is required",
-                  }}
+                  rules={{ required: "Last Name field is required" }}
                   name="last_name"
                   placeholder="Last Name"
                 />
@@ -120,43 +112,23 @@ const AuthPage = () => {
               <div>
                 <Input
                   control={SignUpControl}
+                  rules={{ required: "Username field is required" }}
                   name="username"
                   placeholder="Username"
-                  rules={{
-                    required: "Username field is required",
-                  }}
-                  // updateOnChange={(e: BaseSyntheticEvent) => {
-                  //   return { ...e, ...{ value: "ola" } };
-                  // }}
                 />
               </div>
               <div>
                 <Input
                   control={SignUpControl}
                   rules={{
-                    required: "Phone field is required",
+                    required: "Phone number is required",
                     pattern: {
                       value: NumberPattern,
                       message: "Phone number can't contain letters",
                     },
                   }}
                   name="phone"
-                  placeholder="Phone"
-                />
-              </div>
-              <div>
-                <Input
-                  control={SignUpControl}
-                  rules={{
-                    required: "Email field is required",
-                    pattern: {
-                      value: EmailPattern,
-                      message: "Ouch, that doesn't look like an email!",
-                    },
-                  }}
-                  name="email"
-                  type="email"
-                  placeholder="Email address"
+                  placeholder="Phone number"
                 />
               </div>
               <div>
@@ -167,12 +139,12 @@ const AuthPage = () => {
                     minLength: {
                       value: 8,
                       message:
-                        "Password must contain the following: <br/> <em> - a <strong>lowercase</strong> letter <br/> - an <strong>uppercase</strong> letter <br/> - a <strong>number</strong> <br/> - Minimum of 8 characters </em> ",
+                        "Password must contain the following: <br/> <em> - a <strong>lowercase</strong> letter <br/> - an <strong>uppercase</strong> letter <br/> - a <strong>number</strong> <br/> - Minimum of 8 characters </em>",
                     },
                     pattern: {
                       value: PasswordPattern,
                       message:
-                        "Password must contain the following: <br/> <em> - a <strong>lowercase</strong> letter <br/> - an <strong>uppercase</strong> letter <br/> - a <strong>number</strong> <br/> - Minimum of 8 characters </em> ",
+                        "Password must contain the following: <br/> <em> - a <strong>lowercase</strong> letter <br/> - an <strong>uppercase</strong> letter <br/> - a <strong>number</strong> <br/> - Minimum of 8 characters </em>",
                     },
                   }}
                   name="password"

@@ -14,10 +14,17 @@ import {
 import _ from "lodash";
 import { clearCartProducts } from "./CartQuery";
 
+interface SimplifiedBillingInfo {
+  uid: string;
+  username: string;
+  email?: string;
+  phone_number?: string;
+}
+
 export const newOrderQuery = (
   instance: PaymentOnSuccessProps,
   carts: CartMetaItem[],
-  billing_info: BillingInputInterface
+  billing_info: SimplifiedBillingInfo
 ) =>
   new Promise((resolve, reject) => {
     try {
@@ -29,16 +36,17 @@ export const newOrderQuery = (
           const UserOrderProducts =
             UserProductItems.data() as OrderDataInterface;
           if (UserProductItems.exists() && UserOrderProducts) {
-            // retrieving the order payment reference
             resolve(UserOrderProducts);
-            // resolve(UserProductItems.data());
           } else {
-            delete billing_info.password;
-            delete billing_info.confirm_password;
             setDoc(OrderReferenceDoc, {
               instance: instance,
               products: carts,
-              billing_info: billing_info,
+              billing_info: {
+                uid: billing_info.uid,
+                username: billing_info.username,
+                email: billing_info.email || "", // Blank if not available
+                phone_number: billing_info.phone_number || "", // Blank if not available
+              },
               user_uid: auth.currentUser?.uid,
               createdAt: new Date(),
               updatedAt: new Date(),
@@ -56,7 +64,7 @@ export const newOrderQuery = (
                     responseType: "json",
                     data: JSON.stringify({
                       username: billing_info.username,
-                      email: billing_info.email,
+                      email: billing_info.email || "", // Blank if not available
                       order_id: instance.reference,
                       products: carts.map((item) => ({
                         id: item.productID,
@@ -66,9 +74,7 @@ export const newOrderQuery = (
                       })),
                     }),
                   })
-                  .then((res) => {
-                    // #notification to admin
-                    console.log("respsone", res.data);
+                  .then(() => {
                     notify.success({
                       text: `Payment is successful and order received. You would be redirected to order page to track your products.`,
                     });
@@ -86,13 +92,13 @@ export const newOrderQuery = (
                       console.log(error.response);
                       if (error.response && error.response.data.data) {
                         notify.error({
-                          text: `Notification failed to triggered. ${JSON.stringify(
+                          text: `Notification failed to trigger. ${JSON.stringify(
                             error.response.data.data.message
                           )}`,
                         });
                       } else {
                         notify.error({
-                          text: "Internal Server Error. Please customer support.",
+                          text: "Internal Server Error. Please contact customer support.",
                         });
                       }
                     }
@@ -125,6 +131,7 @@ export const newOrderQuery = (
       reject(error);
     }
   });
+
 
 export const getOrders = (listener: any): Promise<OrderDataInterface[]> =>
   new Promise((resolve, reject) => {

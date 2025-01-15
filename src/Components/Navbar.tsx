@@ -1,5 +1,4 @@
 import { useAuthUser, useCartProducts } from "@/Services/Hooks";
-import { queryToVerifyAccount } from "@/Services/Queries/AuthQuery";
 import { Link, NavLink } from "react-router-dom";
 import Button from "./Button";
 
@@ -8,40 +7,6 @@ function Navbar() {
   const { data: currentUser } = useAuthUser();
   return (
     <>
-      {currentUser &&
-        currentUser?.uid &&
-        !currentUser?.isAnonymous &&
-        !currentUser?.emailVerified && (
-          <div className="mynavbar bg-gray-900 px-6 py-3 relative z-50 text-center space-x-2">
-            {(currentUser?.admin && (
-              <>
-                <span className="text-base font-medium">
-                  You are currently logged in as an{" "}
-                  <span className="underline underline-offset-4 decoration-dotted">
-                    ADMINISTRATOR
-                  </span>
-                </span>
-                <Link to={"/admin/dashboard"} className="btn px-4">
-                  Go to Dashboard
-                </Link>
-              </>
-            )) || (
-              <>
-                <span className="text-base font-medium">
-                  Verify your account to unlock new exciting features
-                </span>
-                <Button
-                  onClick={() => {
-                    queryToVerifyAccount();
-                  }}
-                  className="px-4 py-0.5 text-sm"
-                >
-                  Verify Now
-                </Button>
-              </>
-            )}
-          </div>
-        )}
       <nav className="sticky top-0 z-50 flex items-center justify-between bg-gray-950 shadow-md w-full shadow-gray-900/50 px-4 py-3.5 md:px-10 md:py-3">
         <Link to="/">
           <img

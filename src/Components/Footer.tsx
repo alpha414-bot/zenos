@@ -50,11 +50,7 @@ const Footer = ({
             title: "Secure Payment",
             subtitle: "100% Secured",
           },
-          {
-            icon: "fa-solid fa-truck",
-            title: "Free Shipping",
-            subtitle: "Across Nigeria",
-          },
+        
           {
             icon: "fa-solid fa-calendar",
             title: "30 days return",

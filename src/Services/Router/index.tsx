@@ -103,9 +103,9 @@ const RootRouter: RouteObject[] = [
     ),
     errorElement: <ErrorPage />,
   },
-  // all products and filtering
+  // Product routes
   {
-    path: "/products/:category?/:subcategory?",
+    path: "/products",
     element: (
       <ProtectedRoute>
         <Products />
@@ -113,7 +113,36 @@ const RootRouter: RouteObject[] = [
     ),
     errorElement: <ErrorPage />,
   },
-  // products
+  // New display category routes
+  {
+    path: "/products/phone-accessories/:subcategory?",
+    element: (
+      <ProtectedRoute>
+        <Products />
+      </ProtectedRoute>
+    ),
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: "/products/used-products",
+    element: (
+      <ProtectedRoute>
+        <Products />
+      </ProtectedRoute>
+    ),
+    errorElement: <ErrorPage />,
+  },
+  // Legacy category routes (for backward compatibility)
+  {
+    path: "/products/:category/:subcategory?",
+    element: (
+      <ProtectedRoute>
+        <Products />
+      </ProtectedRoute>
+    ),
+    errorElement: <ErrorPage />,
+  },
+  // Single product details
   {
     path: "/product/:product_id",
     element: (
@@ -128,4 +157,5 @@ const RootRouter: RouteObject[] = [
 const router = createBrowserRouter(
   withScrollToTop([...RootRouter, ...AdminRouter])
 );
+
 export default router;

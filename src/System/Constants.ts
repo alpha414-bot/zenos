@@ -1,9 +1,11 @@
 import { backend_url as BackendUrl } from "../../package.json";
 
 export const baseURL = BackendUrl;
+
 export const getMediaUrl = (path: string, w: any = "original") => {
   return `${baseURL}/media/cdn/images/${w}/${path}`;
 };
+
 export const headers = ({
   content_type,
 }: {
@@ -13,36 +15,68 @@ export const headers = ({
   myHeaders.append("Content-Type", content_type);
   return myHeaders;
 };
+
 export const Config = {
-  phone: "09036279887",
-  email: "info@zenos.com.ng",
-  address: "651 N North Adekunle. St, Lagos",
+  phone: "09131735970",
+  email: "info@zenos.com.ng"
 };
+
+// Main display categories (for UI)
+export const DisplayCategories = [
+  { key: "phone-accessories", value: "Phone Accessories" },
+  { key: "used-products", value: "Used Products" }
+];
+
+// Original categories (for backend/data organization)
 export const ZenosCategory = [
   { key: "oraimo", value: "Oraimo" },
-  { key: "new-age", value: "New Age" },
+ 
   { key: "itel", value: "Itel" },
-  { key: "uk-used", value: "UK Used" },
+  { key: "uk-used", value: "UK Used" }
 ];
 
-export const ZenosOraimoSubCategory = [
+// Phone Accessories subcategories
+export const PhoneAccessoriesSubCategory = [
   { key: "power-banks", value: "Power Banks" },
-  { key: "audio", value: "Audio" },
-  { key: "smart-office", value: "Smart Office" },
-  { key: "personal-care", value: "Personal Care" },
-  { key: "home-appliances", value: "Home Appliances" },
+  { key: "earpods", value: "EarPod/Earbud" },
+  { key: "phone-cords", value: "Phone Cords" },
+  { key: "phone-charger", value: "Phone Charger" },
+  { key: "car-charger", value: "Car Charger" },
+  { key: "phone-pouch", value: "Phone Pouch" },
+  { key: "memory-card", value: "Memory Card" },
+  { key: "bluetooth-speaker", value: "Bluetooth Speaker" }
 ];
 
-export const ZenosNewAgeSubCategory = [
-  { key: "power-banks", value: "Power Banks" },
-  { key: "audio", value: "Audio" },
-  { key: "cables", value: "Cables" },
-  { key: "chargers", value: "Chargers" },
-];
+// Keep the subcategories aligned with PhoneAccessoriesSubCategory for consistency
+export const ZenosOraimoSubCategory = PhoneAccessoriesSubCategory;
 
-export const ZenosItelSubCategory = [
-  { key: "audio", value: "Audio" },
-  { key: "electrics", value: "Electrics" },
-  { key: "power-banks", value: "Power Banks" },
-  { key: "smart-watch", value: "Smart Watch" },
-];
+// Remove unused subcategories since we're focusing on phone accessories
+export const ZenosNewAgeSubCategory = PhoneAccessoriesSubCategory;
+export const ZenosItelSubCategory = PhoneAccessoriesSubCategory;
+
+// Helper function for MixItUp integration
+export const getProductType = (category: string): string => {
+  if (category === 'uk-used') return 'used-products';
+  if (['oraimo',  'itel'].includes(category)) return 'phone-accessories';
+  return category;
+};
+
+export const createSlug = (text: string): string => {
+  if (!text) return '';
+  return text
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/[^\w\-]+/g, '')
+    .replace(/\-\-+/g, '-')
+    .replace(/^-+/, '')
+    .replace(/-+$/, '');
+};
+
+// Debug helpers
+export const DEBUG = {
+  phoneAccessoriesSlug: createSlug('phone-accessories'),
+  categories: DisplayCategories.map(cat => ({
+    original: cat.key,
+    slug: createSlug(cat.key)
+  }))
+};

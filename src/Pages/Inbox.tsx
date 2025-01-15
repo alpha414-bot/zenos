@@ -65,9 +65,9 @@ interface ChatHookReturn {
 
 const AUTO_REPLIES = {
   WELCOME: (userName: string) =>
-    `Hello ${userName}! Thanks for your order. Would you like to apply a discount code before proceeding?`,
+    `Hello ${userName}! Thanks for your order. Would you like to apply a referral code before proceeding?`,
   DISCOUNT_PROMPT:
-    "You can enter your discount code or click 'Chat with an agent' to proceed.",
+    "You can enter your referral code or click 'Chat with an agent' to proceed with payment",
   AGENT_PROMPT: "Would you like to chat with a live agent about your order?",
 };
 

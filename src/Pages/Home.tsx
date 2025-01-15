@@ -1,3 +1,4 @@
+import React from "react";
 import ButtonAsLink from "@/Components/ButtonAsLink";
 import ProductList from "@/Components/ProductList";
 import Spinner from "@/Components/Spinner";
@@ -12,30 +13,31 @@ const Home = () => {
     limit: 12,
   });
 
-  const banners = [
+  // Image-only slider content
+  const imageSlides = [
     {
       lg_image: "OraimoBannerB.jpg",
       sm_image: "BannerG.jpg",
+    },
+    {
+      lg_image: "BannerH.png",
+      sm_image: "oraimo-flyer.jpg",
+    },
+  ];
+
+  // Content slider with text overlays
+  const contentSlides = [
+    {
+      lg_image: "BannerH.jpg",
+      sm_image: "oraimo-flyer.jpg",
       title: "Shop for Oraimo Gadgets",
       link: "/products/oraimo",
     },
     {
-      lg_image: "BannerB.png",
-      sm_image: "BannerB_2.png",
-      title: "Shop for New Age Gadgets",
-      link: "/products/new-age",
-    },
-    {
       lg_image: "BannerC.png",
-      sm_image: "newage-flyer.jpg",
+      sm_image: "BannerB_2.png",
       title: "Shop for Itel Gadgets",
       link: "/products/itel",
-    },
-    {
-      lg_image: "BannerH.jpg",
-      sm_image: "oraimo-flyer.jpg",
-      title: "Buy & Sell Used Products",
-      link: "/products/uk-used",
     },
   ];
 
@@ -53,7 +55,6 @@ const Home = () => {
     nextArrow: <></>,
     prevArrow: <></>,
     customPaging: () => <></>,
-    // Add the correct type for the dots parameter
     appendDots: (dots: React.ReactNode[]) => (
       <div>
         <ul className="custom-slick-dot">{dots}</ul>
@@ -68,9 +69,35 @@ const Home = () => {
         description="The ecommerce with the latest in laptops, mobile and gadgets"
       >
         <div className="space-y-7">
+          {/* Image-only Slider */}
           <div className="w-full py-8 px-2 md:py-8 md:px-12">
             <Slider {...sliderSettings} className="group">
-              {banners.map((item, index) => (
+              {imageSlides.map((item, index) => (
+                <div
+                  key={index}
+                  className="relative w-full !h-auto md:!h-[75vh]"
+                >
+                  <div
+                    className="!hidden w-full min-h-96 h-full bg-no-repeat bg-center bg-cover rounded-lg md:rounded-3xl md:!block"
+                    style={{
+                      backgroundImage: `url('/assets/images/${item.lg_image}')`,
+                    }}
+                  />
+                  <div
+                    className="!block w-full min-h-96 h-full bg-no-repeat bg-center bg-cover rounded-xl md:rounded-3xl md:!hidden"
+                    style={{
+                      backgroundImage: `url('/assets/images/${item.sm_image}')`,
+                    }}
+                  />
+                </div>
+              ))}
+            </Slider>
+          </div>
+
+          {/* Content Slider with Text Overlay */}
+          <div className="w-full py-8 px-2 md:py-8 md:px-12">
+            <Slider {...sliderSettings} className="group">
+              {contentSlides.map((item, index) => (
                 <div
                   key={index}
                   className="relative w-full !h-auto md:!h-[75vh]"
@@ -115,6 +142,8 @@ const Home = () => {
               ))}
             </Slider>
           </div>
+
+          {/* Best Selling Products Section */}
           <div className="py-10 px-3 md:px-10 space-y-10">
             <div id="shop">
               <div className="flex flex-col text-center gap-y-4 items-center justify-between md:flex-row md:text-left md:justify-between">

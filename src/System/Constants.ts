@@ -42,6 +42,8 @@ export const ZenosTypeCategory = [
 // Phone Accessories subcategories
 export const PhoneAccessoriesSubCategory = [
   { key: "power-banks", value: "Power Banks" },
+  {key :"head-phones" , value: "head-phones"},
+
   { key: "earpods", value: "EarPod/Earbud" },
   { key: "phone-cords", value: "Phone Cords" },
   { key: "phone-charger", value: "Phone Charger" },

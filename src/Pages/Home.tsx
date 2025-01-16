@@ -19,26 +19,31 @@ const Home = () => {
       lg_image: "OraimoBannerB.jpg",
       sm_image: "BannerG.jpg",
     },
+    { 
+      lg_image: "BannerB.png", 
+      sm_image: "BannerB_2.png" 
+    },
+    
     {
       lg_image: "BannerH.jpg",
       sm_image: "oraimo-flyer.jpg",
-    },
+    }
   ];
 
   // Content slider with text overlays
   const contentSlides = [
     {
-      lg_image: "oraimo-flyer.jpg",
-      sm_image: "oraimo-flyer.jpg",
+      lg_image: "OraimoBannerB.jpg",
+      sm_image: "OraimoBannerB.jpg",
       title: "Shop for Oraimo Gadgets",
       link: "/products/oraimo",
     },
     {
-      lg_image: "BannerG.jpg",
+      lg_image: "BannerB.png",
       sm_image: "BannerB_2.png",
       title: "Shop for Itel Gadgets",
       link: "/products/itel",
-    },
+    }
   ];
 
   const sliderSettings = {
@@ -61,7 +66,6 @@ const Home = () => {
       </div>
     ),
   };
-
   return (
     <MainLayout>
       <PageMeta
@@ -121,7 +125,7 @@ const Home = () => {
               {contentSlides.map((item, index) => (
                 <div key={index} className="relative w-full h-full p-4">
                   <div
-                    className="!hidden w-full min-h-96 h-full bg-no-repeat bg-center bg-cover rounded-lg md:rounded-3xl md:!block relative"
+                    className="!hidden w-full min-h-48 h-72 bg-no-repeat bg-center bg-cover rounded-lg md:rounded-3xl md:!block relative"
                     style={{
                       backgroundImage: `url('/assets/images/${item.lg_image}')`,
                     }}
@@ -139,7 +143,7 @@ const Home = () => {
                     </div>
                   </div>
                   <div
-                    className="!block w-full min-h-96 h-full bg-no-repeat bg-center bg-cover rounded-xl md:rounded-3xl md:!hidden relative"
+                    className="!block w-full min-h-48 h-72 bg-no-repeat bg-center bg-cover rounded-xl md:rounded-3xl md:!hidden relative"
                     style={{
                       backgroundImage: `url('/assets/images/${item.sm_image}')`,
                     }}

@@ -8,55 +8,57 @@ const Footer = ({
 }: {
   type: "user" | "general" | "admin";
 }) => {
+  const sliderSettings = {
+    slidesToShow: 3,  // Changed from 5 to 3
+    autoplay: true,
+    autoplaySpeed: 900,
+    infinite: true,
+    arrows: false,
+    dots: false,
+    responsive: [
+      {
+        breakpoint: 1024,
+        settings: {
+          slidesToShow: 2,  // Show 2 on medium screens
+          slidesToScroll: 1,
+        },
+      },
+      {
+        breakpoint: 640,
+        settings: {
+          slidesToShow: 1,  // Show 1 on mobile
+          slidesToScroll: 1,
+        },
+      },
+    ],
+  };
+
+  const quickLinks = [
+    {
+      icon: "fa-solid fa-headset",
+      title: "24/7 Support",
+      subtitle: "Support every time",
+    },
+    {
+      icon: "fa-solid fa-credit-card",
+      title: "Accept Payment",
+      subtitle: "Verve, Bank Transfer",
+    },
+    {
+      icon: "fa-solid fa-shield",
+      title: "Secure Payment",
+      subtitle: "100% Secured",
+    },
+  ];
+
   return (
     <div
       className={classNames("space-y-2", {
         "px-3 md:px-10": type === "general",
       })}
     >
-      <Slider
-        {...{
-          slidesToShow: 5,
-          autoplay: true,
-          autoplaySpeed: 900,
-          infinite: true,
-          arrows: false,
-          dots: false,
-          responsive: [
-            {
-              breakpoint: 1024,
-              settings: {
-                slidesToShow: 1,
-                slidesToScroll: 1,
-              },
-            },
-          ],
-        }}
-        className="quick-us px-5"
-      >
-        {[
-          {
-            icon: "fa-solid fa-headset",
-            title: "24/7 Support",
-            subtitle: "Support every time",
-          },
-          {
-            icon: "fa-solid fa-credit-card",
-            title: "Accept Payment",
-            subtitle: "Verve, Bank Transfer",
-          },
-          {
-            icon: "fa-solid fa-shield",
-            title: "Secure Payment",
-            subtitle: "100% Secured",
-          },
-        
-          {
-            icon: "fa-solid fa-calendar",
-            title: "30 days return",
-            subtitle: "Get 30 days guarantee",
-          },
-        ].map((item, index) => (
+      <Slider {...sliderSettings} className="quick-us px-5">
+        {quickLinks.map((item, index) => (
           <div key={index}>
             <div className="w-full px-6 !flex flex-nowrap !flex-row items-center justify-center gap-4 group">
               <i
@@ -75,7 +77,6 @@ const Footer = ({
           </div>
         ))}
       </Slider>
-
       <div className={classNames("mt-8 py-6 md:py-3 shadow-lg")}>
         <div
           className={classNames(
@@ -116,7 +117,7 @@ const Footer = ({
                 { text: "Home", link: "/" },
                 { text: "Dashboard", link: "/user/shop" },
                 { text: "My Orders", link: "/user/orders" },
-                { text: "My Profile", link: "/user/profile" },
+                { text: "My Profile", link: "/user/" },
               ].map((item, index) => (
                 <a
                   key={index}
@@ -133,7 +134,7 @@ const Footer = ({
             <h6 className="text-2xl font-semibold text-gray-400">Services</h6>
             <div className="space-y-2 flex flex-col text-white">
               {[
-                { text: "Return Policy", link: "/legal/return-policy" },
+              
                 { text: "FAQ", link: "/faq" },
                 { text: "Privacy Policy", link: "/legal/privacy-policy" },
                 {

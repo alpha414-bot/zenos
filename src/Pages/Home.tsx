@@ -16,39 +16,39 @@ const Home = () => {
   // Updated image slides focusing on used products and accessories
   const imageSlides = [
     {
-      lg_image: "UsedProductsBanner.jpg",  // Replace with actual used products banner
-      sm_image: "UsedProductsMobile.jpg",
-      title: "Quality Used Products",
-      link: "/products/used-products"
+      lg_image: "BannerE.png", // Replace with actual used products banner
+      sm_image: "BannerE.png",
+
+      link: "/products/used-products",
     },
     {
-      lg_image: "AccessoriesBanner.jpg",  // Replace with actual accessories banner
-      sm_image: "AccessoriesMobile.jpg",
+      lg_image: "BannerF.png", // Replace with actual accessories banner
+      sm_image: "BannerF.png",
       title: "Phone Accessories",
-      link: "/products/phone-accessories"
+      link: "/products/phone-accessories",
     },
     {
       lg_image: "BannerH.jpg",
       sm_image: "oraimo-flyer.jpg",
-    }
+    },
   ];
 
   // Updated content slides with clear CTAs
   const contentSlides = [
     {
-      lg_image: "UsedProductsBanner.jpg",  // Replace with actual used products banner
-      sm_image: "UsedProductsMobile.jpg",
+      lg_image: "BannerD.png", // Replace with actual used products banner
+      sm_image: "BannerD.png",
       title: "Quality Used Products at Great Prices",
       link: "/products/used-products",
-      buttonText: "Shop Used Products"
+      buttonText: "Shop Used Products",
     },
     {
-      lg_image: "AccessoriesBanner.jpg",  // Replace with actual accessories banner
-      sm_image: "AccessoriesMobile.jpg",
+      lg_image: "BannerC.png", // Replace with actual accessories banner
+      sm_image: "BannerC.png",
       title: "Browse Phone Accessories",
       link: "/products/phone-accessories",
-      buttonText: "Shop Accessories"
-    }
+      buttonText: "Shop Accessories",
+    },
   ];
 
   const sliderSettings = {
@@ -152,7 +152,7 @@ const Home = () => {
                     breakpoint: 640,
                     settings: {
                       slidesToShow: 1,
-                      autoplaySpeed: 2000
+                      autoplaySpeed: 2000,
                     },
                   },
                 ],

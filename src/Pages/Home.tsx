@@ -95,7 +95,7 @@ const Home = () => {
           </div>
 
           {/* Content Slider with Text Overlay */}
-          <div className="px-2 md:px-6 bg-gray-800/60 mx-8 rounded-3xl">
+          <div className="px-0 md:px-6 bg-gray-800/60 mx-2 md:mx-8 rounded-3xl">
             <Slider
               {...{
                 slidesToShow: 2,
@@ -105,6 +105,15 @@ const Home = () => {
                 arrows: false,
                 dots: false,
                 adaptiveHeight: true,
+                responsive: [
+                  {
+                    breakpoint: 640,
+                    settings: {
+                      slidesToShow: 1,
+                      autoplaySpeed: 2000
+                    },
+                  },
+                ],
               }}
               centerMode={false}
               className="group w-full gap-4"

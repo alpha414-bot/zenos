@@ -136,11 +136,8 @@ const Footer = ({
               {[
               
                 { text: "FAQ", link: "/faq" },
-                { text: "Privacy Policy", link: "/legal/privacy-policy" },
-                {
-                  text: "Terms & Conditions",
-                  link: "/legal/terms-and-conditions",
-                },
+                { text: "Return policy", link: "/legal/return-policy" },
+               
               ].map((item, index) => (
                 <a
                   key={index}

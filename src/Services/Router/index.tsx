@@ -8,6 +8,8 @@ import ProductDetails from "@/Pages/ProductDetails";
 import Products from "@/Pages/Products";
 import Shop from "@/Pages/Shop";
 import Carts from "@/Pages/Subpages/Carts";
+import FAQPage from "@/Pages/faq";
+import ReturnPolicyPage from "@/Pages/ReturnPolicy";
 import Orders from "@/Pages/Subpages/Orders";
 import {
   Navigate,
@@ -24,6 +26,24 @@ const RootRouter: RouteObject[] = [
     element: (
       <ProtectedRoute>
         <Home />
+      </ProtectedRoute>
+    ),
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: "/legal/return-policy",
+    element: (
+      <ProtectedRoute>
+        <ReturnPolicyPage />
+      </ProtectedRoute>
+    ),
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: "/faq",
+    element: (
+      <ProtectedRoute>
+        <FAQPage />
       </ProtectedRoute>
     ),
     errorElement: <ErrorPage />,

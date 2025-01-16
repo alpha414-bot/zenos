@@ -108,6 +108,16 @@ const Footer = ({
                 <i className="fa-solid fa-envelope text-zenos-600"></i>
                 <span>{Config.email}</span>
               </a>
+              <a
+                href="https://www.instagram.com/zenos_marketplace?igsh=MXFrOWQyY2t2OHg3NQ%3D%3D&utm_source=qr
+"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-zenos-600 text-sm space-x-2"
+              >
+                <i className="fa-brands fa-instagram text-zenos-600"></i>
+                <span>Follow us on Instagram</span>
+              </a>
             </div>
           </div>
           <div className="space-y-3">
@@ -134,10 +144,8 @@ const Footer = ({
             <h6 className="text-2xl font-semibold text-gray-400">Services</h6>
             <div className="space-y-2 flex flex-col text-white">
               {[
-              
                 { text: "FAQ", link: "/faq" },
                 { text: "Return policy", link: "/legal/return-policy" },
-               
               ].map((item, index) => (
                 <a
                   key={index}

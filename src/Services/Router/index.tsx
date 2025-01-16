@@ -8,7 +8,7 @@ import ProductDetails from "@/Pages/ProductDetails";
 import Products from "@/Pages/Products";
 import Shop from "@/Pages/Shop";
 import Carts from "@/Pages/Subpages/Carts";
-import FAQPage from "@/Pages/faq";
+import FAQPage from "@/Pages/Faq";
 import ReturnPolicyPage from "@/Pages/ReturnPolicy";
 import Orders from "@/Pages/Subpages/Orders";
 import {

@@ -31,7 +31,7 @@ export const DisplayCategories = [
 export const ZenosCategory = [
   { key: "oraimo", value: "Oraimo" },
   { key: "itel", value: "Itel" },
-  { key: "uk-used", value: "UK Used" },
+  { key: "used", value: "Used" },
 ];
 
 export const ZenosTypeCategory = [

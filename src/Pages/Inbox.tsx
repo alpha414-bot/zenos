@@ -225,7 +225,7 @@ const Inbox = () => {
     amount: number
   ) => {
     if (!carts?.length) {
-      return `🛍️ New Order Details\nReference: ${reference}\nTotal Amount: $${
+      return `🛍️ New Order Details\nReference: ${reference}\nTotal Amount: #${
         amount?.toFixed(2) || 0
       }`;
     }
@@ -234,7 +234,7 @@ const Inbox = () => {
     🛍️ New Order Details
         ------------------------
         Reference: ${reference}
-        Total Amount: $${amount?.toFixed(2) || 0}
+        Total Amount: #${amount?.toFixed(2) || 0}
 
         📦 Order Items:
         ${carts
@@ -243,8 +243,8 @@ const Inbox = () => {
             (item) => `
         - ${item.name}
           Quantity: ${item.quantity}
-          Price: $${item.price?.toFixed(2)}
-          Subtotal: $${(item.quantity * item.price)?.toFixed(2)}
+          Price: #${item.price?.toFixed(2)}
+          Subtotal: #${(item.quantity * item.price)?.toFixed(2)}
         `
           )
           .join("")}

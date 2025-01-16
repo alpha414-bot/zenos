@@ -13,36 +13,41 @@ const Home = () => {
     limit: 12,
   });
 
-  // Image-only slider content
+  // Updated image slides focusing on used products and accessories
   const imageSlides = [
     {
-      lg_image: "OraimoBannerB.jpg",
-      sm_image: "BannerG.jpg",
+      lg_image: "UsedProductsBanner.jpg",  // Replace with actual used products banner
+      sm_image: "UsedProductsMobile.jpg",
+      title: "Quality Used Products",
+      link: "/products/used-products"
     },
-    { 
-      lg_image: "BannerB.png", 
-      sm_image: "BannerB_2.png" 
+    {
+      lg_image: "AccessoriesBanner.jpg",  // Replace with actual accessories banner
+      sm_image: "AccessoriesMobile.jpg",
+      title: "Phone Accessories",
+      link: "/products/phone-accessories"
     },
-    
     {
       lg_image: "BannerH.jpg",
       sm_image: "oraimo-flyer.jpg",
     }
   ];
 
-  // Content slider with text overlays
+  // Updated content slides with clear CTAs
   const contentSlides = [
     {
-      lg_image: "OraimoBannerB.jpg",
-      sm_image: "OraimoBannerB.jpg",
-      title: "Shop for Oraimo Gadgets",
-      link: "/products/oraimo",
+      lg_image: "UsedProductsBanner.jpg",  // Replace with actual used products banner
+      sm_image: "UsedProductsMobile.jpg",
+      title: "Quality Used Products at Great Prices",
+      link: "/products/used-products",
+      buttonText: "Shop Used Products"
     },
     {
-      lg_image: "BannerB.png",
-      sm_image: "BannerB_2.png",
-      title: "Shop for Itel Gadgets",
-      link: "/products/itel",
+      lg_image: "AccessoriesBanner.jpg",  // Replace with actual accessories banner
+      sm_image: "AccessoriesMobile.jpg",
+      title: "Browse Phone Accessories",
+      link: "/products/phone-accessories",
+      buttonText: "Shop Accessories"
     }
   ];
 
@@ -66,6 +71,7 @@ const Home = () => {
       </div>
     ),
   };
+
   return (
     <MainLayout>
       <PageMeta
@@ -73,6 +79,16 @@ const Home = () => {
         description="The ecommerce with the latest in laptops, mobile and gadgets"
       >
         <div className="space-y-7">
+          {/* Custom Order Button - Fixed Position */}
+          <div className="fixed bottom-6 right-6 z-50">
+            <ButtonAsLink
+              to="/user/inbox"
+              className="!bg-primary !text-white hover:!bg-primary-dark shadow-lg rounded-full px-6 py-3 flex items-center gap-2"
+            >
+              <span className="material-icons">chat</span>
+              Custom Order
+            </ButtonAsLink>
+          </div>
           {/* Image-only Slider */}
           <div className="w-full py-8 px-2 md:py-8 md:px-12">
             <Slider {...sliderSettings} className="group">
@@ -86,13 +102,35 @@ const Home = () => {
                     style={{
                       backgroundImage: `url('/assets/images/${item.lg_image}')`,
                     }}
-                  />
+                  >
+                    {item.title && (
+                      <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                        <ButtonAsLink
+                          to={item.link}
+                          className="!bg-white !text-black hover:!bg-gray-100 text-lg font-bold"
+                        >
+                          {item.title}
+                        </ButtonAsLink>
+                      </div>
+                    )}
+                  </div>
                   <div
                     className="!block w-full min-h-96 h-full bg-no-repeat bg-center bg-cover rounded-xl md:rounded-3xl md:!hidden"
                     style={{
                       backgroundImage: `url('/assets/images/${item.sm_image}')`,
                     }}
-                  />
+                  >
+                    {item.title && (
+                      <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                        <ButtonAsLink
+                          to={item.link}
+                          className="!bg-white !text-black hover:!bg-gray-100 text-lg font-bold"
+                        >
+                          {item.title}
+                        </ButtonAsLink>
+                      </div>
+                    )}
+                  </div>
                 </div>
               ))}
             </Slider>
@@ -138,7 +176,7 @@ const Home = () => {
                         to={item.link}
                         className="!bg-white !text-black hover:!bg-gray-100"
                       >
-                        Shop Now
+                        {item.buttonText || "Shop Now"}
                       </ButtonAsLink>
                     </div>
                   </div>
@@ -156,7 +194,7 @@ const Home = () => {
                         to={item.link}
                         className="!bg-white !text-black hover:!bg-gray-100"
                       >
-                        Shop Now
+                        {item.buttonText || "Shop Now"}
                       </ButtonAsLink>
                     </div>
                   </div>

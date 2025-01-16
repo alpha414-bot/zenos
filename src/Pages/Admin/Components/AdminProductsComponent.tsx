@@ -664,18 +664,26 @@ const AdminProductsComponent = () => {
   const submitProductsForm = (data: any) => {
     const auth = getAuth();
     const currentUser = auth.currentUser;
-
+  
     if (!currentUser) {
       console.error("No user is signed in.");
       return;
     }
-
+  
     // Get the user's unique identifier (UUID)
     const userUuid = currentUser.uid;
-
+  
+    // Determine the type based on the selected category
+    let type = "";
+    if (data.category?.key === "itel" || data.category?.key === "oraimo") {
+      type = "phone accessories";
+    } else if (data.category?.key === "uk-used") {
+      type = "used product";
+    }
+  
     // Process images
     let image = _.flatMap(data.image, (item) => item.media.name);
-
+  
     // Add document to Firestore
     addCollectionDoc(
       "Products",
@@ -688,6 +696,7 @@ const AdminProductsComponent = () => {
               status: "active",
               createdBy: userUuid, // Assign the user UUID to the "createdBy" field
               description: data.description?.replace(/\n/g, "\\n"),
+              type, // Include the dynamically assigned type field
             },
           })
         ),
@@ -703,6 +712,7 @@ const AdminProductsComponent = () => {
         reset();
       });
   };
+  
   useLayoutEffect(() => {
     const $targetEl: HTMLElement | null =
       document.getElementById(`add-product-modal`);

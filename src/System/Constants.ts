@@ -18,21 +18,25 @@ export const headers = ({
 
 export const Config = {
   phone: "09131735970",
-  email: "info@zenos.com.ng"
+  email: "info@zenos.com.ng",
 };
 
 // Main display categories (for UI)
 export const DisplayCategories = [
   { key: "phone-accessories", value: "Phone Accessories" },
-  { key: "used-products", value: "Used Products" }
+  { key: "used-products", value: "Used Products" },
 ];
 
 // Original categories (for backend/data organization)
 export const ZenosCategory = [
   { key: "oraimo", value: "Oraimo" },
- 
   { key: "itel", value: "Itel" },
-  { key: "uk-used", value: "UK Used" }
+  { key: "uk-used", value: "UK Used" },
+];
+
+export const ZenosTypeCategory = [
+  { key: "phone-accesories", value: "Phone Accessoories" },
+  { key: "used-products", value: "Used Products" },
 ];
 
 // Phone Accessories subcategories
@@ -44,7 +48,7 @@ export const PhoneAccessoriesSubCategory = [
   { key: "car-charger", value: "Car Charger" },
   { key: "phone-pouch", value: "Phone Pouch" },
   { key: "memory-card", value: "Memory Card" },
-  { key: "bluetooth-speaker", value: "Bluetooth Speaker" }
+  { key: "bluetooth-speaker", value: "Bluetooth Speaker" },
 ];
 
 // Keep the subcategories aligned with PhoneAccessoriesSubCategory for consistency
@@ -56,27 +60,27 @@ export const ZenosItelSubCategory = PhoneAccessoriesSubCategory;
 
 // Helper function for MixItUp integration
 export const getProductType = (category: string): string => {
-  if (category === 'uk-used') return 'used-products';
-  if (['oraimo',  'itel'].includes(category)) return 'phone-accessories';
+  if (category === "uk-used") return "used-products";
+  if (["oraimo", "itel"].includes(category)) return "phone-accessories";
   return category;
 };
 
 export const createSlug = (text: string): string => {
-  if (!text) return '';
+  if (!text) return "";
   return text
     .toLowerCase()
-    .replace(/\s+/g, '-')
-    .replace(/[^\w\-]+/g, '')
-    .replace(/\-\-+/g, '-')
-    .replace(/^-+/, '')
-    .replace(/-+$/, '');
+    .replace(/\s+/g, "-")
+    .replace(/[^\w\-]+/g, "")
+    .replace(/\-\-+/g, "-")
+    .replace(/^-+/, "")
+    .replace(/-+$/, "");
 };
 
 // Debug helpers
 export const DEBUG = {
-  phoneAccessoriesSlug: createSlug('phone-accessories'),
-  categories: DisplayCategories.map(cat => ({
+  phoneAccessoriesSlug: createSlug("phone-accessories"),
+  categories: DisplayCategories.map((cat) => ({
     original: cat.key,
-    slug: createSlug(cat.key)
-  }))
+    slug: createSlug(cat.key),
+  })),
 };

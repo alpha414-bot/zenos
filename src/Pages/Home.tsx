@@ -1,4 +1,3 @@
-import React from "react";
 import ButtonAsLink from "@/Components/ButtonAsLink";
 import ProductList from "@/Components/ProductList";
 import Spinner from "@/Components/Spinner";
@@ -6,6 +5,7 @@ import Title from "@/Components/Title";
 import MainLayout from "@/Layouts/MainLayout";
 import PageMeta from "@/Layouts/PageMeta";
 import { useProductsData } from "@/Services/Hooks";
+import React from "react";
 import Slider from "react-slick";
 
 const Home = () => {
@@ -20,7 +20,7 @@ const Home = () => {
       sm_image: "BannerG.jpg",
     },
     {
-      lg_image: "BannerH.png",
+      lg_image: "BannerH.jpg",
       sm_image: "oraimo-flyer.jpg",
     },
   ];
@@ -28,13 +28,13 @@ const Home = () => {
   // Content slider with text overlays
   const contentSlides = [
     {
-      lg_image: "BannerH.jpg",
+      lg_image: "oraimo-flyer.jpg",
       sm_image: "oraimo-flyer.jpg",
       title: "Shop for Oraimo Gadgets",
       link: "/products/oraimo",
     },
     {
-      lg_image: "BannerC.png",
+      lg_image: "BannerG.jpg",
       sm_image: "BannerB_2.png",
       title: "Shop for Itel Gadgets",
       link: "/products/itel",
@@ -48,7 +48,7 @@ const Home = () => {
     autoplay: true,
     autoplaySpeed: 4000,
     adaptiveHeight: true,
-    arrows: true,
+    arrows: false,
     swipe: true,
     dots: true,
     dotsClass: "absolute bottom-2 w-full block !px-6 !py-4",
@@ -95,13 +95,22 @@ const Home = () => {
           </div>
 
           {/* Content Slider with Text Overlay */}
-          <div className="w-full py-8 px-2 md:py-8 md:px-12">
-            <Slider {...sliderSettings} className="group">
+          <div className="px-2 md:px-6 bg-gray-800/60 mx-8 rounded-3xl">
+            <Slider
+              {...{
+                slidesToShow: 2,
+                autoplaySpeed: 2500,
+                autoplay: true,
+                infinite: false,
+                arrows: false,
+                dots: false,
+                adaptiveHeight: true,
+              }}
+              centerMode={false}
+              className="group w-full gap-4"
+            >
               {contentSlides.map((item, index) => (
-                <div
-                  key={index}
-                  className="relative w-full !h-auto md:!h-[75vh]"
-                >
+                <div key={index} className="relative w-full h-full p-4">
                   <div
                     className="!hidden w-full min-h-96 h-full bg-no-repeat bg-center bg-cover rounded-lg md:rounded-3xl md:!block relative"
                     style={{

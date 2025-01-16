@@ -1,6 +1,5 @@
 import { useAuthUser, useCartProducts } from "@/Services/Hooks";
 import { Link, NavLink } from "react-router-dom";
-import Button from "./Button";
 
 function Navbar() {
   const { data: CartProducts } = useCartProducts() as { data: CartMetaItem[] };

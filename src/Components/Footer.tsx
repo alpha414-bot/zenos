@@ -107,13 +107,6 @@ const Footer = ({
                 <i className="fa-solid fa-envelope text-zenos-600"></i>
                 <span>{Config.email}</span>
               </a>
-              <a
-                href={`//map.google.com`}
-                className="hover:text-zenos-600 text-sm space-x-2"
-              >
-                <i className="fa-solid fa-map text-zenos-600"></i>
-                <span>{Config.address}</span>
-              </a>
             </div>
           </div>
           <div className="space-y-3">

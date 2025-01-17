@@ -16,9 +16,9 @@ const Home = () => {
   // Updated image slides focusing on used products and accessories
   const imageSlides = [
     {
-      lg_image: "BannerE.png", // Replace with actual used products banner
-      sm_image: "BannerE.png",
-
+      lg_image: "OraimoBannerB.jpg",
+      sm_image: "BannerG.jpg",
+      title: "Used Products",
       link: "/products/used-products",
     },
     {
@@ -29,37 +29,35 @@ const Home = () => {
     },
     {
       lg_image: "BannerH.jpg",
-      sm_image: "oraimo-flyer.jpg",
+      sm_image: "BannerB_2.png",
     },
   ];
 
   // Updated content slides with clear CTAs
   const contentSlides = [
     {
-      lg_image: "BannerD.png", // Replace with actual used products banner
-      sm_image: "BannerD.png",
+      placeholder: "oraimo-flyer.jpg",
       title: "Quality Used Products at Great Prices",
       link: "/products/used-products",
       buttonText: "Shop Used Products",
     },
     {
-      lg_image: "BannerC.png", // Replace with actual accessories banner
-      sm_image: "BannerC.png",
+      placeholder: "newage-flyer.jpg",
       title: "Browse Phone Accessories",
       link: "/products/phone-accessories",
       buttonText: "Shop Accessories",
     },
   ];
 
-  const sliderSettings = {
+  const heroSliderSettings = {
     fade: true,
     slidesToShow: 1,
     slidesToScroll: 1,
     autoplay: true,
-    autoplaySpeed: 4000,
+    autoplaySpeed: 3500,
     adaptiveHeight: true,
     arrows: false,
-    swipe: true,
+    // swipe: true,
     dots: true,
     dotsClass: "absolute bottom-2 w-full block !px-6 !py-4",
     nextArrow: <></>,
@@ -85,20 +83,20 @@ const Home = () => {
               to="/user/inbox"
               className="!bg-primary !text-white hover:!bg-primary-dark shadow-lg rounded-full px-6 py-3 flex items-center gap-2"
             >
-              <span className="material-icons">chat</span>
+              <i className="fa-solid fa-comments"></i>
               Custom Order
             </ButtonAsLink>
           </div>
           {/* Image-only Slider */}
           <div className="w-full py-8 px-2 md:py-8 md:px-12">
-            <Slider {...sliderSettings} className="group">
+            <Slider {...heroSliderSettings} className="group">
               {imageSlides.map((item, index) => (
                 <div
                   key={index}
-                  className="relative w-full !h-auto md:!h-[75vh]"
+                  className="relative w-full !h-auto md:!h-[80vh]"
                 >
                   <div
-                    className="!hidden w-full min-h-96 h-full bg-no-repeat bg-center bg-cover rounded-lg md:rounded-3xl md:!block"
+                    className="!hidden w-full min-h-96 h-full bg-no-repeat bg-top bg-cover rounded-lg md:rounded-3xl md:!block"
                     style={{
                       backgroundImage: `url('/assets/images/${item.lg_image}')`,
                     }}
@@ -161,42 +159,25 @@ const Home = () => {
               className="group w-full gap-4"
             >
               {contentSlides.map((item, index) => (
-                <div key={index} className="relative w-full h-full p-4">
-                  <div
-                    className="!hidden w-full min-h-48 h-72 bg-no-repeat bg-center bg-cover rounded-lg md:rounded-3xl md:!block relative"
-                    style={{
-                      backgroundImage: `url('/assets/images/${item.lg_image}')`,
-                    }}
-                  >
-                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center flex-col gap-4 rounded-3xl">
-                      <h2 className="text-4xl font-bold text-white text-center">
+                <div key={index} className="p-4">
+                  <div className="h-44 relative bg-gray-700 rounded-lg gap-8 overflow-hidden md:rounded-3xl">
+                    <div className="relative z-10 w-full inset-0 py-4 px-8 bg-gray-800/75 flex flex-col items-center text-center justify-start gap-y-3 md:py-2 md:justify-center md:h-full">
+                      <h2 className="text-2xl font-bold text-gray-200 underline underline-offset-4 decoration-dotted md:text-4xl md:leading-[3rem]">
                         {item.title}
                       </h2>
                       <ButtonAsLink
                         to={item.link}
-                        className="!bg-white !text-black hover:!bg-gray-100"
+                        className="whitespace-nowrap !m-0"
                       >
-                        {item.buttonText || "Shop Now"}
+                        {item.buttonText}
                       </ButtonAsLink>
                     </div>
-                  </div>
-                  <div
-                    className="!block w-full min-h-48 h-72 bg-no-repeat bg-center bg-cover rounded-xl md:rounded-3xl md:!hidden relative"
-                    style={{
-                      backgroundImage: `url('/assets/images/${item.sm_image}')`,
-                    }}
-                  >
-                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center flex-col gap-4 rounded-xl">
-                      <h2 className="text-2xl font-bold text-white text-center">
-                        {item.title}
-                      </h2>
-                      <ButtonAsLink
-                        to={item.link}
-                        className="!bg-white !text-black hover:!bg-gray-100"
-                      >
-                        {item.buttonText || "Shop Now"}
-                      </ButtonAsLink>
-                    </div>
+                    <div
+                      className="absolute inset-0 z-0 w-full h-full bg-red-500 bg-cover bg-center bg-no-repeat"
+                      style={{
+                        backgroundImage: `url("/assets/images/${item.placeholder}")`,
+                      }}
+                    ></div>
                   </div>
                 </div>
               ))}
@@ -229,7 +210,10 @@ const Home = () => {
                 ) : (
                   data &&
                   (data.length > 0 ? (
-                    <ProductList products={data} />
+                    <ProductList
+                      products={data}
+                      filterContainerEnabled={false}
+                    />
                   ) : (
                     <div className="no-container-products">
                       <p className="no-product-data">No Product found!</p>

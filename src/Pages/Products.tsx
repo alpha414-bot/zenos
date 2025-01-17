@@ -108,6 +108,7 @@ const Products = () => {
           products={products}
           type="product_listing"
           filter_by={filterState}
+          filterContainerEnabled
         />
         <div className="mixitup-page-list" />
       </div>

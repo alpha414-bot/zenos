@@ -83,7 +83,7 @@ function Navbar() {
               className="relative inline-flex items-center px-1 py-1 rounded-full"
             >
               <svg
-                className="w-8 h-8 md:w-8 md:h-8 text-zenos-500"
+                className="w-6 h-6 text-zenos-500"
                 aria-hidden="true"
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"

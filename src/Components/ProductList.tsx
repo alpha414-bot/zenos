@@ -13,12 +13,13 @@ interface ProductListInterface {
     type?: string;
     subcategory?: string;
   };
+  filterContainerEnabled: boolean
 }
 
 const ProductList: React.FC<ProductListInterface> = ({
   products,
   type = "product_listing",
-  
+  filterContainerEnabled
 }) => {
   const dispatch = useAppDispatch();
   const TypeCartListing = type === "carts_listing";
@@ -43,7 +44,8 @@ const ProductList: React.FC<ProductListInterface> = ({
         "grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-1": TypeSimilarListing,
         "grid-cols-1 gap-6": TypeCartListing,
         "grid-cols-1 gap-4": TypeOrderListing,
-        "grid-cols-1 xl:grid-cols-3 gap-x-4 gap-y-12": TypeProductListing,
+        "grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-x-4 gap-y-12": TypeProductListing && !filterContainerEnabled, // Filter container is not included side-by-side with ProductsComponent
+        "grid-cols-1 xl:grid-cols-3 gap-x-4 gap-y-12": TypeProductListing && filterContainerEnabled,
       })}
     >
       {products.length > 0 ? (

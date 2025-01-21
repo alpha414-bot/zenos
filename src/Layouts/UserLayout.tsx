@@ -54,7 +54,7 @@ const UserLayout: FC<AdminLayoutInterface> = ({ children }) => {
             <div
               className={classNames({
                 "sm:ml-64": true,
-                "px-0 py-0 sm:px-0 space-y-0 h-[90vh] overflow-hidden bg-red-500":
+                "px-0 py-0 sm:px-0 space-y-0 h-[90vh] overflow-hidden md:h-full":
                   chatStateEnable, // if in chat component
                 "px-2 py-6 sm:px-4 space-y-4": !chatStateEnable, // if not in chat component
               })}

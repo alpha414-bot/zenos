@@ -23,7 +23,7 @@ const MainLayout: React.FC<{
         <div className="h-full md:h-full">
           <div
             className={classNames("", {
-              "relative pb-20 overflow-y-auto h-full scroll-mobile md:h-auto md:overflow-clip":
+              "relative pb-20 overflow-y-auto h-full scroll-mobile md:h-auto md:overflow-clip md:pb-4":
                 true,
             })}
           >

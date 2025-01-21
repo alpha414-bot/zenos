@@ -77,16 +77,6 @@ const Home = () => {
         description="The ecommerce with the latest in laptops, mobile and gadgets"
       >
         <div className="space-y-7">
-          {/* Custom Order Button - Fixed Position */}
-          <div className="fixed bottom-6 right-6 z-50">
-            <ButtonAsLink
-              to="/user/inbox"
-              className="!bg-primary !text-white hover:!bg-primary-dark shadow-lg rounded-full px-6 py-3 flex items-center gap-2"
-            >
-              <i className="fa-solid fa-comments"></i>
-              Custom Order
-            </ButtonAsLink>
-          </div>
           {/* Image-only Slider */}
           <div className="w-full py-8 px-2 md:py-8 md:px-12">
             <Slider {...heroSliderSettings} className="group">
@@ -161,7 +151,7 @@ const Home = () => {
               {contentSlides.map((item, index) => (
                 <div key={index} className="p-4">
                   <div className="h-44 relative bg-gray-700 rounded-lg gap-8 overflow-hidden md:rounded-3xl">
-                    <div className="relative z-10 w-full inset-0 py-4 px-8 bg-gray-800/75 flex flex-col items-center text-center justify-start gap-y-3 md:py-2 md:justify-center md:h-full">
+                    <div className="relative z-10 w-full h-full inset-0 py-4 px-8 bg-gray-800/75 flex flex-col items-center text-center justify-start gap-y-3 md:py-2 md:justify-center md:h-full">
                       <h2 className="text-2xl font-bold text-gray-200 underline underline-offset-4 decoration-dotted md:text-4xl md:leading-[3rem]">
                         {item.title}
                       </h2>

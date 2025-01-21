@@ -73,7 +73,7 @@ const MobileFooterBar = () => {
   return (
     <div
       className={classNames(
-        " z-50 -bottom-2 left-0 right-0 pt-4 pb-7 px-4 bg-gray-900 w-full gap-x-0.5 rounded-t-2xl grid items-center md:hidden",
+        "fixed z-50 -bottom-2 left-0 right-0 pt-4 pb-4 px-4 bg-gray-900 w-full gap-x-0.5 rounded-t-2xl grid items-center md:hidden",
         {
           "grid-cols-5": VisibleFilteredLink.length === 5,
           "grid-cols-4": VisibleFilteredLink.length === 4,

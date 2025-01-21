@@ -1,3 +1,4 @@
+import ButtonAsLink from "@/Components/ButtonAsLink";
 import Footer from "@/Components/Footer";
 import MediaModal from "@/Components/MediaModal";
 import MobileFooterBar from "@/Components/MobileFooterBar";
@@ -18,10 +19,11 @@ const MainLayout: React.FC<{
   return (
     <>
       <div className="h-screen md:h-full">
-        <div className="relative grid grid-rows-[minmax(10vh,90vh)_auto] items-start !p-0 !m-0 bg-gry-900 md:block">
+        {/* <div className="relative grid grid-rows-[minmax(10vh,90vh)_auto] items-start !p-0 !m-0 bg-gry-900 md:block"> */}
+        <div className="h-full md:h-full">
           <div
             className={classNames("", {
-              "overflow-y-auto h-full scroll-mobile md:h-auto md:overflow-clip":
+              "relative pb-20 overflow-y-auto h-full scroll-mobile md:h-auto md:overflow-clip":
                 true,
             })}
           >
@@ -45,6 +47,16 @@ const MainLayout: React.FC<{
                 <div id="wrapper">{children}</div>
               </div>
               {!no_footer && <Footer type="user" />}
+              {/* Custom Order Button - Fixed Position */}
+              <div className="fixed bottom-20 md:bottom-6 right-4 z-50">
+                <ButtonAsLink
+                  to="/user/inbox"
+                  className="!bg-primary !text-white hover:!bg-primary-dark shadow-lg rounded-full px-4 md:px-6 py-4 flex items-center gap-2"
+                >
+                  <i className="fa-solid fa-comments"></i>
+                  <span className="hidden md:block">Custom Order</span>
+                </ButtonAsLink>
+              </div>
             </div>
           </div>
           <MobileFooterBar />

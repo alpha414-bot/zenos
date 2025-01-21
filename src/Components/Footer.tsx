@@ -82,7 +82,8 @@ const Footer = ({
           className={classNames(
             "py-4 grid grid-cols-1 items-stretch justify-center gap-x-2 gap-y-8 md:items-start md:grid-cols-4",
             {
-              "px-4 md:px-5": type === "general",
+              "px-6 md:px-5": type === "general",
+              "px-4": type === "user",
             }
           )}
         >

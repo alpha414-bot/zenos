@@ -28,10 +28,11 @@ const UserLayout: FC<AdminLayoutInterface> = ({ children }) => {
   return (
     <>
       <div className="h-screen overflow-hidden md:h-auto md:overflow-auto">
-        <div className="grid grid-rows-[minmax(10vh,90vh)_auto] min-h-screen items-start !p-0 !m-0 bg-gray-900 md:block">
+        {/* <div className="grid grid-rows-[minmax(10vh,90vh)_auto] min-h-screen items-start !p-0 !m-0 bg-gray-900 md:block"> */}
+        <div className="h-full md:h-full">
           <div
             className={classNames("relative", {
-              "overflow-hidden h-full": chatStateEnable,
+              "overflow-hidden h-full bg-gray-900": chatStateEnable,
               "overflow-y-auto h-full scroll-mobile md:h-auto md:overflow-auto":
                 !chatStateEnable,
             })}
@@ -53,7 +54,8 @@ const UserLayout: FC<AdminLayoutInterface> = ({ children }) => {
             <div
               className={classNames({
                 "sm:ml-64": true,
-                "px-0 py-0 sm:px-0 space-y-0 h-full": chatStateEnable, // if in chat component
+                "px-0 py-0 sm:px-0 space-y-0 h-[90vh] overflow-hidden bg-red-500":
+                  chatStateEnable, // if in chat component
                 "px-2 py-6 sm:px-4 space-y-4": !chatStateEnable, // if not in chat component
               })}
             >

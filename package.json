@@ -1,7 +1,7 @@
 {
   "name": "zenos",
   "private": true,
-  "development": true,
+  "development": false,
   "version": "1.0.0",
   "type": "module",
   "local_backend_url": "http://127.0.0.1:8095",

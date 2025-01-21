@@ -212,7 +212,7 @@ const Home = () => {
                   (data.length > 0 ? (
                     <ProductList
                       products={data}
-                    
+                      filterContainerEnabled={false}
                     />
                   ) : (
                     <div className="no-container-products">

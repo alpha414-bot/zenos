@@ -20,10 +20,9 @@ function Navbar() {
               <NavLink
                 to="/"
                 className={({ isActive }) =>
-                  `tracking-wide ${
-                    isActive
-                      ? "underline underline-offset-4 decoration-dotted"
-                      : ""
+                  `tracking-wide ${isActive
+                    ? "underline underline-offset-4 decoration-dotted"
+                    : ""
                   } hover:text-gray-500 font-medium`
                 }
               >
@@ -34,10 +33,9 @@ function Navbar() {
               <NavLink
                 to="/about"
                 className={({ isActive }) =>
-                  `tracking-wide ${
-                    isActive
-                      ? "underline underline-offset-4 decoration-dotted"
-                      : ""
+                  `tracking-wide ${isActive
+                    ? "underline underline-offset-4 decoration-dotted"
+                    : ""
                   } hover:text-gray-500 font-medium`
                 }
               >
@@ -49,10 +47,9 @@ function Navbar() {
                 <NavLink
                   to={currentUser.admin ? "/admin/dashboard" : "/user/carts"}
                   className={({ isActive }) =>
-                    `tracking-wide ${
-                      isActive
-                        ? "underline underline-offset-4 decoration-dotted"
-                        : ""
+                    `tracking-wide ${isActive
+                      ? "underline underline-offset-4 decoration-dotted"
+                      : ""
                     } hover:text-gray-500 font-medium`
                   }
                 >
@@ -60,21 +57,20 @@ function Navbar() {
                 </NavLink>
               </li>
             )) || (
-              <li>
-                <NavLink
-                  to="/auth"
-                  className={({ isActive }) =>
-                    `tracking-wide ${
-                      isActive
+                <li>
+                  <NavLink
+                    to="/auth"
+                    className={({ isActive }) =>
+                      `tracking-wide ${isActive
                         ? "underline underline-offset-4 decoration-dotted"
                         : ""
-                    } hover:text-gray-500 font-medium`
-                  }
-                >
-                  Sign In/Sign Up
-                </NavLink>
-              </li>
-            )}
+                      } hover:text-gray-500 font-medium`
+                    }
+                  >
+                    Sign In/Sign Up
+                  </NavLink>
+                </li>
+              )}
           </ul>
           <div className="flex items-center gap-x-1 md:gap-x-2">
             {/* Search Icon */}

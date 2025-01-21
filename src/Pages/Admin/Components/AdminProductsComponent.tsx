@@ -9,6 +9,7 @@ import Table from "@/Components/Table";
 import VariantsType from "@/Components/VariantsType";
 import { useProductsData, useUkUsedProductData } from "@/Services/Hooks";
 import { addCollectionDoc, updateCollectionDoc } from "@/Services/Queries";
+import { queryToGetUserData } from "@/Services/Queries/AuthQuery";
 import { queryToDeleteProduct } from "@/Services/Queries/ProductQuery";
 import {
   ZenosCategory,
@@ -26,6 +27,7 @@ import _ from "lodash";
 import moment from "moment";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
+import { useQuery } from "react-query";
 
 // Components to handle product in the ecommerce website
 const ProductsAction = ({ values }: { values: ProductItemType }) => {
@@ -477,6 +479,39 @@ const SelectProductAction = ({
   );
 };
 
+const UserActionPlaceholder = ({ uid }: { uid: string }) => {
+  const { data: user } = useQuery({
+    queryKey: ["user", uid],
+    queryFn: () =>
+      queryToGetUserData({
+        uid,
+        admin: false,
+        isAnonymous: false,
+      }),
+  });
+  return (
+    <div>
+      <div className={`px-0 py-2 cursor-pointer md:px-4 md:py-4`}>
+        <div className="flex items-center space-x-3">
+          <div className="flex-shrink-0 mx-auto">
+            <div className="w-8 h-8 rounded-full bg-zenos-600 flex items-center justify-center">
+              <span className="text-sm text-gray-900">
+                {user?.first_name?.[0]?.toUpperCase() || "?"}
+              </span>
+            </div>
+          </div>
+          <div className="hidden flex-1 min-w-0 md:block">
+            <p className="text-sm font-medium text-white truncate">
+              {user ? `${user.first_name} ${user.last_name}` : "Unknown User"}{" "}
+              [@{user?.username}]
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const AdminProductsComponent = () => {
   const formRef = useRef<HTMLFormElement>(null);
   const { data: products } = useProductsData({ admin: true });
@@ -534,6 +569,9 @@ const AdminProductsComponent = () => {
       {
         accessorKey: "createdBy",
         header: () => <span>Created By</span>,
+        cell: (info) => (
+          <UserActionPlaceholder uid={info.getValue() as string} />
+        ),
         footer: (props) => props.column.id,
       },
       {
@@ -542,11 +580,11 @@ const AdminProductsComponent = () => {
         cell: (info) => <span>{price(info.getValue(), "currency", 0)}</span>,
         footer: (props) => props.column.id,
       },
-      {
-        accessorKey: "subcategory.value",
-        header: () => <span>Total Sold</span>,
-        footer: (props) => props.column.id,
-      },
+      // {
+      //   accessorKey: "subcategory.value",
+      //   header: () => <span>Total Sold</span>,
+      //   footer: (props) => props.column.id,
+      // },
       {
         accessorKey: "createdAt",
         header: "Created",
@@ -664,26 +702,26 @@ const AdminProductsComponent = () => {
   const submitProductsForm = (data: any) => {
     const auth = getAuth();
     const currentUser = auth.currentUser;
-  
+
     if (!currentUser) {
       console.error("No user is signed in.");
       return;
     }
-  
+
     // Get the user's unique identifier (UUID)
     const userUuid = currentUser.uid;
-  
+
     // Determine the type based on the selected category
     let type = "";
-    if (data.category?.key === "itel" || data.category?.key === "oraimo") {
-      type = "phone accessories";
-    } else if (data.category?.key === "uk-used") {
-      type = "used product";
+    if (data.category?.key === "used") {
+      type = "used-products";
+    } else {
+      type = "phone-accesories";
     }
-  
+
     // Process images
     let image = _.flatMap(data.image, (item) => item.media.name);
-  
+
     // Add document to Firestore
     addCollectionDoc(
       "Products",
@@ -712,7 +750,7 @@ const AdminProductsComponent = () => {
         reset();
       });
   };
-  
+
   useLayoutEffect(() => {
     const $targetEl: HTMLElement | null =
       document.getElementById(`add-product-modal`);

@@ -1,5 +1,6 @@
 import { auth, firestore } from "@/firebase-config";
 import { notify } from "@/notify";
+import { baseURL } from "@/System/Constants";
 import { createSlug, isURL } from "@/System/function";
 import { MediaItemInterface, MediaMetaDataInterface } from "@/Types/Media";
 import {
@@ -16,7 +17,7 @@ import {
   updateDoc,
   where,
 } from "firebase/firestore";
-import { backend_url } from "../../../package.json";
+
 
 /**
  * <read>
@@ -41,7 +42,7 @@ export const queryToGetAssetFile = (
       } else if (path) {
         return resolve(
           listener(
-            `${backend_url}/media/cdn/${type}/${
+            `${baseURL}/media/cdn/${type}/${
               isNaN(Number(width)) ? width : `w${width}`
             }/${path}`
           )
@@ -80,7 +81,7 @@ export const queryToUploadFiles = (
               "random_filename",
               randomFileName ? "True" : "False"
             );
-            fetch(`${backend_url}/media/upload-image/`, {
+            fetch(`${baseURL}/media/upload-image/`, {
               method: "POST",
               body: formdata,
               redirect: "follow",
@@ -210,7 +211,7 @@ export const queryToDeleteFiles = (path: string) =>
             .then(() => {
               const headers = new Headers();
               headers.append("Content-Type", "application/json");
-              fetch(`${backend_url}/media/delete?`, {
+              fetch(`${baseURL}/media/delete?`, {
                 method: "DELETE",
                 body: JSON.stringify({
                   filename: media.name,

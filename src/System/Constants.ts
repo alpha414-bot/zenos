@@ -1,6 +1,10 @@
-import { backend_url as BackendUrl } from "../../package.json";
+import {
+  backend_url as BackendUrl,
+  local_backend_url,
+  development,
+} from "../../package.json";
 
-export const baseURL = BackendUrl;
+export const baseURL = development ? local_backend_url : BackendUrl;
 
 export const getMediaUrl = (path: string, w: any = "original") => {
   return `${baseURL}/media/cdn/images/${w}/${path}`;
@@ -42,10 +46,10 @@ export const ZenosTypeCategory = [
 // Phone Accessories subcategories
 export const PhoneAccessoriesSubCategory = [
   { key: "power-banks", value: "Power Banks" },
-  {key :"head-phones" , value: "head-phones"},
-  {key :"smart-watches" , value: "smart-watches"},
+  { key: "head-phones", value: "Head Phones" },
+  { key: "smart-watches", value: "Smart Watches" },
   { key: "earpods", value: "EarPod/Earbud" },
-  { key : "earpiece", value : "earpiece"},
+  { key: "earpiece", value: "Earpiece" },
   { key: "phone-cords", value: "Phone Cords" },
   { key: "phone-charger", value: "Phone Charger" },
   { key: "car-charger", value: "Car Charger" },

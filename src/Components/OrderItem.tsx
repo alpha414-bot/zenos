@@ -85,6 +85,7 @@ const OrderItem = ({ order }: { order: OrderDataInterface }) => {
                 } as ProductItemType;
                 return data;
               })}
+              filterContainerEnabled={false}
             />
           </div>
           {/* order metadata details */}

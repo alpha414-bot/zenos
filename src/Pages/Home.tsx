@@ -10,7 +10,7 @@ import Slider from "react-slick";
 
 const Home = () => {
   const { data, isLoading, isFetching } = useProductsData<ProductItemType[]>({
-    limit: 12,
+    limit: 8,
   });
 
   // Updated image slides focusing on used products and accessories
@@ -54,7 +54,7 @@ const Home = () => {
     slidesToShow: 1,
     slidesToScroll: 1,
     autoplay: true,
-    autoplaySpeed: 3500,
+    autoplaySpeed: 5000,
     adaptiveHeight: true,
     arrows: false,
     // swipe: true,

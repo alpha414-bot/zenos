@@ -72,6 +72,7 @@ interface ProductItemType {
   description: string;
   category: { key: "oraimo" | "new-age" | "itel" | "uk-used"; value: string };
   subcategory?: { key: string; value: string };
+  type?: "used-products" | "phone-accesories";
   price: number;
   salesPrice?: number;
   variants?: ProductVariantType[];

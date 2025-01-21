@@ -35,6 +35,8 @@ const ProductItem: React.FC<{
         "mix-target",
         `product-category-${createSlug(
           product?.category?.value?.toLowerCase()
+        )} product-type-${createSlug(
+          product?.type || "phone-accessories"
         )} product-subcategory-${createSlug(
           product?.subcategory?.value?.toLowerCase()
         )} ${createSlug(

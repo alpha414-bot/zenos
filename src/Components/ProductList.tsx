@@ -4,22 +4,25 @@ import { setMixerContainerEnable } from "@/Services/Redux/MixerSlice";
 import classNames from "classnames";
 import React, { useEffect } from "react";
 import ProductItem from "./ProductItem";
-import { getProductType } from "@/System/Constants";
 
 interface ProductListInterface {
   products: any[];
-  type?: "product_listing" | "carts_listing" | "similar_listing" | "order_listing";
+  type?:
+    | "product_listing"
+    | "carts_listing"
+    | "similar_listing"
+    | "order_listing";
   filter_by?: {
     type?: string;
     subcategory?: string;
   };
-  filterContainerEnabled: boolean
+  filterContainerEnabled?: boolean;
 }
 
 const ProductList: React.FC<ProductListInterface> = ({
   products,
   type = "product_listing",
-  filterContainerEnabled
+  filterContainerEnabled = false,
 }) => {
   const dispatch = useAppDispatch();
   const TypeCartListing = type === "carts_listing";
@@ -31,32 +34,22 @@ const ProductList: React.FC<ProductListInterface> = ({
     dispatch(setMixerContainerEnable(true));
   }, [dispatch]);
 
-  const getProductClasses = (product: any) => {
-    const displayType = getProductType(product.category.key);
-    return `mix-target category-${displayType} ${
-      product.subcategory ? `subcategory-${product.subcategory.key}` : ''
-    }`;
-  };
-
   return (
     <div
       className={classNames("relative grid mixitup-product-wrapper", {
         "grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-1": TypeSimilarListing,
         "grid-cols-1 gap-6": TypeCartListing,
         "grid-cols-1 gap-4": TypeOrderListing,
-        "grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-x-4 gap-y-12": TypeProductListing && !filterContainerEnabled, // Filter container is not included side-by-side with ProductsComponent
-        "grid-cols-1 xl:grid-cols-3 gap-x-4 gap-y-12": TypeProductListing && filterContainerEnabled,
+        "grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-x-4 gap-y-12":
+          TypeProductListing && !filterContainerEnabled, // Filter container is not included side-by-side with ProductsComponent
+        "grid-cols-1 xl:grid-cols-3 gap-x-4 gap-y-12 items-stretch":
+          TypeProductListing && filterContainerEnabled, // Filter is enabled for this component
       })}
     >
       {products.length > 0 ? (
         <>
           {products.map((product, index) => (
-            <div key={product.id || index} className={getProductClasses(product)}>
-              <ProductItem
-                product={product}
-                type={type}
-              />
-            </div>
+            <ProductItem product={product} type={type} key={index} />
           ))}
           {false && (
             <img
@@ -67,11 +60,15 @@ const ProductList: React.FC<ProductListInterface> = ({
           )}
         </>
       ) : (
-        <div className="hidden no-product-data bottom-0 space-y-2">
+        <div className="no-product-data bottom-0 space-y-2">
           <i className="fa-3x fa-solid fa-bug block text-zenos-600"></i>
           <p>Oops! No product found.</p>
         </div>
       )}
+      <div className="hidden no-product-data bottom-0 space-y-2">
+        <i className="fa-3x fa-solid fa-bug block text-zenos-600"></i>
+        <p>Oops! No product found.</p>
+      </div>
     </div>
   );
 };

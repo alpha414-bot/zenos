@@ -581,6 +581,7 @@ const Shop = () => {
               status: "archived",
               createdBy: userUuid,
               description: data.description?.replace(/\n/g, "\\n"),
+              type: "used-products",
             },
           })
         ),

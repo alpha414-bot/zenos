@@ -1,5 +1,7 @@
+import { useAppSelector } from "@/Services/Redux/Hook";
 import {
   ZenosCategory,
+  ZenosItelSubCategory,
   ZenosNewAgeSubCategory,
   ZenosOraimoSubCategory,
 } from "@/System/Constants";
@@ -34,15 +36,16 @@ const Filter = ({
     subcategory?: string;
   };
 }) => {
+  const { mixerContainerState } = useAppSelector((state) => state.mixer);
   const [categoryType, setCategoryType] = useState<
     | ""
     | ".product-category-oraimo"
     | ".product-category-new-age"
+    | ".product-category-itel"
     | ".product-category-uk-used"
   >("");
   const [mixer, setMixer] = useState<any>();
   const [filter, setFilter] = useState("");
-  var $containerEl = document.querySelector(".mixitup-product-wrapper");
   useEffect(() => {
     if (filter_by?.category) {
       setCategoryType(`.product-category-${filter_by?.category}` as any);
@@ -56,6 +59,7 @@ const Filter = ({
         {
           ".product-category-oraimo": filter_by?.category?.match("oraimo"),
           ".product-category-new-age": filter_by?.category?.match("new-age"),
+          ".product-category-itel": filter_by?.category?.match("itel"),
           ".product-category-uk-used": filter_by?.category?.match("uk-used"),
         },
         `${
@@ -73,6 +77,7 @@ const Filter = ({
   useEffect(() => {
     mixitup.use(mixitupmultifilter);
     mixitup.use(mixitupPagination);
+    const $containerEl = document.querySelector(".mixitup-product-wrapper");
     if ($containerEl) {
       setMixer(
         mixitup($containerEl, {
@@ -85,7 +90,6 @@ const Filter = ({
             hidePageListIfSinglePage: true,
           },
           load: {
-            // filter:
             filter: filter == "all" || !filter ? null : filter,
           },
           animation: {
@@ -99,8 +103,14 @@ const Filter = ({
             onMixStart: function (_state: any, futureState: any) {
               const selector =
                 futureState.activeFilter.selector.match(/\.(\w[\w-]*)/);
-              if (selector && selector.length > 0) {
-                setCategoryType(selector[0]);
+              const categoryType = selector?.input
+                .split(".")
+                .find((item: any) => item.startsWith("product-category-"));
+              console.log("Selector", selector, categoryType);
+              if (!!categoryType) {
+                setCategoryType(`.${categoryType}` as any);
+              } else {
+                setCategoryType("");
               }
             },
           },
@@ -111,7 +121,7 @@ const Filter = ({
       // mixer?.paginate(paginateLimit);
       mixer?.destroy();
     };
-  }, [products, paginateLimit, $containerEl, filter]);
+  }, [products, paginateLimit, filter_by, filter, mixerContainerState]);
   return (
     <div className="flex w-full flex-col-reverse md:flex-col">
       <form
@@ -139,10 +149,12 @@ const Filter = ({
               "grid-cols-2": ![
                 ".product-category-oraimo",
                 ".product-category-new-age",
+                ".product-category-itel",
               ].includes(categoryType),
               "grid-cols-3": [
                 ".product-category-oraimo",
                 ".product-category-new-age",
+                ".product-category-itel",
               ].includes(categoryType),
             })}
           >
@@ -160,6 +172,26 @@ const Filter = ({
                 className="pt-6 pb-2 px-4 border-r-0 m-0 bg-gray-700 text-white font-extrabold placeholder:font-medium placeholder:text-gray-400 md:rounded-ss-xl md:rounded-se-xl border-2 border-gray-400 focus:outline-none focus:border-2 focus:ring-zenos-500 focus:border-zenos-500 md:border-r-2"
                 data-search-attribute="data-product-name"
               />
+            </div>
+            <div className="relative flex flex-col" data-filter-group="type">
+              <label
+                htmlFor="type"
+                className="absolute top-2 left-4 text-xs text-gray-300 tracking-tighter"
+              >
+                Type
+              </label>
+              <select
+                id="type"
+                className="pt-6 pb-2 px-4 m-0 bg-gray-700 text-white font-bold border-2 border-gray-400 focus:border-2 focus:ring-zenos-500 focus:border-zenos-500"
+              >
+                <option value="">All</option>
+                <option value=".product-type-phone-accessories">
+                  Phone Accessories
+                </option>
+                <option value=".product-type-used-products">
+                  Used Products
+                </option>
+              </select>
             </div>
             <div
               className="relative flex flex-col"
@@ -199,15 +231,16 @@ const Filter = ({
               data-filter-group="subcategory"
             >
               {(categoryType == ".product-category-oraimo" ||
-                categoryType == ".product-category-new-age") && (
+                categoryType == ".product-category-new-age" ||
+                categoryType == ".product-category-itel") && (
                 <label
                   htmlFor="subcategory"
                   className="absolute top-2 left-4 text-xs text-gray-300 tracking-tighter  whitespace-nowrap"
                 >
-                  {categoryType == ".product-category-oraimo"
-                    ? "Oraimo"
-                    : "New Age"}{" "}
-                  Category
+                  {categoryType == ".product-category-oraimo" ? "Oraimo" : ""}
+                  {categoryType == ".product-category-new-age" ? "New Age" : ""}
+                  {categoryType == ".product-category-itel" ? "Itel" : ""}
+                  &nbsp; category
                 </label>
               )}
               {categoryType == ".product-category-oraimo" && (
@@ -236,6 +269,25 @@ const Filter = ({
                 >
                   <option value="">All</option>
                   {ZenosNewAgeSubCategory.map((item, i) => (
+                    <option
+                      value={`.product-subcategory-${createSlug(
+                        item.value.toLowerCase()
+                      )}`}
+                      key={i}
+                    >
+                      {item.value}
+                    </option>
+                  ))}
+                </select>
+              )}
+              {categoryType == ".product-category-itel" && (
+                <select
+                  id="subcategory"
+                  className="pt-6 pb-2 px-4 m-0 bg-gray-700 text-white font-bold border-2 border-gray-400 focus:border-2 focus:ring-zenos-500 focus:border-zenos-500"
+                  defaultValue=""
+                >
+                  <option value="">All</option>
+                  {ZenosItelSubCategory.map((item, i) => (
                     <option
                       value={`.product-subcategory-${createSlug(
                         item.value.toLowerCase()

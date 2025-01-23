@@ -30,6 +30,11 @@ import { useForm } from "react-hook-form";
 import { useQuery } from "react-query";
 
 // Components to handle product in the ecommerce website
+const sanitizePrice = (price?: string | number): string => {
+  // Convert to string and remove non-numeric characters
+  const priceString = String(price || '');
+  return priceString.replace(/[^\d.]/g, '');
+};
 const ProductsAction = ({ values }: { values: ProductItemType }) => {
   const { control, handleSubmit, reset, watch } = useForm();
   const [editProductModal, setEditProductModal] = useState<Modal>();
@@ -721,7 +726,8 @@ const AdminProductsComponent = () => {
 
     // Process images
     let image = _.flatMap(data.image, (item) => item.media.name);
-
+    const cleanPrice = sanitizePrice(data.price);
+    const cleanSalesPrice = sanitizePrice(data.salesPrice);
     // Add document to Firestore
     addCollectionDoc(
       "Products",
@@ -729,6 +735,8 @@ const AdminProductsComponent = () => {
         JSON.parse(
           JSON.stringify({
             ...data,
+            price: cleanPrice,
+            salesPrice: cleanSalesPrice,
             ...{
               image: image,
               status: "active",

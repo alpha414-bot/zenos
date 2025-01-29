@@ -108,6 +108,7 @@ export const keys = {
     user_id || "no_user",
     order_id || "all",
   ],
+  product_reviews: (product_id?: string) => ['product', 'reviews', product_id],
   amazon_media: (key: string) => ["image_gallery_from_amazon", key],
 };
 

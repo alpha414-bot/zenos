@@ -5,6 +5,7 @@ import MainLayout from "@/Layouts/MainLayout";
 import PageMeta from "@/Layouts/PageMeta";
 import { useProductsData, useSimilarProductsData } from "@/Services/Hooks";
 import { addToCartQuery } from "@/Services/Queries/CartQuery";
+import ReviewSection from "@/Components/ReviewSection";
 import { getMediaUrl } from "@/System/Constants";
 import { price } from "@/System/function";
 import _ from "lodash";
@@ -297,7 +298,14 @@ const ProductDetails = () => {
                 </div>
               )}
             </div>
+           
+
+         
+
           </div>
+        </div>
+        <div className="w-full mt-8">
+          <ReviewSection product_id={product_id} />
         </div>
       </PageMeta>
     </MainLayout>

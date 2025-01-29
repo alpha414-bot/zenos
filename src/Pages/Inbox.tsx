@@ -69,6 +69,16 @@ const AUTO_REPLIES = {
   DISCOUNT_PROMPT:
     "You can enter your referral code or click 'Chat with an agent' to proceed with payment",
   AGENT_PROMPT: "Would you like to chat with a live agent about your order?",
+  PAYMENT_INSTRUCTIONS: `Thank you for shopping with Zenos!
+
+Please complete your payment by transferring to the following account:
+**Bank Name:** Opay
+**Account Name:** Tony Omotosho
+**Account Number:** 6105496977
+
+Once the transfer is done, kindly send proof of payment and your order will be processed as soon as the payment is confirmed.
+
+Thank you for choosing Zenos!`
 };
 
 const Inbox = () => {
@@ -99,6 +109,7 @@ const Inbox = () => {
   const [initialMessageSent, setInitialMessageSent] = useState(false);
   const [orderDetailsSent, setOrderDetailsSent] = useState(false);
   const [hasInitiatedChat, setHasInitiatedChat] = useState(false);
+  const [paymentInstructionsSent, setPaymentInstructionsSent] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messageListRef = useRef<HTMLDivElement>(null);
@@ -135,7 +146,6 @@ const Inbox = () => {
     }
   }, [messages]);
 
-  // add attachment to form hook
   useEffect(() => {
     setValue("attachments", mediaAttachment as any);
   }, [mediaAttachment]);
@@ -152,6 +162,17 @@ const Inbox = () => {
 
     try {
       setUploading(true);
+
+      // Check if the message might be a referral code
+      if (!paymentInstructionsSent && data.message.trim() && !data.attachments?.length) {
+        // Send payment instructions after referral code is entered
+        await sendMessage(AUTO_REPLIES.PAYMENT_INSTRUCTIONS, {
+          isAutoReply: true,
+          sender_uid: adminUid,
+          recipient_uid: currentUser.uid,
+        });
+        setPaymentInstructionsSent(true);
+      }
 
       if (data.attachments?.length) {
         for (const file of data.attachments) {
@@ -265,6 +286,16 @@ const Inbox = () => {
     try {
       setHasInitiatedChat(true);
 
+      // Send payment instructions first
+      if (!paymentInstructionsSent) {
+        await sendMessage(AUTO_REPLIES.PAYMENT_INSTRUCTIONS, {
+          isAutoReply: true,
+          sender_uid: adminUid,
+          recipient_uid: currentUser.uid,
+        });
+        setPaymentInstructionsSent(true);
+      }
+
       await sendMessage(
         "You've been connected with an agent. They will respond shortly.",
         { isSystemMessage: true }
@@ -277,7 +308,6 @@ const Inbox = () => {
   const formatTimestamp = (timestamp: Timestamp) => {
     return moment(timestamp.toDate()).format("DD MMM YYYY, h:mma");
   };
-
   return (
     <UserLayout>
       <PageMeta

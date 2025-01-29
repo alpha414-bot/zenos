@@ -51,6 +51,8 @@ export const PhoneAccessoriesSubCategory = [
   { key: "earpods", value: "EarPod/Earbud" },
   { key: "earpiece", value: "Earpiece" },
   { key: "phone-cords", value: "Phone Cords" },
+  { key: "adapter", value: "Adapter" },
+  { key: "extension-box", value: "Extension Box" },
   { key: "phone-charger", value: "Phone Charger" },
   { key: "car-charger", value: "Car Charger" },
   { key: "phone-pouch", value: "Phone Pouch" },

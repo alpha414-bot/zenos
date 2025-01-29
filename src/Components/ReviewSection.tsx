@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
 import Button from '@/Components/Button';
 import { useAuthUser } from '@/Services/Hooks';
-import { ReviewType, addReviewQuery } from '@/Services/Queries/ReviewsQuery';
 import { useProductReviews } from '@/Services/Hooks/UseReviews';
+import { addReviewQuery } from '@/Services/Queries/ReviewsQuery';
 import { notify } from '@/notify';
+import React, { useState } from 'react';
 
 interface ReviewSectionProps {
   product_id: string | undefined;

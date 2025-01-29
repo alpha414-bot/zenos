@@ -26,19 +26,24 @@ const ProductItem: React.FC<{
   const TypeProductListing = type === "product_listing";
   const QuantityInputRef = useRef<HTMLInputElement>(null);
   const [, setQuantity] = useState<number>(product.cartQuantity || 1);
+  const productType = product?.type?.match("accesories")
+    ? "phone-accessories"
+    : product?.type;
   return (
     // TailwindCSS styles in ProductItem Component
     <div
-      data-product-name={`${createSlug(product?.name.toLowerCase())}`}
+      data-product-name={`${createSlug(
+        product?.name.toLowerCase()
+      )}-${product?.subcategory?.value.toLowerCase()}-${product?.name?.toLowerCase()}`}
       data-price={product?.price}
       className={classNames(
         "mix-target",
         `product-category-${createSlug(
-          product?.category?.value?.toLowerCase()
+          product?.category?.key?.toLowerCase()
         )} product-type-${createSlug(
-          product?.type || "phone-accessories"
+          productType
         )} product-subcategory-${createSlug(
-          product?.subcategory?.value?.toLowerCase()
+          product?.subcategory?.key?.toLowerCase()
         )} ${createSlug(
           product?.name.toLowerCase()
         )} flex justify-start leading-normal rounded-xl bg-gray-800 shadow-sm shadow-gray-600`,
@@ -152,7 +157,9 @@ const ProductItem: React.FC<{
                   }`}
                 >
                   <span className="underline underline-offset-2 decoration-dashed">
-                    {product.category.key == "uk-used" ? "UK-USED - " : ""}
+                    {product.category.key == "used-products"
+                      ? "used-products - "
+                      : ""}
                   </span>
                   {product.name}
                 </h3>

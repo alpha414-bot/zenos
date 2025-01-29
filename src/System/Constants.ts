@@ -35,11 +35,11 @@ export const DisplayCategories = [
 export const ZenosCategory = [
   { key: "oraimo", value: "Oraimo" },
   { key: "itel", value: "Itel" },
-  { key: "used", value: "Used" },
+  { key: "used-products", value: "Used Products" },
 ];
 
 export const ZenosTypeCategory = [
-  { key: "phone-accesories", value: "Phone Accessoories" },
+  { key: "phone-accessories", value: "Phone Accessoories" },
   { key: "used-products", value: "Used Products" },
 ];
 
@@ -69,7 +69,7 @@ export const ZenosItelSubCategory = PhoneAccessoriesSubCategory;
 
 // Helper function for MixItUp integration
 export const getProductType = (category: string): string => {
-  if (category === "uk-used") return "used-products";
+  if (category === "used-products") return "used-products";
   if (["oraimo", "itel"].includes(category)) return "phone-accessories";
   return category;
 };

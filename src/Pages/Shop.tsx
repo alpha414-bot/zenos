@@ -577,7 +577,7 @@ const Shop = () => {
             ...data,
             ...{
               image: image,
-              category: { key: "uk-used", value: "UK Used" },
+              category: { key: "used-products", value: "UK Used" },
               status: "archived",
               createdBy: userUuid,
               description: data.description?.replace(/\n/g, "\\n"),
@@ -738,7 +738,7 @@ const Shop = () => {
                         control={control}
                         placeholder="Category"
                         disableOptionKeys={["oraimo", "new-age", "itel"]}
-                        defaultOptionKey="uk-used"
+                        defaultOptionKey="used-products"
                         containerClassName="z-30"
                         rules={{ required: "Category is required" }}
                       />

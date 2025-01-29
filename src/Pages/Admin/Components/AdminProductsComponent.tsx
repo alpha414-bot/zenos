@@ -721,7 +721,7 @@ const AdminProductsComponent = () => {
     if (data.category?.key === "used") {
       type = "used-products";
     } else {
-      type = "phone-accesories";
+      type = "phone-accessories";
     }
 
     // Process images

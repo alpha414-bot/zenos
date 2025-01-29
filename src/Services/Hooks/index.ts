@@ -59,11 +59,11 @@ export const useUkUsedProductData = <T>() => {
   const queryClient = useQueryClient();
   // listener to subscribe to firestore snappshot
   const snapshotListener = useCallback((data: any) => {
-    queryClient.setQueryData(keys.product_data("uk-used"), data);
+    queryClient.setQueryData(keys.product_data("used-products"), data);
     return data;
   }, []);
   return useQuery(
-    keys.product_data("uk-used"),
+    keys.product_data("used-products"),
     (): Promise<T> => getUkUsedProductData(snapshotListener),
     {
       keepPreviousData: true,

@@ -34,6 +34,7 @@ const Filter = ({
     name?: string;
     category?: string;
     subcategory?: string;
+    type?: string;
   };
 }) => {
   const { mixerContainerState } = useAppSelector((state) => state.mixer);
@@ -42,8 +43,9 @@ const Filter = ({
     | ".product-category-oraimo"
     | ".product-category-new-age"
     | ".product-category-itel"
-    | ".product-category-uk-used"
+    | ".product-category-used-products"
   >("");
+  const [, setTypeType] = useState<".product-type-phone-accessories" | "">("");
   const [mixer, setMixer] = useState<any>();
   const [filter, setFilter] = useState("");
   useEffect(() => {
@@ -54,25 +56,25 @@ const Filter = ({
     } else {
       setCategoryType("");
     }
-    setFilter(
-      classNames(
-        {
-          ".product-category-oraimo": filter_by?.category?.match("oraimo"),
-          ".product-category-new-age": filter_by?.category?.match("new-age"),
-          ".product-category-itel": filter_by?.category?.match("itel"),
-          ".product-category-uk-used": filter_by?.category?.match("uk-used"),
-        },
-        `${
-          getParam("filter") && !filter_by?.category
-            ? `.product-category-${getParam("filter")}`
-            : ""
-        }${
-          !!filter_by?.subcategory
-            ? `.product-subcategory-${filter_by?.subcategory}`
-            : ""
-        }`
-      ).replace(" ", "")
-    );
+    const newFilter = classNames(
+      {
+        ".product-category-oraimo": filter_by?.category?.match("oraimo"),
+        ".product-category-new-age": filter_by?.category?.match("new-age"),
+        ".product-category-itel": filter_by?.category?.match("itel"),
+        ".product-type-phone-accessories":
+          filter_by?.type?.match("phone-accessories"),
+        ".product-type-used-products": filter_by?.type?.match("used-products"),
+      },
+      {
+        [`.product-category-${getParam("filter")}`]:
+          getParam("filter") && !filter_by?.category,
+      },
+      {
+        [`.product-subcategory-${filter_by?.subcategory}`]:
+          !!filter_by?.subcategory,
+      }
+    ).replace(" ", "");
+    setFilter(newFilter.replace(" ", ""));
   }, [filter_by]);
   useEffect(() => {
     mixitup.use(mixitupmultifilter);
@@ -103,14 +105,24 @@ const Filter = ({
             onMixStart: function (_state: any, futureState: any) {
               const selector =
                 futureState.activeFilter.selector.match(/\.(\w[\w-]*)/);
-              const categoryType = selector?.input
-                .split(".")
-                .find((item: any) => item.startsWith("product-category-"));
-              console.log("Selector", selector, categoryType);
-              if (!!categoryType) {
-                setCategoryType(`.${categoryType}` as any);
-              } else {
-                setCategoryType("");
+              if (selector) {
+                const input = selector?.input.split(".");
+                const categoryType = input.find((item: any) =>
+                  item.startsWith("product-category-")
+                );
+                const typeOfType = input.find((item: any) =>
+                  item.startsWith("product-type-")
+                );
+                if (!!typeOfType) {
+                  setTypeType(`.${typeOfType}` as any);
+                } else {
+                  setTypeType("");
+                }
+                if (!!categoryType) {
+                  setCategoryType(`.${categoryType}` as any);
+                } else {
+                  setCategoryType("");
+                }
               }
             },
           },
@@ -120,6 +132,7 @@ const Filter = ({
     return () => {
       // mixer?.paginate(paginateLimit);
       mixer?.destroy();
+      // mixer?.filter('.product-category-itel')
     };
   }, [products, paginateLimit, filter_by, filter, mixerContainerState]);
   return (

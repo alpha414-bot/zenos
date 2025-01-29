@@ -133,28 +133,28 @@ const RootRouter: RouteObject[] = [
     ),
     errorElement: <ErrorPage />,
   },
-  // New display category routes
-  {
-    path: "/products/phone-accessories/:subcategory?",
-    element: (
-      <ProtectedRoute>
-        <Products />
-      </ProtectedRoute>
-    ),
-    errorElement: <ErrorPage />,
-  },
-  {
-    path: "/products/used-products",
-    element: (
-      <ProtectedRoute>
-        <Products />
-      </ProtectedRoute>
-    ),
-    errorElement: <ErrorPage />,
-  },
+  // // New display category routes
+  // {
+  //   path: "/products/phone-accessories/:subcategory?",
+  //   element: (
+  //     <ProtectedRoute>
+  //       <Products />
+  //     </ProtectedRoute>
+  //   ),
+  //   errorElement: <ErrorPage />,
+  // },
+  // {
+  //   path: "/products/used-products",
+  //   element: (
+  //     <ProtectedRoute>
+  //       <Products />
+  //     </ProtectedRoute>
+  //   ),
+  //   errorElement: <ErrorPage />,
+  // },
   // Legacy category routes (for backward compatibility)
   {
-    path: "/products/:category/:subcategory?",
+    path: "/products/:type?/:category?/:subcategory?",
     element: (
       <ProtectedRoute>
         <Products />

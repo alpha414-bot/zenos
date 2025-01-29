@@ -70,9 +70,9 @@ interface ProductItemType {
   status?: string;
   name: string;
   description: string;
-  category: { key: "oraimo" | "new-age" | "itel" | "uk-used"; value: string };
+  category: { key: "oraimo" | "new-age" | "itel" | "used-products"; value: string };
   subcategory?: { key: string; value: string };
-  type?: "used-products" | "phone-accesories";
+  type?: "used-products" | "phone-accessories";
   price: number;
   salesPrice?: number;
   variants?: ProductVariantType[];

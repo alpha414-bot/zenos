@@ -9,10 +9,10 @@ import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 
 const Products = () => {
-  const { category, subcategory } = useParams();
+  const { type, category, subcategory } = useParams();
   useEffect(() => {
     if (!!category) {
-      if (!["oraimo", "uk-used", "new-age"].includes(category)) {
+      if (!["oraimo", "used-products", "new-age", "itel"].includes(category)) {
         throw new Response("", {
           status: 404,
           statusText: "Not Found",
@@ -46,6 +46,7 @@ const Products = () => {
                 paginateLimit={6}
                 filter_by={{
                   name: "",
+                  type,
                   category,
                   subcategory,
                 }}

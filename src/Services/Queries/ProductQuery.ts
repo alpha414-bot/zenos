@@ -43,7 +43,7 @@ export const getUkUsedProductData = <T>(listener: any): Promise<T> =>
       const ProductCollection = collection(firestore, "Products");
       const productQuery = query(
         ProductCollection,
-        where("category.key", "==", "uk-used")
+        where("category.key", "==", "used-products")
       );
       onSnapshot(
         productQuery,
@@ -119,7 +119,7 @@ export const getProductData = <T>(
         } else {
           productQuery = query(
             productQuery,
-            where("category.key", "!=", "uk-used")
+            where("category.key", "!=", "used-products")
           );
         }
 

@@ -70,5 +70,11 @@ service cloud.firestore {
         request.auth.uid == 'Y4P4ECBLLWRbk7VZUqkpqqixE7H2'
       );
     }
+     match /databases/{database}/documents {
+    match /reviews/{reviewId} {
+      allow read: if true;
+      allow create: if request.auth != null;
+    }
+  }
   }
 }

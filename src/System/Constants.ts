@@ -28,19 +28,19 @@ export const Config = {
 // Main display categories (for UI)
 export const DisplayCategories = [
   { key: "phone-accessories", value: "Phone Accessories" },
-  { key: "used-products", value: "Used Products" },
+  { key: "used-products", value: "others" },
 ];
 
 // Original categories (for backend/data organization)
 export const ZenosCategory = [
   { key: "oraimo", value: "Oraimo" },
   { key: "itel", value: "Itel" },
-  { key: "used-products", value: "Used Products" },
+  { key: "used-products", value: "others" },
 ];
 
 export const ZenosTypeCategory = [
   { key: "phone-accessories", value: "Phone Accessoories" },
-  { key: "used-products", value: "Used Products" },
+  { key: "used-products", value: "others" },
 ];
 
 // Phone Accessories subcategories

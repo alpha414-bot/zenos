@@ -1,8 +1,6 @@
 // ProductList.tsx
-import { useAppDispatch } from "@/Services/Redux/Hook";
-import { setMixerContainerEnable } from "@/Services/Redux/MixerSlice";
 import classNames from "classnames";
-import React, { useEffect } from "react";
+import React from "react";
 import ProductItem from "./ProductItem";
 
 interface ProductListInterface {
@@ -24,15 +22,10 @@ const ProductList: React.FC<ProductListInterface> = ({
   type = "product_listing",
   filterContainerEnabled = false,
 }) => {
-  const dispatch = useAppDispatch();
   const TypeCartListing = type === "carts_listing";
   const TypeSimilarListing = type === "similar_listing";
   const TypeOrderListing = type === "order_listing";
   const TypeProductListing = type === "product_listing";
-
-  useEffect(() => {
-    dispatch(setMixerContainerEnable(true));
-  }, [dispatch]);
 
   return (
     <div

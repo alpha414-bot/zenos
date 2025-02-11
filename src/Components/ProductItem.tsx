@@ -6,10 +6,12 @@ import {
   updateCartProductDiscount,
   updateCartQuantity,
 } from "@/Services/Queries/CartQuery";
+import { useAppDispatch } from "@/Services/Redux/Hook";
+import { setMixerContainerEnable } from "@/Services/Redux/MixerSlice";
 import { createSlug, price, short, stripHtml } from "@/System/function";
 import classNames from "classnames";
 import _ from "lodash";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import Slider from "react-slick";
 import Button from "./Button";
@@ -20,6 +22,7 @@ const ProductItem: React.FC<{
   product: ProductItemType;
   type: ListingProductType;
 }> = ({ product, type }) => {
+  const dispatch = useAppDispatch();
   const TypeCartListing = type === "carts_listing";
   const TypeSimilarListing = type === "similar_listing";
   const TypeOrderListing = type === "order_listing";
@@ -29,6 +32,10 @@ const ProductItem: React.FC<{
   const productType = product?.type?.match("accesories")
     ? "phone-accessories"
     : product?.type;
+  useEffect(() => {
+    dispatch(setMixerContainerEnable(true));
+    window.addEventListener("", () => {});
+  }, [dispatch]);
   return (
     // TailwindCSS styles in ProductItem Component
     <div

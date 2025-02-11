@@ -10,7 +10,7 @@ import classNames from "classnames";
 import mixitup from "mixitup";
 import mixitupmultifilter from "mixitup-multifilter";
 import mixitupPagination from "mixitup-pagination";
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 
 function getParam(param: string): string {
   var url = window.location.href
@@ -37,12 +37,13 @@ const Filter = ({
     type?: string;
   };
 }) => {
-  const { mixerContainerState } = useAppSelector((state) => state.mixer);
+  const { mixerContainerEnabled } = useAppSelector((state) => state.mixer);
   const [categoryType, setCategoryType] = useState<
     | ""
     | ".product-category-oraimo"
     | ".product-category-new-age"
     | ".product-category-itel"
+    | ".product-category-rexi"
     | ".product-category-used-products"
   >("");
   const [, setTypeType] = useState<".product-type-phone-accessories" | "">("");
@@ -76,7 +77,7 @@ const Filter = ({
     ).replace(" ", "");
     setFilter(newFilter.replace(" ", ""));
   }, [filter_by]);
-  useEffect(() => {
+  useLayoutEffect(() => {
     mixitup.use(mixitupmultifilter);
     mixitup.use(mixitupPagination);
     const $containerEl = document.querySelector(".mixitup-product-wrapper");
@@ -130,11 +131,10 @@ const Filter = ({
       );
     }
     return () => {
-      // mixer?.paginate(paginateLimit);
+      mixer?.paginate(paginateLimit);
       mixer?.destroy();
-      // mixer?.filter('.product-category-itel')
     };
-  }, [products, paginateLimit, filter_by, filter, mixerContainerState]);
+  }, [products, paginateLimit, filter_by, filter, mixerContainerEnabled]);
   return (
     <div className="flex w-full flex-col-reverse md:flex-col">
       <form

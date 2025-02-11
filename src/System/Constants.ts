@@ -36,13 +36,12 @@ export const ZenosCategory = [
   { key: "oraimo", value: "Oraimo" },
   { key: "itel", value: "Itel" },
   { key: "rexi", value: "Rexi" },
-
-  { key: "used-products", value: "others" },
+  { key: "used-products", value: "Others" },
 ];
 
 export const ZenosTypeCategory = [
   { key: "phone-accessories", value: "Phone Accessoories" },
-  { key: "used-products", value: "others" },
+  { key: "used-products", value: "Others" },
 ];
 
 // Phone Accessories subcategories

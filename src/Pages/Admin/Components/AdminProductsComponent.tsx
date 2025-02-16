@@ -508,7 +508,7 @@ const UserActionPlaceholder = ({ uid }: { uid: string }) => {
           <div className="hidden flex-1 min-w-0 md:block">
             <p className="text-sm font-medium text-white truncate">
               {user ? `${user.first_name} ${user.last_name}` : "Unknown User"}{" "}
-              [@{user?.username}]
+              [{user?.phone_number}]
             </p>
           </div>
         </div>

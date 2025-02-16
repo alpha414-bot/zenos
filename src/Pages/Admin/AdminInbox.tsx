@@ -52,6 +52,7 @@ const AdminInbox: React.FC = () => {
 
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [selectedChatUser, setSelectedChatUser] = useState<any>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messageListRef = useRef<HTMLDivElement>(null);
@@ -63,8 +64,9 @@ const AdminInbox: React.FC = () => {
     }
   }, [messages]);
 
-  const handleChatSelect = (chatId?: string) => {
+  const handleChatSelect = (chatId?: string, user?: any) => {
     setSelectedChatId(chatId as string);
+    setSelectedChatUser(user);
     reset({ message: "", attachments: [] });
     if (messageListRef.current) {
       messageListRef.current.scrollTo(0, 0);
@@ -199,7 +201,7 @@ const AdminInbox: React.FC = () => {
                   chats.map((chat) => (
                     <div
                       key={chat.id}
-                      onClick={() => handleChatSelect(chat.id)}
+                      onClick={() => handleChatSelect(chat.id, chat.userData)}
                       className={`px-0 py-2 cursor-pointer hover:bg-gray-700 transition-colors md:px-4 md:py-4 ${
                         selectedChatId === chat.id ? "bg-gray-700" : ""
                       }`}
@@ -238,7 +240,11 @@ const AdminInbox: React.FC = () => {
           <div className="flex-1 flex flex-col bg-gray-900">
             {selectedChatId ? (
               <>
-                <div className="py-2 px-2 flex justify-between bg-zenos-500">
+                <div className="py-2 px-2 flex items-center justify-between bg-zenos-500">
+                  <p className="font-bold">
+                    {selectedChatUser?.first_name} {selectedChatUser?.last_name}{" "}
+                    [{selectedChatUser?.phone}]
+                  </p>
                   <button
                     onClick={() => {
                       handleChatSelect(undefined);

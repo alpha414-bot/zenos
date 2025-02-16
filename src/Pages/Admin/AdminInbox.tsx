@@ -238,7 +238,7 @@ const AdminInbox: React.FC = () => {
           <div className="flex-1 flex flex-col bg-gray-900">
             {selectedChatId ? (
               <>
-                <div className="py-2 px-2 flex justify-end">
+                <div className="py-2 px-2 flex justify-between bg-zenos-500">
                   <button
                     onClick={() => {
                       handleChatSelect(undefined);

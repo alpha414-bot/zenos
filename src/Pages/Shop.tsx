@@ -577,7 +577,7 @@ const Shop = () => {
             ...data,
             ...{
               image: image,
-              category: { key: "used-products", value: "UK Used" },
+              category: { key: "used-products", value: "Used Products" },
               status: "archived",
               createdBy: userUuid,
               description: data.description?.replace(/\n/g, "\\n"),
